@@ -1023,6 +1023,12 @@
         renderSites(sites);
         showScreen("screen-home");
         initChat(phone);
+        document.getElementById("client-emoji-bar").style.display = "flex";
+        /* עדכון presence */
+        set(ref(db, `clients/${phone}/presence`), { online: true, lastSeen: Date.now() });
+        window.addEventListener("beforeunload", () => {
+          set(ref(db, `clients/${phone}/presence`), { online: false, lastSeen: Date.now() });
+        });
       } catch(err) { showScreen("screen-login"); }
     }
 
@@ -1148,6 +1154,26 @@
       document.getElementById("popup-unavailable").classList.add("show");
     };
     window.closePopup = id => document.getElementById(id).classList.remove("show");
+
+    /* emoji מהיר מהלקוח */
+    window.clientQuickEmoji = async (emoji) => {
+      if (!currentPhone) return;
+      const key = `msg_${Date.now()}`;
+      await set(ref(db, `clients/${currentPhone}/messages/${key}`), {
+        text: emoji, at: Date.now(), sender: "client", seen: false, agentRead: false
+      });
+    };
+
+    /* reaction מהלקוח */
+    window.clientToggleReaction = async (msgKey, emoji) => {
+      if (!currentPhone) return;
+      const snap = await get(ref(db, `clients/${currentPhone}/messages/${msgKey}/reactions/r_client`));
+      if (snap.exists() && snap.val().emoji === emoji) {
+        await remove(ref(db, `clients/${currentPhone}/messages/${msgKey}/reactions/r_client`));
+      } else {
+        await set(ref(db, `clients/${currentPhone}/messages/${msgKey}/reactions/r_client`), { emoji, by: "client", at: Date.now() });
+      }
+    };
     window.openContactPopup = () => {
       document.getElementById("contact-main").style.display = "";
       document.getElementById("msg-form").classList.remove("show");
@@ -1200,13 +1226,21 @@
     let activeConvId = null;   /* מזהה השיחה הפעילה */
     let chatListener = null;   /* מאזין Firebase */
 
-    /* אתחול צ'אט — מאזין ל-messages בזמן אמת */
+    /* אתחול צ'אט — מאזין ל-messages ו-agentTyping בזמן אמת */
     function initChat(phone) {
-      /* האזנה לכל ההודעות של הלקוח */
+      /* האזנה לכל ההודעות */
       onValue(ref(db, `clients/${phone}/messages`), snap => {
         const msgs = snap.val() || {};
         renderClientChat(msgs, phone);
         updateChatBadge(msgs);
+      });
+      /* האזנה לקלדן של הנציג */
+      onValue(ref(db, `clients/${phone}/agentTyping`), snap => {
+        const data = snap.val();
+        const typingEl = document.getElementById("typing-indicator");
+        if (typingEl) {
+          typingEl.classList.toggle("show", !!(data?.active));
+        }
       });
     }
 
@@ -1247,14 +1281,37 @@
         const isMe = m.sender === "client";
         const wrap = document.createElement("div");
         wrap.className = `msg-bubble-wrap ${isMe ? "mine" : "theirs"}`;
+
+        /* טקסט הודעה */
+        const bubbleText = m.deleted
+          ? `<span style="font-style:italic;opacity:.6;display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>ההודעה נמחקה</span>`
+          : `${m.text}${m.edited ? `<span style="font-size:10px;opacity:.55;margin-right:4px">(נערך)</span>` : ""}`;
+
+        /* reactions */
+        const reactions = m.reactions || {};
+        const rGroups = {};
+        Object.entries(reactions).forEach(([, r]) => {
+          if (!rGroups[r.emoji]) rGroups[r.emoji] = 0;
+          rGroups[r.emoji]++;
+        });
+        const rHtml = Object.entries(rGroups).length
+          ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${
+              Object.entries(rGroups).map(([emoji, count]) =>
+                `<div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:12px;padding:2px 7px;font-size:13px;display:inline-flex;align-items:center;gap:3px;cursor:pointer" onclick="clientToggleReaction('${key}','${emoji}')">${emoji}${count > 1 ? `<span style="font-size:11px;color:var(--text-muted);font-weight:600">${count}</span>` : ""}</div>`
+              ).join("")
+            }</div>`
+          : "";
+
         wrap.innerHTML = `
-          <div class="msg-bubble">${m.text}</div>
+          <div class="msg-bubble" style="${m.deleted ? "opacity:.65" : ""}">${bubbleText}</div>
+          ${rHtml}
           <div class="msg-time-label">${fmtTime(m.at)}</div>
         `;
         container.insertBefore(wrap, document.getElementById("typing-indicator"));
         /* סימון כנקרא */
         if (chatOpen && m.sender === "agent" && !m.clientRead) {
           set(ref(db, `clients/${phone}/messages/${key}/clientRead`), true);
+          set(ref(db, `clients/${phone}/messages/${key}/clientReadAt`), Date.now());
         }
       });
       setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
@@ -1309,6 +1366,8 @@
           text, at: Date.now(), sender: "client", seen: false, agentRead: false
         });
         ta.value = ""; ta.style.height = "";
+      /* ניקוי typing אחרי שליחה */
+      if (currentPhone) set(ref(db, `clients/${currentPhone}/typing`), { active: false, text: "", at: Date.now() });
       } catch(e) { console.error(e); }
       finally { ta2.disabled = false; }
     };
@@ -1333,6 +1392,15 @@
     };
     window.autoResize = el => {
       el.style.height = ""; el.style.height = Math.min(el.scrollHeight, 120) + "px";
+      /* שליחת הקלדה בזמן אמת */
+      if (currentPhone) {
+        const text = el.value;
+        set(ref(db, `clients/${currentPhone}/typing`), {
+          active: text.length > 0,
+          text: text,
+          at: Date.now()
+        });
+      }
     };
 
     function fmtTime(ts) {
@@ -1399,6 +1467,15 @@
       </div>
     </div>
 
+    <!-- emoji bar מהיר -->
+    <div class="client-emoji-bar" id="client-emoji-bar" style="display:none">
+      <button class="ce-btn" onclick="clientQuickEmoji('❤️')">❤️</button>
+      <button class="ce-btn" onclick="clientQuickEmoji('👍')">👍</button>
+      <button class="ce-btn" onclick="clientQuickEmoji('😂')">😂</button>
+      <button class="ce-btn" onclick="clientQuickEmoji('😮')">😮</button>
+      <button class="ce-btn" onclick="clientQuickEmoji('🙏')">🙏</button>
+      <button class="ce-btn" onclick="clientQuickEmoji('🔥')">🔥</button>
+    </div>
     <!-- קלט -->
     <div class="chat-input-wrap" id="chat-input-wrap">
       <textarea
