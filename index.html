@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="icon" href="https://i.postimg.cc/3R4hWfVm/IMG-0696.png"/>
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/3R4hWfVm/IMG-0696.png"/>
+  <meta property="og:image" content="https://i.postimg.cc/3R4hWfVm/IMG-0696.png"/>
   <meta name="theme-color" content="#0ea5e9" />
   <title>WebDesk Pro</title>
   <link rel="manifest" href="manifest.json" />
@@ -217,7 +220,7 @@
     .redirect-site-img {
       width: 100px; height: 100px;
       border-radius: 20px;
-      object-fit: cover;
+      object-fit: contain;
       border: 3px solid rgba(255,255,255,0.15);
       box-shadow: 0 16px 48px rgba(0,0,0,0.4);
       display: none;
@@ -311,7 +314,7 @@
     }
     .site-image-wrap img {
       width: 100%; height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: transform 0.4s ease;
     }
     .site-card:hover .site-image-wrap img { transform: scale(1.03); }
@@ -919,7 +922,7 @@
 
   <script type="module">
     import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, set, push, remove, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey:            "AIzaSyB9jeWAKY2UEz70V77SCPnSJ18IfwnsVV0",
@@ -943,6 +946,28 @@
         try {
           const { phone, expiry } = JSON.parse(saved);
           if (Date.now() < expiry) { loadHomeScreen(phone); return; }
+          /* פג תוקף — ניתוק אוטומטי */
+          localStorage.removeItem(SESSION_KEY);
+          showScreen("screen-login");
+          setTimeout(() => {
+            const d = document.createElement("div");
+            d.style.cssText = "position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0d1b2e;color:#fff;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);border-right:3px solid #f59e0b;direction:rtl;font-family:'Heebo',sans-serif";
+            d.textContent = "ניתקנו אותך לצורך אבטחה — ניתן להתחבר מחדש";
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 5000);
+          }, 100);
+          return;
+          /* פג תוקף */
+          localStorage.removeItem(SESSION_KEY);
+          showScreen("screen-login");
+          setTimeout(()=>{
+            const d=document.createElement("div");
+            d.style.cssText="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0d1b2e;color:#fff;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);border-right:3px solid var(--warning);white-space:nowrap;direction:rtl;font-family:'Heebo',sans-serif";
+            d.textContent="ניתקנו אותך לצורך אבטחה — ניתן להתחבר מחדש";
+            document.body.appendChild(d);
+            setTimeout(()=>d.remove(),5000);
+          },100);
+          return;
         } catch(e) {}
         localStorage.removeItem(SESSION_KEY);
       }
@@ -1019,9 +1044,6 @@
     };
 
     async function recordFail(phone, pin, client) {
-      const cur = client?.failedAttempts || 0;
-      const upd = cur + 1;
-      const log = client?.failLog || {};
       /* שליפת IP */
       let geoData = {};
       try {
@@ -1029,7 +1051,22 @@
         const geo = await geoRes.json();
         geoData = { ip: geo.ip||"", country: geo.country||"", city: geo.city||"", countryName: geo.country_name||"" };
       } catch(e) {}
-      log[Date.now()] = { pin, at: Date.now(), ...geoData };
+
+      const entry = { pin, at: Date.now(), ...geoData };
+
+      if (!client) {
+        /* מספר לא קיים — כותב לנתיב נפרד, לא יוצר לקוח */
+        const unknownLog = {};
+        unknownLog[Date.now()] = { phone, ...entry };
+        await set(ref(db, `failedUnknown/${phone.slice(-4)}_${Date.now()}`), { phone, ...entry });
+        return 1;
+      }
+
+      /* לקוח קיים — כותב בתוך הלקוח */
+      const cur = client.failedAttempts || 0;
+      const upd = cur + 1;
+      const log = client.failLog || {};
+      log[Date.now()] = entry;
       await set(ref(db,`clients/${phone}/failedAttempts`), upd);
       await set(ref(db,`clients/${phone}/failLog`), log);
       return upd;
@@ -1052,6 +1089,18 @@
         if (!snap.exists()) { localStorage.removeItem(SESSION_KEY); showScreen("screen-login"); return; }
         const client = snap.val();
         document.getElementById("greeting-name").textContent = client.name || "לקוח יקר";
+        /* ברכה לפי שעה */
+        (()=>{
+          const hr=new Date().getHours(), day=new Date().getDay();
+          let g="שלום,";
+          if(day===6) g="שבת שלום,";
+          else if(hr>=5&&hr<12) g="בוקר טוב,";
+          else if(hr>=12&&hr<17) g="צהריים טובים,";
+          else if(hr>=17&&hr<21) g="ערב טוב,";
+          else g="לילה טוב,";
+          const el=document.querySelector(".greeting-hello");
+          if(el) el.textContent=g;
+        })();
         /* הצגת אווטר קיים */
         if (client.avatar) updateAvatarDisplay(client.avatar);
         const sites = client.sites ? Object.values(client.sites) : [];
@@ -1226,7 +1275,21 @@
       document.getElementById("msg-form").classList.remove("show");
     };
     window.handleLogout = () => {
-      localStorage.removeItem(SESSION_KEY);
+      const ov=document.createElement("div");
+      ov.style.cssText="position:fixed;inset:0;background:rgba(12,26,46,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:flex-end;justify-content:center;font-family:'Heebo',sans-serif";
+      ov.innerHTML=`<div style="background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:12px 28px 44px;text-align:center">
+        <div style="width:44px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 24px"></div>
+        <div style="font-size:20px;font-weight:800;margin-bottom:8px">יציאה מהמערכת</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:24px">לאחר היציאה תצטרך להתחבר מחדש.</div>
+        <button id="c-lo" style="width:100%;background:linear-gradient(135deg,var(--primary),var(--primary-d));border:none;border-radius:var(--radius-sm);color:#fff;font-family:'Heebo',sans-serif;font-size:16px;font-weight:700;padding:15px;cursor:pointer;margin-bottom:10px">כן, צא מהמערכת</button>
+        <button id="x-lo" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Heebo',sans-serif;font-size:15px;font-weight:600;padding:13px;cursor:pointer">ביטול</button>
+      </div>`;
+      document.body.appendChild(ov);
+      ov.onclick=e=>{if(e.target===ov)ov.remove();};
+      document.getElementById("x-lo").onclick=()=>ov.remove();
+      document.getElementById("c-lo").onclick=()=>{ ov.remove(); doActualLogout(); };
+    };
+    function doActualLogout() {localStorage.removeItem(SESSION_KEY);
       document.getElementById("inp-phone").value = "";
       document.getElementById("inp-pin").value   = "";
       document.getElementById("login-error").classList.remove("show");
@@ -1237,6 +1300,7 @@
       document.getElementById("check-path").classList.remove("draw");
       currentPhone = null;
       showScreen("screen-login");
+    
     };
     window.toggleTheme = () => {
       document.body.classList.toggle("dark");
@@ -1285,7 +1349,7 @@
 
     /* רינדור צ'אט לקוח מתוך messages */
     function renderClientChat(msgs, phone) {
-      const entries   = Object.entries(msgs);
+      const entries   = Object.entries(msgs).filter(([,m]) => m.type !== "closed" && !m.hiddenForClient);
       const container = document.getElementById("chat-messages");
       const empty     = document.getElementById("chat-empty");
       const banner    = document.getElementById("chat-closed-banner");
@@ -1317,6 +1381,7 @@
           container.insertBefore(div, document.getElementById("typing-indicator"));
         }
         const isMe = m.sender === "client";
+        const senderLabel = !isMe && m.agentName ? m.agentName : null;
         const wrap = document.createElement("div");
         wrap.className = `msg-bubble-wrap ${isMe ? "mine" : "theirs"}`;
 
@@ -1340,8 +1405,12 @@
             }</div>`
           : "";
 
+        /* reply preview */
+        const rpHtml = m.replyTo ? `<div style="background:rgba(14,165,233,.08);border-right:3px solid var(--primary);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);max-width:100%;overflow:hidden"><div style="font-weight:700;color:var(--primary);font-size:11px;margin-bottom:1px">${m.replyTo.sender==="client"?"אתה":"נציג"}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.replyTo.text}</div></div>` : "";
         wrap.innerHTML = `
-          <div class="msg-bubble" style="${m.deleted ? "opacity:.65" : ""}">${bubbleText}</div>
+          ${rpHtml}
+          ${senderLabel ? `<div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:3px;padding:0 2px">${senderLabel}</div>` : ""}
+          <div class="msg-bubble" onclick="openClientCtx('${key}',${JSON.stringify(m).replace(/`/g,'\`')})" style="${m.deleted ? "opacity:.65" : ""}">${bubbleText}</div>
           ${rHtml}
           <div class="msg-time-label">${fmtTime(m.at)}</div>
         `;
@@ -1400,9 +1469,9 @@
       ta2.disabled = true;
       try {
         const msgKey = `msg_${Date.now()}`;
-        await set(ref(db, `clients/${currentPhone}/messages/${msgKey}`), {
-          text, at: Date.now(), sender: "client", seen: false, agentRead: false
-        });
+        const msgData = { text, at: Date.now(), sender: "client", seen: false, agentRead: false };
+        if (clientReplyTo) { msgData.replyTo = { text: clientReplyTo.text.slice(0,80), sender: clientReplyTo.sender }; cancelClientReply(); }
+        await set(ref(db, `clients/${currentPhone}/messages/${msgKey}`), msgData);
         ta.value = ""; ta.style.height = "";
       /* ניקוי typing אחרי שליחה */
       if (currentPhone) set(ref(db, `clients/${currentPhone}/typing`), { active: false, text: "", at: Date.now() });
@@ -1446,24 +1515,9 @@
     }
 
 
-    /* ══ אווטרים — DiceBear ══ */
-    const AV_BASE = "https://api.dicebear.com/7.x/avataaars/svg";
-    const AV_LIST = {
-      male: [
-        {seed:"david",bg:"b6e3f4"},{seed:"yosef",bg:"c0aede"},
-        {seed:"moshe",bg:"ffd5dc"},{seed:"avi",bg:"d1d4f9"},
-        {seed:"ron",bg:"ffdfbf"},{seed:"dan",bg:"c1e1c5"},
-        {seed:"eyal",bg:"ffe4b5"},{seed:"noam",bg:"ffc0cb"},
-        {seed:"tal",bg:"d2b48c"},{seed:"omer",bg:"e8e8e8"}
-      ],
-      female: [
-        {seed:"maya",bg:"b6e3f4"},{seed:"shira",bg:"c0aede"},
-        {seed:"noa",bg:"ffd5dc"},{seed:"yael",bg:"d1d4f9"},
-        {seed:"dana",bg:"ffdfbf"},{seed:"lior",bg:"c1e1c5"},
-        {seed:"mia",bg:"ffe4b5"},{seed:"tamar",bg:"ffc0cb"},
-        {seed:"eden",bg:"d2b48c"},{seed:"gal",bg:"e8e8e8"}
-      ]
-    };
+const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlZmY2ZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzNiODJmNiIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjM2I4MmY2IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05db\u05d7\u05d5\u05dc"}, {"id": "m2", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlY2ZkZjUiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzEwYjk4MSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjMTBiOTgxIiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05d9\u05e8\u05d5\u05e7"}, {"id": "m3", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZmZiZWIiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2Y1OWUwYiIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjZjU5ZTBiIiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05db\u05ea\u05d5\u05dd"}, {"id": "m4", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmNWYzZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzhiNWNmNiIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjOGI1Y2Y2IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05e1\u05d2\u05d5\u05dc"}, {"id": "m5", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZWYyZjIiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2VmNDQ0NCIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjZWY0NDQ0IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05d0\u05d3\u05d5\u05dd"}, {"id": "m6", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlY2ZlZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzA2YjZkNCIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjMDZiNmQ0IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05e6\u05d9\u05d0\u05df"}, {"id": "m7", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZmY3ZWQiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2Y5NzMxNiIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjZjk3MzE2IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05db\u05ea\u05d5\u05dd2"}, {"id": "m8", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmN2ZlZTciLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzg0Y2MxNiIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjODRjYzE2IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05d9\u05e8\u05d5\u05e72"}, {"id": "m9", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZGYyZjgiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2VjNDg5OSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjZWM0ODk5IiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05d5\u05e8\u05d5\u05d3"}, {"id": "m10", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlZWYyZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzYzNjZmMSIgb3BhY2l0eT0iLjg1Ii8+PGVsbGlwc2UgY3g9IjQwIiBjeT0iNjUiIHJ4PSIyMCIgcnk9IjE0IiBmaWxsPSIjNjM2NmYxIiBvcGFjaXR5PSIuNyIvPjxjaXJjbGUgY3g9IjM0IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI0NiIgY3k9IjI3IiByPSIyIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTM1IDM1IFE0MCAzOSA0NSAzNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==", "label": "\u05d0\u05d9\u05e0\u05d3\u05d9\u05d2\u05d5"}];
+    const AV_FEMALE = [{"id": "f1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZGYyZjgiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2RiMjc3NyIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iI2RiMjc3NyIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiNkYjI3NzciIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05d5\u05e8\u05d5\u05d3"}, {"id": "f2", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmNWYzZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzdjM2FlZCIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iIzdjM2FlZCIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiM3YzNhZWQiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05e1\u05d2\u05d5\u05dc"}, {"id": "f3", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlY2ZlZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzA4OTFiMiIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iIzA4OTFiMiIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiMwODkxYjIiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05e6\u05d9\u05d0\u05df"}, {"id": "f4", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZmZiZWIiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2Q5NzcwNiIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iI2Q5NzcwNiIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiNkOTc3MDYiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05e2\u05e0\u05d1\u05e8"}, {"id": "f5", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmMGZkZjQiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzE2YTM0YSIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iIzE2YTM0YSIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiMxNmEzNGEiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05d9\u05e8\u05d5\u05e7"}, {"id": "f6", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZWYyZjIiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2RjMjYyNiIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iI2RjMjYyNiIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiNkYzI2MjYiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05d0\u05d3\u05d5\u05dd"}, {"id": "f7", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNlZmY2ZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzI1NjNlYiIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iIzI1NjNlYiIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiMyNTYzZWIiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05db\u05d7\u05d5\u05dc"}, {"id": "f8", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmYWY1ZmYiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzkzMzNlYSIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iIzkzMzNlYSIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiM5MzMzZWEiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05e1\u05d2\u05d5\u05dc2"}, {"id": "f9", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmMGZkZmEiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iIzBkOTQ4OCIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iIzBkOTQ4OCIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiMwZDk0ODgiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05ea\u05db\u05dc\u05ea"}, {"id": "f10", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAgODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiNmZWYzYzciLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjMwIiByPSIxNCIgZmlsbD0iI2I0NTMwOSIgb3BhY2l0eT0iLjg1Ii8+PHBhdGggZD0iTTI2IDMwIFEyNCA1MCAyNiA2MCBRMzAgNjUgNDAgNjUgUTUwIDY1IDU0IDYwIFE1NiA1MCA1NCAzMCIgZmlsbD0iI2I0NTMwOSIgb3BhY2l0eT0iLjQiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSI2NSIgcng9IjIwIiByeT0iMTQiIGZpbGw9IiNiNDUzMDkiIG9wYWNpdHk9Ii43Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNyIgcj0iMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjQ2IiBjeT0iMjciIHI9IjIiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMzUgMzUgUTQwIDM5IDQ1IDM1IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+", "label": "\u05d7\u05d5\u05dd"}];
+    
     function avUrl(seed, bg, gender) {
       return AV_BASE + "?seed=" + seed + "&backgroundColor=" + bg + "&gender=" + gender;
     }
@@ -1502,26 +1556,30 @@
 
     window.showAvTab = (gender) => {
       const grid = document.getElementById("av-grid");
+      if (!grid) return;
       const curAv = allClients?.[currentPhone]?.avatar || "";
       const mBtn = document.getElementById("av-tab-m");
       const fBtn = document.getElementById("av-tab-f");
-      if (mBtn && fBtn) {
-        mBtn.style.background = gender === "male" ? "var(--primary)" : "var(--bg)";
-        mBtn.style.color = gender === "male" ? "white" : "var(--text-muted)";
-        mBtn.style.border = gender === "male" ? "none" : "1.5px solid var(--border)";
-        fBtn.style.background = gender === "female" ? "var(--primary)" : "var(--bg)";
-        fBtn.style.color = gender === "female" ? "white" : "var(--text-muted)";
-        fBtn.style.border = gender === "female" ? "none" : "1.5px solid var(--border)";
-      }
-      if (grid) {
-        grid.innerHTML = AV_LIST[gender].map(a => {
-          const url = avUrl(a.seed, a.bg, gender);
-          const sel = curAv === url;
-          return `<div onclick="selectAvatar('${url}')" style="cursor:pointer;border-radius:16px;overflow:hidden;border:3px solid ${sel ? "var(--primary)" : "transparent"};background:#f8faff;aspect-ratio:1;display:flex;align-items:center;justify-content:center;transition:border-color .2s">
-            <img src="${url}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='👤'" />
-          </div>`;
-        }).join("");
-      }
+      if(mBtn){mBtn.style.background=gender==="male"?"var(--primary)":"var(--bg)";mBtn.style.color=gender==="male"?"white":"var(--text-muted)";mBtn.style.border=gender==="male"?"none":"1.5px solid var(--border)";}
+      if(fBtn){fBtn.style.background=gender==="female"?"var(--primary)":"var(--bg)";fBtn.style.color=gender==="female"?"white":"var(--text-muted)";fBtn.style.border=gender==="female"?"none":"1.5px solid var(--border)";}
+      const avList = gender === "male" ? AV_MALE : AV_FEMALE;
+      /* שימוש ב-data-index כדי לא לשבור את ה-HTML */
+      grid.innerHTML = avList.map((a, i) => {
+        const sel = curAv === a.url;
+        return `<div data-gender="${gender}" data-idx="${i}" class="av-pick-item" style="cursor:pointer;border-radius:16px;overflow:hidden;border:3px solid ${sel?"var(--primary)":"transparent"};background:#f8faff;aspect-ratio:1;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative">
+          <img src="${a.url}" style="width:100%;height:100%;object-fit:cover;border-radius:13px"/>
+          ${sel?`<div style="position:absolute;bottom:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>`:""}
+        </div>`;
+      }).join("");
+      /* אירועי לחיצה */
+      grid.querySelectorAll(".av-pick-item").forEach(el => {
+        el.onclick = () => {
+          const g = el.dataset.gender;
+          const i = parseInt(el.dataset.idx);
+          const list = g === "male" ? AV_MALE : AV_FEMALE;
+          selectAvatar(list[i].url);
+        };
+      });
     };
 
     window.selectAvatar = async (url) => {
@@ -1547,6 +1605,183 @@
         el.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
       }
     }
+
+
+    /* ── תפריט פרטי לקוח ── */
+    window.openClientMenu = () => {
+      if (!currentPhone) return;
+      const snap = allClients?.[currentPhone] || {};
+      /* הסרה אם כבר קיים */
+      document.getElementById("client-profile-sheet")?.remove();
+
+      const sheet = document.createElement("div");
+      sheet.id = "client-profile-sheet";
+      sheet.style.cssText = "position:fixed;inset:0;background:rgba(12,26,46,.7);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease";
+
+      const sites = snap.sites ? Object.values(snap.sites) : [];
+      const avg = sites.length ? Math.round(sites.reduce((s,si)=>s+(parseInt(si.progress||0)),0)/sites.length) : 0;
+      const avatarHtml = snap.avatar
+        ? `<img src="${snap.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`
+        : `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+      sheet.innerHTML = `
+        <div style="background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:85dvh;overflow-y:auto;padding:0 0 40px">
+          <div style="background:linear-gradient(135deg,var(--primary),var(--primary-d));padding:32px 24px 28px;text-align:center;border-radius:24px 24px 0 0;position:relative">
+            <button id="cps-close" style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;overflow:hidden;font-size:26px;font-weight:800;color:#fff">
+              ${avatarHtml}
+            </div>
+            <div style="color:#fff;font-size:20px;font-weight:800;margin-bottom:4px">${snap.name || "לקוח"}</div>
+            <div style="color:rgba(255,255,255,.65);font-size:13px;direction:ltr">${currentPhone.replace(/(\d{3})(\d+)/,"$1-$2")}</div>
+          </div>
+          <div style="padding:20px 24px 0">
+            ${snap.email ? `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(14,165,233,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">אימייל</div><div style="font-size:14px;font-weight:600">${snap.email}</div></div>
+            </div>` : ""}
+            ${snap.deadline ? `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--warning)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <div><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">יעד לסיום</div><div style="font-size:14px;font-weight:600">${new Date(snap.deadline).toLocaleDateString("he-IL")}</div></div>
+            </div>` : ""}
+            ${sites.length ? `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--success)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></div>
+              <div><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">אתרים · התקדמות כוללת</div><div style="font-size:14px;font-weight:600">${sites.length} אתרים · ${avg}%</div></div>
+            </div>` : ""}
+            ${snap.joinedAt ? `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <div><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">הצטרפות</div><div style="font-size:14px;font-weight:600">${new Date(snap.joinedAt).toLocaleDateString("he-IL")}</div></div>
+            </div>` : ""}
+            <div style="padding-top:16px">
+              <button id="cps-avatar-btn" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;color:var(--primary);font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                שנה תמונת פרופיל
+              </button>
+              <button id="cps-close2" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;color:var(--text-muted);font-family:'Heebo',sans-serif;font-size:14px;font-weight:600;padding:13px;cursor:pointer">סגור</button>
+            </div>
+          </div>
+        </div>`;
+
+      document.body.appendChild(sheet);
+      sheet.onclick = e => { if(e.target===sheet) sheet.remove(); };
+      sheet.querySelector("#cps-close").onclick = () => sheet.remove();
+      sheet.querySelector("#cps-close2").onclick = () => sheet.remove();
+      sheet.querySelector("#cps-avatar-btn").onclick = () => { sheet.remove(); openAvatarPicker(); };
+    };
+
+    /* ── Reply לקוח ── */
+    let clientReplyTo = null;
+    window.setClientReply = (key, msg) => {
+      clientReplyTo = { key, text: msg.text, sender: msg.sender };
+      document.getElementById("crb-name").textContent = msg.sender === "client" ? "אתה" : (allClients?.[currentPhone]?.agentName || "נציג");
+      document.getElementById("crb-text").textContent = msg.text.slice(0, 60);
+      document.getElementById("client-reply-bar").style.display = "flex";
+      document.getElementById("chat-textarea").focus();
+    };
+    window.cancelClientReply = () => {
+      clientReplyTo = null;
+      document.getElementById("client-reply-bar").style.display = "none";
+    };
+
+    /* ══════════════════════════════════
+       צ'אט לקוח — Context Menu מלא
+    ══════════════════════════════════ */
+    const EDIT_WIN_CLIENT = 1800000;
+    let ctxKey = null, ctxMsg = null;
+
+    function openClientCtx(key, msg) {
+      ctxKey = key; ctxMsg = msg;
+      document.getElementById("client-ctx-prev").textContent = msg.text || "";
+      /* הצגת עריכה רק אם ההודעה שלי ובתוך 30 דקות */
+      const canEdit = msg.sender === "client" && (Date.now() - msg.at) < EDIT_WIN_CLIENT;
+      document.getElementById("cctx-edit").style.display = canEdit ? "" : "none";
+      document.getElementById("client-ctx-overlay").classList.add("show");
+    }
+    window.openClientCtx = openClientCtx;
+
+    function closeClientCtx() {
+      document.getElementById("client-ctx-overlay").classList.remove("show");
+      ctxKey = null; ctxMsg = null;
+    }
+
+    document.getElementById("client-ctx-overlay").onclick = e => { if(e.target === document.getElementById("client-ctx-overlay")) closeClientCtx(); };
+
+    /* Emoji reactions */
+    document.querySelectorAll(".ctx-emoji-btn").forEach(btn => {
+      btn.onclick = async () => {
+        if (!ctxKey || !currentPhone) { closeClientCtx(); return; }
+        const snap = await get(ref(db, `clients/${currentPhone}/messages/${ctxKey}/reactions/r_client`));
+        if (snap.exists() && snap.val().emoji === btn.dataset.emoji) {
+          await remove(ref(db, `clients/${currentPhone}/messages/${ctxKey}/reactions/r_client`));
+        } else {
+          await set(ref(db, `clients/${currentPhone}/messages/${ctxKey}/reactions/r_client`), {
+            emoji: btn.dataset.emoji, by: "client", at: Date.now()
+          });
+        }
+        closeClientCtx();
+      };
+    });
+
+    /* Actions */
+    document.getElementById("cctx-reply").onclick = () => {
+      if (ctxKey && ctxMsg) { setClientReply(ctxKey, ctxMsg); closeClientCtx(); }
+    };
+    document.getElementById("cctx-copy").onclick = () => {
+      if (ctxMsg?.text) navigator.clipboard?.writeText(ctxMsg.text).then(() => toast("הועתק ✓"));
+      closeClientCtx();
+    };
+    document.getElementById("cctx-edit").onclick = () => {
+      if (ctxKey && ctxMsg) { openClientEdit(ctxKey, ctxMsg); closeClientCtx(); }
+    };
+    document.getElementById("cctx-del-me").onclick = async () => {
+      if (ctxKey && currentPhone) {
+        await set(ref(db, `clients/${currentPhone}/messages/${ctxKey}/hiddenForClient`), true);
+        toast("נמחק אצלך");
+      }
+      closeClientCtx();
+    };
+    document.getElementById("cctx-del-all").onclick = async () => {
+      if (ctxKey && currentPhone) {
+        await update(ref(db, `clients/${currentPhone}/messages/${ctxKey}`), {
+          deleted: true, text: "ההודעה נמחקה", deletedAt: Date.now()
+        });
+        toast("נמחק אצל כולם");
+      }
+      closeClientCtx();
+    };
+
+    /* Edit */
+    let editClientKey = null;
+    function openClientEdit(key, msg) {
+      editClientKey = key;
+      document.getElementById("client-edit-ta").value = msg.text || "";
+      document.getElementById("client-edit-overlay").classList.add("show");
+      document.getElementById("client-edit-ta").focus();
+    }
+    document.getElementById("client-edit-overlay").onclick = e => { if(e.target === document.getElementById("client-edit-overlay")) document.getElementById("client-edit-overlay").classList.remove("show"); };
+    document.getElementById("client-edit-cancel").onclick = () => document.getElementById("client-edit-overlay").classList.remove("show");
+    document.getElementById("client-edit-save").onclick = async () => {
+      const text = document.getElementById("client-edit-ta").value.trim();
+      if (!text || !editClientKey || !currentPhone) return;
+      await update(ref(db, `clients/${currentPhone}/messages/${editClientKey}`), { text, edited: true, editedAt: Date.now() });
+      document.getElementById("client-edit-overlay").classList.remove("show");
+      toast("הודעה עודכנה ✓");
+    };
+
+    /* Reply */
+    window.setClientReply = (key, msg) => {
+      clientReplyTo = { key, text: msg.text, sender: msg.sender };
+      const bar = document.getElementById("client-reply-bar");
+      document.getElementById("crb-name").textContent = msg.sender === "client" ? "אתה" : "נציג";
+      document.getElementById("crb-text").textContent = msg.text?.slice(0, 60) || "";
+      bar.classList.add("show");
+      document.getElementById("chat-textarea").focus();
+    };
+    window.cancelClientReply = () => {
+      clientReplyTo = null;
+      document.getElementById("client-reply-bar").classList.remove("show");
+    };
 
   </script>
 
@@ -1618,6 +1853,26 @@
       <button class="ce-btn" onclick="clientQuickEmoji('🔥')">🔥</button>
     </div>
     <!-- קלט -->
+    <div id="client-reply-bar" style="display:none;background:rgba(14,165,233,.07);border-top:1px solid var(--border);padding:8px 14px;flex-direction:row;align-items:center;gap:10px">
+      <div style="border-right:3px solid var(--primary);padding-right:8px;flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:var(--primary)" id="crb-name"></div>
+        <div style="font-size:12px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="crb-text"></div>
+      </div>
+      <button onclick="cancelClientReply()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;flex-shrink:0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+        <!-- Reply bar -->
+    <div class="reply-bar-client" id="client-reply-bar">
+      <div class="rbc-line">
+        <div class="rbc-name" id="crb-name"></div>
+        <div class="rbc-text" id="crb-text"></div>
+      </div>
+      <button onclick="cancelClientReply()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;flex-shrink:0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <!-- קלט -->
     <div class="chat-input-wrap" id="chat-input-wrap">
       <textarea
         id="chat-textarea"
@@ -1633,6 +1888,56 @@
           <polygon points="22 2 15 22 11 13 2 9 22 2"/>
         </svg>
       </button>
+    </div>
+  </div>
+
+
+  <!-- Context Menu לקוח -->
+  <div class="ctx-overlay" id="client-ctx-overlay">
+    <div class="ctx-sheet">
+      <div class="ctx-handle"></div>
+      <div class="ctx-bubble-prev" id="client-ctx-prev"></div>
+      <div class="ctx-emoji-row">
+        <button class="ctx-emoji-btn" data-emoji="❤️">❤️</button>
+        <button class="ctx-emoji-btn" data-emoji="👍">👍</button>
+        <button class="ctx-emoji-btn" data-emoji="😂">😂</button>
+        <button class="ctx-emoji-btn" data-emoji="😮">😮</button>
+        <button class="ctx-emoji-btn" data-emoji="🙏">🙏</button>
+      </div>
+      <div class="ctx-action" id="cctx-reply">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg>
+        השב להודעה
+      </div>
+      <div class="ctx-action" id="cctx-copy">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        העתק הודעה
+      </div>
+      <div class="ctx-action" id="cctx-edit" style="display:none">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
+        ערוך הודעה
+      </div>
+      <div class="ctx-sep"></div>
+      <div class="ctx-action danger" id="cctx-del-me">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        מחק אצלי
+      </div>
+      <div class="ctx-action danger" id="cctx-del-all">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        מחק אצל כולם
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit overlay לקוח -->
+  <div class="edit-overlay" id="client-edit-overlay">
+    <div class="edit-sheet">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px"></div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:12px">עריכת הודעה</div>
+      <textarea id="client-edit-ta" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Heebo',sans-serif;font-size:15px;resize:none;outline:none;color:var(--text);line-height:1.5;min-height:80px;display:block" rows="3"></textarea>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button id="client-edit-save" style="flex:1;background:linear-gradient(135deg,var(--primary),var(--primary-d));border:none;border-radius:12px;color:#fff;font-family:'Heebo',sans-serif;font-size:15px;font-weight:700;padding:14px;cursor:pointer">שמור</button>
+        <button id="client-edit-cancel" style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;color:var(--text-muted);font-family:'Heebo',sans-serif;font-size:15px;font-weight:600;padding:14px 20px;cursor:pointer">ביטול</button>
+      </div>
     </div>
   </div>
 
