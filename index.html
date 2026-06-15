@@ -668,6 +668,15 @@
       font-size: 14px; line-height: 1.5;
       word-break: break-word;
     }
+    /* גודל תמונה בצ'אט — מוגבל לתצוגה נורמלית */
+    .msg-img {
+      max-width: 220px; max-height: 280px;
+      width: auto; height: auto;
+      border-radius: 14px; object-fit: cover;
+      display: block; cursor: pointer; margin-top: 2px;
+    }
+    /* בועת תמונה — בלי padding מיותר סביב התמונה */
+    .msg-bubble:has(.msg-img) { padding: 4px; }
     .msg-bubble-wrap.mine .msg-bubble {
       background: linear-gradient(135deg, var(--primary), var(--primary-d));
       color: white;
