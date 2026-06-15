@@ -1032,6 +1032,7 @@
 
     const SESSION_KEY = "wd_session";
     let currentPhone  = null;
+    let allClients    = {};   /* רשומת הלקוח הנוכחי — מסונכרנת מהשרת (מתקן ReferenceError ששבר את הצ'אט) */
 
     /* ── בדיקת סשן ── */
     window.addEventListener("DOMContentLoaded", () => {
@@ -1483,6 +1484,10 @@
 
     /* אתחול צ'אט — מאזין ל-messages ו-agentTyping בזמן אמת */
     function initChat(phone) {
+      /* סנכרון רשומת הלקוח (avatar/openedBy/agentName) — נדרש לרינדור הצ'אט */
+      onValue(ref(db, `clients/${phone}`), snap => {
+        if (snap.exists()) allClients[phone] = snap.val();
+      });
       /* האזנה לכל ההודעות */
       onValue(ref(db, `clients/${phone}/messages`), snap => {
         const msgs = snap.val() || {};
