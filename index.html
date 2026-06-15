@@ -677,6 +677,32 @@
     }
     /* בועת תמונה — בלי padding מיותר סביב התמונה */
     .msg-bubble:has(.msg-img) { padding: 4px; }
+    /* Lightbox עם זום */
+    .img-lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.94); z-index: 9000; align-items: center; justify-content: center; touch-action: none; }
+    .img-lightbox.show { display: flex; animation: fadeIn .2s ease; }
+    .img-lightbox img { max-width: 95vw; max-height: 92vh; object-fit: contain; border-radius: 10px; transform-origin: center; will-change: transform; cursor: grab; }
+    .img-lightbox-close { position: fixed; top: 18px; right: 18px; background: rgba(255,255,255,.15); border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9001; }
+    /* קופסת טעינת תמונה — ספינר בסגנון Google */
+    .img-loading-box { width: 200px; height: 150px; border-radius: 12px; background: linear-gradient(110deg, var(--bg) 30%, rgba(255,255,255,.04) 50%, var(--bg) 70%); background-size: 200% 100%; animation: imgShimmer 1.4s infinite; display: flex; align-items: center; justify-content: center; }
+    @keyframes imgShimmer { to { background-position: -200% 0; } }
+    .img-spinner { width: 38px; height: 38px; border-radius: 50%; border: 3px solid rgba(14,165,233,.18); border-top-color: var(--primary); animation: spin .8s linear infinite; }
+    /* Preview לפני שליחה */
+    .img-preview-overlay { display: none; position: fixed; inset: 0; background: rgba(8,18,32,.96); z-index: 9500; flex-direction: column; }
+    .img-preview-overlay.show { display: flex; animation: fadeIn .2s ease; }
+    .img-preview-sheet { display: flex; flex-direction: column; height: 100%; }
+    .img-preview-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; color: #fff; font-size: 16px; font-weight: 700; }
+    .ipv-btn-x, .ipv-onetime { background: rgba(255,255,255,.12); border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .ipv-onetime.active { background: var(--primary); color: #fff; box-shadow: 0 0 0 3px rgba(14,165,233,.3); }
+    .img-preview-imgwrap { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; }
+    .img-preview-imgwrap img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; }
+    .img-preview-bottom { display: flex; align-items: center; gap: 10px; padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); }
+    .img-preview-caption { flex: 1; background: rgba(255,255,255,.1); border: none; border-radius: 22px; padding: 12px 18px; color: #fff; font-family: 'Heebo', sans-serif; font-size: 15px; outline: none; }
+    .img-preview-caption::placeholder { color: rgba(255,255,255,.5); }
+    .img-preview-send { background: var(--primary); border: none; border-radius: 50%; width: 48px; height: 48px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .img-preview-send:disabled { opacity: .5; }
+    /* בועות תמונה חד-פעמית */
+    .onetime-receive { display: flex; align-items: center; gap: 8px; padding: 4px 6px; cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--primary); }
+    .onetime-sent, .onetime-opened { display: flex; align-items: center; gap: 6px; padding: 4px 6px; font-size: 12.5px; font-style: italic; opacity: .7; }
     .msg-bubble-wrap.mine .msg-bubble {
       background: linear-gradient(135deg, var(--primary), var(--primary-d));
       color: white;
@@ -1566,9 +1592,20 @@
         /* טקסט/תמונה הודעה */
         let bubbleText;
         if (m.deleted) {
-          bubbleText = `<span style="font-style:italic;opacity:.6;display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>ההודעה נמחקה</span>`;
+          const delTxt = (m.type === "image") ? "התמונה נמחקה" : "ההודעה נמחקה";
+          bubbleText = `<span style="font-style:italic;opacity:.6;display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>${delTxt}</span>`;
         } else if (m.type === "image" && m.imageUrl) {
-          bubbleText = `<img class="msg-img" src="${m.imageUrl}" onclick="openLightbox(this.dataset.url)" class="msg-img-clickable" alt="תמונה" loading="lazy"/>`;
+          const isMineImg = m.sender === "client";
+          if (m.oneTime && !isMineImg && m.viewed) {
+            bubbleText = `<div class="onetime-opened"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="8" y1="12" x2="16" y2="12"/></svg>נפתחה</div>`;
+          } else if (m.oneTime && !isMineImg && !m.viewed) {
+            bubbleText = `<div class="onetime-receive"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="11" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg><span>תמונה חד-פעמית · הקש לצפייה</span></div>`;
+          } else if (m.oneTime && isMineImg) {
+            bubbleText = `<div class="onetime-sent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="10" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>${m.viewed ? "נצפתה" : "תמונה חד-פעמית"}</div>`;
+          } else {
+            bubbleText = `<img class="msg-img" src="${m.imageUrl}" data-url="${m.imageUrl}" alt="תמונה" loading="lazy"/>`;
+            if (m.text) bubbleText += `<div style="font-size:13px;margin-top:4px">${m.text}</div>`;
+          }
         } else {
           bubbleText = `${m.text}${m.edited ? `<span style="font-size:10px;opacity:.55;margin-right:4px">(נערך)</span>` : ""}`;
         }
@@ -1597,13 +1634,29 @@
           ${rHtml}
           <div class="msg-time-label">${fmtTime(m.at)}</div>
         `;
-        /* חיבור event לחיצה על bubble */
+        /* חיבור event לחיצה על bubble — תמונה: לחיצה=הצגה, לחיצה ארוכה=תפריט (#3) */
         const bubbleEl = wrap.querySelector('.msg-bubble-item');
         if (bubbleEl) {
           const msgData = m;
-          bubbleEl.addEventListener('click', () => {
-            if (!msgData.deleted) openClientCtx(key, msgData);
-          });
+          const isImg = msgData.type === "image" && msgData.imageUrl && !msgData.deleted;
+          if (isImg) {
+            let lpTimer = null, lpFired = false;
+            const startLP = () => { lpFired = false; lpTimer = setTimeout(() => { lpFired = true; openClientCtx(key, msgData); }, 500); };
+            const cancelLP = () => { if (lpTimer) clearTimeout(lpTimer); };
+            bubbleEl.addEventListener('click', (e) => {
+              if (lpFired) { e.preventDefault(); return; }
+              if (msgData.oneTime) { openOneTimeImage(key, msgData); }
+              else { openLightbox(msgData.imageUrl); }
+            });
+            bubbleEl.addEventListener('touchstart', startLP, { passive: true });
+            bubbleEl.addEventListener('touchend', cancelLP);
+            bubbleEl.addEventListener('touchmove', cancelLP);
+            bubbleEl.addEventListener('contextmenu', (e) => { e.preventDefault(); openClientCtx(key, msgData); });
+          } else {
+            bubbleEl.addEventListener('click', () => {
+              if (!msgData.deleted) openClientCtx(key, msgData);
+            });
+          }
         }
         container.insertBefore(wrap, document.getElementById("typing-indicator"));
         /* סימון כנקרא */
@@ -1888,7 +1941,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       document.getElementById("client-ctx-prev").textContent = msg.text || "";
       /* הצגת עריכה רק אם ההודעה שלי ובתוך 30 דקות */
       const isMine = msg.sender === "client";
-      const canEdit = isMine && (Date.now() - msg.at) < EDIT_WIN_CLIENT;
+      const canEdit = isMine && msg.type !== "image" && (Date.now() - msg.at) < EDIT_WIN_CLIENT;
       document.getElementById("cctx-edit").style.display = canEdit ? "" : "none";
       /* מחיקה אצל כולם — רק להודעות שהלקוח שלח (#11) */
       document.getElementById("cctx-del-all").style.display = isMine ? "" : "none";
@@ -1992,84 +2045,162 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
 
 
     /* ══════════════════════════════════
-       שליחת תמונות
+       שליחת תמונות — Preview לפני שליחה (#1/#2/#35)
     ══════════════════════════════════ */
+    let pendingImgFile = null;
+    let pendingOneTime = false;
+
     document.getElementById("chat-img-btn").onclick = () => {
       document.getElementById("chat-file-input").click();
     };
 
-    document.getElementById("chat-file-input").onchange = async (e) => {
+    document.getElementById("chat-file-input").onchange = (e) => {
       const file = e.target.files[0];
       if (!file || !currentPhone) return;
-      e.target.value = ""; // reset
+      e.target.value = "";
+      if (!file.type.startsWith("image/")) { toast("ניתן להעלות תמונות בלבד"); return; }
+      if (file.size > 10 * 1024 * 1024) { toast("הקובץ גדול מדי — מקסימום 10MB"); return; }
+      pendingImgFile = file;
+      pendingOneTime = false;
+      showImgPreview(file);
+    };
 
-      /* בדיקת סוג — תמונות בלבד */
-      if (!file.type.startsWith("image/")) {
-        toast("ניתן להעלות תמונות בלבד");
-        return;
-      }
+    function showImgPreview(file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById("img-preview-thumb").src = ev.target.result;
+        document.getElementById("img-preview-onetime").classList.remove("active");
+        document.getElementById("img-preview-caption").value = "";
+        document.getElementById("img-preview-overlay").classList.add("show");
+        setTimeout(() => document.getElementById("img-preview-caption").focus(), 100);
+      };
+      reader.readAsDataURL(file);
+    }
 
-      /* בדיקת גודל — מקסימום 10MB */
-      if (file.size > 10 * 1024 * 1024) {
-        toast("הקובץ גדול מדי — מקסימום 10MB");
-        return;
-      }
+    window.cancelImgPreview = () => {
+      pendingImgFile = null; pendingOneTime = false;
+      document.getElementById("img-preview-overlay").classList.remove("show");
+    };
 
-      /* אינדיקטור טעינה */
-      const loadingKey = "img_uploading_" + Date.now();
+    window.toggleOneTime = () => {
+      pendingOneTime = !pendingOneTime;
+      document.getElementById("img-preview-onetime").classList.toggle("active", pendingOneTime);
+    };
+
+    window.sendPendingImg = async () => {
+      if (!pendingImgFile || !currentPhone) return;
+      const file = pendingImgFile;
+      const caption = document.getElementById("img-preview-caption").value.trim();
+      const oneTime = pendingOneTime;
+      const sendBtn = document.getElementById("img-preview-send");
+      sendBtn.disabled = true;
+      /* קופסת טעינה עם ספינר בזמן ההעלאה */
       const loadingEl = document.createElement("div");
-      loadingEl.style.cssText = "display:flex;flex-direction:column;align-items:flex-end;margin:4px 0;padding:0 4px";
-      loadingEl.innerHTML = `
-        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0"/></svg>
-          מעלה תמונה...
-        </div>
-        <div class="img-upload-progress" style="width:120px;margin-top:6px"><div class="img-upload-bar" id="upload-bar" style="width:0%"></div></div>
-      `;
+      loadingEl.className = "msg-bubble-wrap mine";
+      loadingEl.innerHTML = `<div class="msg-bubble" style="padding:4px"><div class="img-loading-box"><div class="img-spinner"></div></div></div>`;
       const container = document.getElementById("chat-messages");
-      const typingEl = document.getElementById("typing-indicator");
-      container.insertBefore(loadingEl, typingEl);
+      container.insertBefore(loadingEl, document.getElementById("typing-indicator"));
       container.scrollTop = container.scrollHeight;
-
+      cancelImgPreview();
       try {
-        /* העלאה ל-Firebase Storage */
         const ext = file.name.split('.').pop() || 'jpg';
         const path = "chat-images/" + currentPhone + "/" + Date.now() + "." + ext;
-        const storageRef = sRef(storage, path);
-
-        /* העלאה */
-        const snapshot = await uploadBytes(storageRef, file);
-
-        /* קבלת URL */
+        const snapshot = await uploadBytes(sRef(storage, path), file);
         const url = await getDownloadURL(snapshot.ref);
-
-        /* שליחת ההודעה עם URL */
         const msgKey = "msg_" + Date.now();
-        let msgData = { 
-          text: "", imageUrl: url, 
-          at: Date.now(), sender: "client", 
-          seen: false, agentRead: false,
-          type: "image"
+        let msgData = {
+          text: caption || "", imageUrl: url,
+          at: Date.now(), sender: "client",
+          seen: false, agentRead: false, type: "image"
         };
-        if (clientReplyTo) {
-          msgData.replyTo = { text: clientReplyTo.text?.slice(0,80)||"📷 תמונה", sender: clientReplyTo.sender };
-          cancelClientReply();
-        }
+        if (oneTime) { msgData.oneTime = true; msgData.viewed = false; }
+        if (clientReplyTo) { msgData.replyTo = { text: clientReplyTo.text?.slice(0,80)||"📷 תמונה", sender: clientReplyTo.sender }; cancelClientReply(); }
         await set(ref(db, "clients/" + currentPhone + "/messages/" + msgKey), msgData);
+        await stampOpenedBy(currentPhone, "client", allClients?.[currentPhone]?.name || "הלקוח");
         loadingEl.remove();
-
       } catch(err) {
         console.error("Upload error:", err);
         loadingEl.remove();
         toast("שגיאה בהעלאת התמונה");
+      } finally {
+        sendBtn.disabled = false;
+      }
+    };
+
+    /* פתיחת תמונה חד-פעמית (#35) */
+    window.openOneTimeImage = async (key, msg) => {
+      if (msg.viewed && msg.sender === "agent") { toast("התמונה כבר נצפתה"); return; }
+      /* צד הלקוח צופה בתמונה שנשלחה אליו */
+      openLightbox(msg.imageUrl);
+      if (msg.sender === "agent" && !msg.viewed) {
+        /* סימון כנצפתה + מחיקת ה-URL מהשרת אחרי צפייה */
+        await set(ref(db, `clients/${currentPhone}/messages/${key}/viewed`), true);
+        await set(ref(db, `clients/${currentPhone}/messages/${key}/viewedAt`), Date.now());
       }
     };
 
     /* פתיחת lightbox */
+    /* ── Lightbox עם זום (#4) ── */
+    let lbScale = 1, lbX = 0, lbY = 0, lbStartDist = 0, lbStartScale = 1, lbPanX = 0, lbPanY = 0, lbDragging = false, lbLastX = 0, lbLastY = 0;
+    function lbApply() {
+      const img = document.getElementById("lightbox-img");
+      img.style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbScale})`;
+    }
+    function lbReset() { lbScale = 1; lbX = 0; lbY = 0; lbApply(); }
     window.openLightbox = (url) => {
-      document.getElementById("lightbox-img").src = url;
+      const img = document.getElementById("lightbox-img");
+      img.src = url;
+      lbReset();
       document.getElementById("img-lightbox").classList.add("show");
     };
+    (function initLightboxZoom() {
+      const lb = document.getElementById("img-lightbox");
+      const img = document.getElementById("lightbox-img");
+      if (!lb || !img) return;
+      /* גלגלת עכבר — זום */
+      img.addEventListener("wheel", e => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 1.15 : 0.87;
+        lbScale = Math.min(5, Math.max(1, lbScale * delta));
+        if (lbScale === 1) { lbX = 0; lbY = 0; }
+        lbApply();
+      }, { passive: false });
+      /* דאבל-קליק — זום פנימה/החוצה */
+      img.addEventListener("dblclick", e => {
+        e.stopPropagation();
+        lbScale = lbScale > 1 ? 1 : 2.5;
+        lbX = 0; lbY = 0; lbApply();
+      });
+      /* גרירה כשמוגדל (עכבר) */
+      img.addEventListener("mousedown", e => { if (lbScale > 1) { lbDragging = true; lbLastX = e.clientX; lbLastY = e.clientY; e.preventDefault(); } });
+      window.addEventListener("mousemove", e => { if (lbDragging) { lbX += e.clientX - lbLastX; lbY += e.clientY - lbLastY; lbLastX = e.clientX; lbLastY = e.clientY; lbApply(); } });
+      window.addEventListener("mouseup", () => { lbDragging = false; });
+      /* פינץ' זום + גרירה במגע */
+      img.addEventListener("touchstart", e => {
+        if (e.touches.length === 2) {
+          lbStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+          lbStartScale = lbScale;
+        } else if (e.touches.length === 1 && lbScale > 1) {
+          lbLastX = e.touches[0].clientX; lbLastY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+      img.addEventListener("touchmove", e => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+          lbScale = Math.min(5, Math.max(1, lbStartScale * (d / lbStartDist)));
+          if (lbScale === 1) { lbX = 0; lbY = 0; }
+          lbApply();
+        } else if (e.touches.length === 1 && lbScale > 1) {
+          e.preventDefault();
+          lbX += e.touches[0].clientX - lbLastX; lbY += e.touches[0].clientY - lbLastY;
+          lbLastX = e.touches[0].clientX; lbLastY = e.touches[0].clientY; lbApply();
+        }
+      }, { passive: false });
+      /* סגירה רק בלחיצה על הרקע (לא על התמונה) */
+      lb.addEventListener("click", e => { if (e.target === lb) { lb.classList.remove("show"); lbReset(); } });
+      img.addEventListener("click", e => e.stopPropagation());
+    })();
 
   /* ── מודול אופליין (#8): באנר + חסימת פעולות בזמן אין אינטרנט ── */
   (function(){
@@ -2253,9 +2384,29 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
 
 
   <!-- Lightbox תמונה -->
-  <div class="img-lightbox" id="img-lightbox" onclick="this.classList.remove('show')">
-    <button class="img-lightbox-close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <div class="img-lightbox" id="img-lightbox">
+    <button class="img-lightbox-close" onclick="document.getElementById('img-lightbox').classList.remove('show')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <img id="lightbox-img" src="" alt="תמונה"/>
+  </div>
+
+  <!-- Preview תמונה לפני שליחה (#1/#35) -->
+  <div class="img-preview-overlay" id="img-preview-overlay">
+    <div class="img-preview-sheet">
+      <div class="img-preview-top">
+        <button class="ipv-btn-x" onclick="cancelImgPreview()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <span>שליחת תמונה</span>
+        <button class="ipv-onetime" id="img-preview-onetime" onclick="toggleOneTime()" title="צפייה חד-פעמית">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="11" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
+        </button>
+      </div>
+      <div class="img-preview-imgwrap"><img id="img-preview-thumb" src="" alt="תצוגה מקדימה"/></div>
+      <div class="img-preview-bottom">
+        <input type="text" id="img-preview-caption" class="img-preview-caption" placeholder="הוסף כיתוב (אופציונלי)..."/>
+        <button class="img-preview-send" id="img-preview-send" onclick="sendPendingImg()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
   </div>
   <!-- input מוסתר לבחירת קובץ -->
   <input type="file" id="chat-file-input" accept="image/*" style="display:none"/>
