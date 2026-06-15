@@ -618,6 +618,8 @@
     .chat-header-name { font-size: 15px; font-weight: 800; }
     .chat-header-status { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
     .online-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+    .offline-banner { display: none; position: fixed; top: 0; left: 0; right: 0; background: var(--warning); color: #fff; font-family: 'Heebo', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; text-align: center; z-index: 9999; }
+    .offline-banner.show { display: block; }
     @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
     .chat-close-btn {
       background: var(--bg); border: none; border-radius: 50%;
@@ -645,6 +647,7 @@
     }
 
     /* הודעות */
+    .opened-by-banner { text-align: center; font-size: 12px; color: var(--text-muted); background: var(--bg); border-radius: 10px; padding: 6px 12px; margin: 4px auto 10px; max-width: 80%; }
     .chat-messages {
       flex: 1; overflow-y: auto; padding: 16px 16px 8px;
       display: flex; flex-direction: column; gap: 8px;
@@ -759,6 +762,42 @@
   </style>
 </head>
 <body>
+
+  <div class="offline-banner" id="offline-banner">אין חיבור לאינטרנט</div>
+
+  <!-- ── מסך טעינה ראשוני (#9): מוצג מיד עד שהאפליקציה נטענת ── -->
+  <div id="boot-splash" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(145deg,#0c1a2e,#0a2540);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .4s ease">
+    <img src="https://i.postimg.cc/3R4hWfVm/IMG-0696.png" alt="WebDesk Pro" onerror="this.style.display='none'" style="width:96px;height:96px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:bootPulse 1.8s ease-in-out infinite"/>
+    <div style="display:flex;gap:8px">
+      <span style="width:10px;height:10px;border-radius:50%;background:#0ea5e9;animation:bootDot 1.2s ease-in-out infinite"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#0ea5e9;animation:bootDot 1.2s ease-in-out .2s infinite"></span>
+      <span style="width:10px;height:10px;border-radius:50%;background:#0ea5e9;animation:bootDot 1.2s ease-in-out .4s infinite"></span>
+    </div>
+  </div>
+  <style>
+    @keyframes bootPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.06);opacity:.85} }
+    @keyframes bootDot { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-8px);opacity:1} }
+    #boot-splash.hide { opacity:0; pointer-events:none; }
+  </style>
+  <script>
+    /* לוכד שגיאות אמיתי — חושף את המקור מאחורי "Script error" כללי */
+    window.addEventListener("error", function(ev){
+      try{
+        var msg = ev.message || "";
+        var src = ev.filename || "";
+        if(msg==="Script error." && !src){
+          console.warn("[WebDesk] שגיאה חוצת-מקור (כנראה Firebase/CDN/תמונה חיצונית) — לרוב לא משפיע על תפקוד האתר.");
+        } else {
+          console.warn("[WebDesk] שגיאה:", msg, "@", src, ev.lineno+":"+ev.colno);
+        }
+      }catch(_){}
+    });
+    window.addEventListener("unhandledrejection", function(ev){
+      try{ console.warn("[WebDesk] Promise נדחה:", ev.reason && (ev.reason.message||ev.reason)); }catch(_){}
+    });
+    window.__hideBoot = function(){ var b=document.getElementById("boot-splash"); if(b){ b.classList.add("hide"); setTimeout(function(){ b.remove(); }, 450); } };
+    window.addEventListener("load", function(){ setTimeout(window.__hideBoot, 600); });
+  </script>
 
   <!-- מסך כניסה -->
   <div id="screen-login" class="screen active">
@@ -1426,6 +1465,7 @@
     function showScreen(id) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.getElementById(id).classList.add("active");
+      if (window.__hideBoot) window.__hideBoot();
     }
     function showError(msg) {
       const el = document.getElementById("login-error");
@@ -1480,6 +1520,17 @@
 
       if (!entries.length) { empty.style.display = ""; return; }
       empty.style.display = "none";
+
+      /* #2 — באנר 'נפתחה על ידי' */
+      container.querySelector(".opened-by-banner")?.remove();
+      const ob = allClients?.[phone]?.openedBy;
+      if (ob && ob.role) {
+        const who = ob.role === "client" ? "הלקוח" : (ob.name || (ob.role === "admin" ? "המנהל" : "נציג"));
+        const ban = document.createElement("div");
+        ban.className = "opened-by-banner";
+        ban.textContent = `השיחה נפתחה על ידי ${who}`;
+        container.insertBefore(ban, container.firstChild);
+      }
 
       entries.sort(([,a],[,b]) => a.at - b.at);
       let lastDate = "";
@@ -1588,6 +1639,16 @@
     };
 
     /* שליחת הודעה — שמירה ב-messages (מקום אחד עם הנציג) */
+    /* #2 — מסמן מי פתח את השיחה, רק אם עדיין לא סומן */
+    async function stampOpenedBy(phone, role, name) {
+      try {
+        const ob = await get(ref(db, `clients/${phone}/openedBy`));
+        if (!ob.exists()) {
+          await set(ref(db, `clients/${phone}/openedBy`), { role, name: name||"", at: Date.now() });
+        }
+      } catch(e) {}
+    }
+
     window.sendChatMsg = async () => {
       const ta  = document.getElementById("chat-textarea");
       const text= ta.value.trim();
@@ -1599,6 +1660,8 @@
         const msgData = { text, at: Date.now(), sender: "client", seen: false, agentRead: false };
         if (clientReplyTo) { msgData.replyTo = { text: clientReplyTo.text.slice(0,80), sender: clientReplyTo.sender }; cancelClientReply(); }
         await set(ref(db, `clients/${currentPhone}/messages/${msgKey}`), msgData);
+        /* #2 — סימון מי פתח את השיחה (אם אין עדיין) */
+        await stampOpenedBy(currentPhone, "client", allClients?.[currentPhone]?.name || "הלקוח");
         ta.value = ""; ta.style.height = "";
       /* ניקוי typing אחרי שליחה */
       if (currentPhone) set(ref(db, `clients/${currentPhone}/typing`), { active: false, text: "", at: Date.now() });
@@ -1926,6 +1989,12 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       if (!file || !currentPhone) return;
       e.target.value = ""; // reset
 
+      /* בדיקת סוג — תמונות בלבד */
+      if (!file.type.startsWith("image/")) {
+        toast("ניתן להעלות תמונות בלבד");
+        return;
+      }
+
       /* בדיקת גודל — מקסימום 10MB */
       if (file.size > 10 * 1024 * 1024) {
         toast("הקובץ גדול מדי — מקסימום 10MB");
@@ -1987,6 +2056,31 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       document.getElementById("lightbox-img").src = url;
       document.getElementById("img-lightbox").classList.add("show");
     };
+
+  /* ── מודול אופליין (#8): באנר + חסימת פעולות בזמן אין אינטרנט ── */
+  (function(){
+    const banner=document.getElementById("offline-banner");
+    function update(){
+      const off=!navigator.onLine;
+      if(banner)banner.classList.toggle("show",off);
+      document.body.classList.toggle("is-offline",off);
+    }
+    document.addEventListener("click",e=>{
+      try{
+        if(navigator.onLine)return;
+        const tgt=e.target;
+        if(!tgt||typeof tgt.closest!=="function")return;
+        const t=tgt.closest("button,a,[onclick]");
+        if(!t)return;
+        if(t.id&&/close|cancel|back|skip|מבטל/i.test(t.id))return;
+        e.preventDefault();e.stopPropagation();
+        try{showToastClient("אין חיבור לאינטרנט — נסה שוב כשהחיבור יחזור");}catch(_){}
+      }catch(_){}
+    },true);
+    window.addEventListener("online",update);
+    window.addEventListener("offline",update);
+    update();
+  })();
 
   </script>
 
@@ -2150,7 +2244,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     <img id="lightbox-img" src="" alt="תמונה"/>
   </div>
   <!-- input מוסתר לבחירת קובץ -->
-  <input type="file" id="chat-file-input" accept="image/*" capture="environment" style="display:none"/>
+  <input type="file" id="chat-file-input" accept="image/*" style="display:none"/>
 
 </body>
 </html>
