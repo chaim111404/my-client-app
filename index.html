@@ -380,6 +380,17 @@
 
     /* מטא */
     .site-meta { display: flex; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+
+    /* סיסמאות לאתר (#1) */
+    .site-pwds { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+    .site-pwds-head { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
+    .site-pwd-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid var(--border); }
+    .site-pwd-row:first-of-type { border-top: none; }
+    .site-pwd-label { font-size: 12.5px; color: var(--text-muted); min-width: 90px; font-weight: 600; }
+    .site-pwd-val { flex: 1; font-family: 'Courier New', monospace; font-size: 14px; letter-spacing: 1px; color: var(--text); direction: ltr; text-align: right; transition: filter .15s; }
+    .site-pwd-val.blurred { filter: blur(5px); user-select: none; }
+    .site-pwd-eye, .site-pwd-copy { background: none; border: none; cursor: pointer; color: var(--primary); padding: 5px; display: flex; align-items: center; border-radius: 7px; }
+    .site-pwd-eye:active, .site-pwd-copy:active { background: rgba(14,165,233,0.12); }
     .meta-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-muted); }
 
     /* כפתור */
@@ -422,6 +433,32 @@
     .popup-title { font-size: 21px; font-weight: 800; margin-bottom: 10px; }
     .popup-text  { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px; }
     .btn-popup-close { width: 100%; background: var(--primary); border: none; border-radius: var(--radius-sm); color: white; font-family: 'Heebo', sans-serif; font-size: 16px; font-weight: 700; padding: 15px; cursor: pointer; }
+
+    /* ── תפריט פעולות הודעה (#18) — מוסתר עד לחיצה ארוכה ── */
+    .ctx-overlay { display: none; position: fixed; inset: 0; background: rgba(12,26,46,0.7); backdrop-filter: blur(6px); z-index: 600; align-items: flex-end; justify-content: center; }
+    .ctx-overlay.show { display: flex; animation: fadeIn 0.18s ease; }
+    .ctx-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 520px; padding: 10px 14px 34px; animation: slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both; }
+    .ctx-handle { width: 42px; height: 4px; background: var(--border); border-radius: 2px; margin: 4px auto 14px; }
+    .ctx-bubble-prev { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px; max-height: 80px; overflow: hidden; line-height: 1.5; }
+    .ctx-emoji-row { display: flex; justify-content: space-around; gap: 6px; padding: 6px 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+    .ctx-emoji-btn { background: none; border: none; font-size: 26px; cursor: pointer; padding: 6px 8px; border-radius: 12px; transition: transform .12s, background .12s; }
+    .ctx-emoji-btn:active { transform: scale(1.25); background: var(--bg); }
+    .ctx-action { display: flex; align-items: center; gap: 13px; padding: 13px 10px; font-size: 15px; font-weight: 600; color: var(--text); cursor: pointer; border-radius: 12px; }
+    .ctx-action:active { background: var(--bg); }
+    .ctx-action.danger { color: #ef4444; }
+    .ctx-sep { height: 1px; background: var(--border); margin: 6px 0; }
+
+    /* ── חלון עריכת הודעה (#18) — מוסתר עד הפעלה ── */
+    .edit-overlay { display: none; position: fixed; inset: 0; background: rgba(12,26,46,0.7); backdrop-filter: blur(6px); z-index: 650; align-items: flex-end; justify-content: center; }
+    .edit-overlay.show { display: flex; animation: fadeIn 0.18s ease; }
+    .edit-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 520px; padding: 16px 24px 34px; animation: slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1) both; }
+
+    /* ── סרגל ציטוט (reply) לקוח — מוסתר עד הפעלה ── */
+    .reply-bar-client { display: none; align-items: center; gap: 10px; padding: 10px 16px; background: var(--bg); border-top: 1px solid var(--border); }
+    .reply-bar-client.show { display: flex; }
+    .rbc-line { flex: 1; border-right: 3px solid var(--primary); padding-right: 10px; overflow: hidden; }
+    .rbc-name { font-size: 12px; font-weight: 700; color: var(--primary); }
+    .rbc-text { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ── פופאפ יצירת קשר ── */
     .contact-sheet { text-align: right; }
@@ -882,6 +919,22 @@
   </div>
 
 
+  <!-- פופאפ יצירת קשר -->
+  <div class="popup-overlay" id="popup-contact" onclick="closePopup('popup-contact')">
+    <div class="popup-sheet contact-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div id="contact-main">
+        <div class="contact-title">יצירת קשר</div>
+        <div class="contact-sub">נשמח לעמוד לרשותך</div>
+        <div class="contact-options">
+          <a href="https://wa.me/972533729687" target="_blank" rel="noopener" class="contact-btn">
+            <div class="contact-btn-icon wa">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+            </div>
+            <div class="contact-btn-text">
+              <div class="contact-btn-label">WhatsApp</div>
+              <div class="contact-btn-desc">מענה מהיר</div>
+            </div>
           </a>
           <button class="contact-btn" onclick="showMsgForm()">
             <div class="contact-btn-icon msg">
@@ -924,7 +977,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, get, set, push, remove, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, get, set, push, remove, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
     const firebaseConfig = {
       apiKey:            "AIzaSyB9jeWAKY2UEz70V77SCPnSJ18IfwnsVV0",
@@ -1084,6 +1137,38 @@
       }, 2000);
     }
 
+    /* ── מערכת presence אמיתית (#10/#17/#24) ──
+       online   = מחובר לאתר (כרטיסייה/אפליקציה פתוחה)
+       chatOpen = חלון הצ'אט פתוח כרגע
+       lastSeen = חותמת זמן אחרונה
+       onDisconnect מבטיח עדכון גם בסגירת כרטיסייה/אפליקציה/ניתוק רשת */
+    let presenceRef = null;
+    let chatOpen = false;   /* חלון הצ'אט פתוח כרגע (מוגדר כאן כדי שיהיה זמין ל-setupPresence) */
+    function setupPresence(phone) {
+      presenceRef = ref(db, `clients/${phone}/presence`);
+      const goOnline = () => set(presenceRef, { online: true, chatOpen: chatOpen, lastSeen: Date.now() }).catch(()=>{});
+      goOnline();
+      /* כשמתנתקים (סגירת כרטיסייה/אפליקציה/רשת) — השרת מסמן אופליין אוטומטית */
+      onDisconnect(presenceRef).set({ online: false, chatOpen: false, lastSeen: Date.now() }).catch(()=>{});
+      /* מעבר בין טאבים/מזעור אפליקציה */
+      document.addEventListener("visibilitychange", () => {
+        if (!currentPhone) return;
+        if (document.visibilityState === "hidden") {
+          set(presenceRef, { online: false, chatOpen: false, lastSeen: Date.now() }).catch(()=>{});
+        } else {
+          goOnline();
+        }
+      });
+      window.addEventListener("pagehide", () => {
+        if (currentPhone) set(presenceRef, { online: false, chatOpen: false, lastSeen: Date.now() }).catch(()=>{});
+      });
+    }
+    /* עדכון סטטוס פתיחת/סגירת צ'אט (#17) */
+    function setChatPresence(open) {
+      if (!currentPhone) return;
+      set(ref(db, `clients/${currentPhone}/presence`), { online: true, chatOpen: open, lastSeen: Date.now() }).catch(()=>{});
+    }
+
     async function loadHomeScreen(phone) {
       currentPhone = phone;
       try {
@@ -1113,11 +1198,8 @@
         showScreen("screen-home");
         initChat(phone);
         document.getElementById("client-emoji-bar").style.display = "flex";
-        /* עדכון presence */
-        set(ref(db, `clients/${phone}/presence`), { online: true, lastSeen: Date.now() });
-        window.addEventListener("beforeunload", () => {
-          set(ref(db, `clients/${phone}/presence`), { online: false, lastSeen: Date.now() });
-        });
+        /* ── עדכון presence אמיתי (#10/#17/#24) ── */
+        setupPresence(phone);
       } catch(err) { showScreen("screen-login"); }
     }
 
@@ -1152,6 +1234,18 @@
         const lastUpdate = site.lastUpdated ? `<div class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>עודכן: ${site.lastUpdated}</div>` : "";
         const msgHtml = site.message ? `<div class="site-message">${site.message}</div>` : "";
 
+        /* סיסמאות לאתר (#1) — מטושטש + צפייה + העתקה */
+        const spArr = site.sitePasswords ? Object.values(site.sitePasswords) : [];
+        const pwdsHtml = spArr.length ? `<div class="site-pwds">
+          <div class="site-pwds-head"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>סיסמאות לאתר</div>
+          ${spArr.map((sp,k)=>`<div class="site-pwd-row">
+            <span class="site-pwd-label">${sp.label||"סיסמה"}</span>
+            <span class="site-pwd-val blurred" id="sp-${i}-${k}">${sp.value||""}</span>
+            <button class="site-pwd-eye" onclick="toggleSitePwd('sp-${i}-${k}',this)" aria-label="הצג"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="site-pwd-copy" onclick="copySitePwd('${btoa(unescape(encodeURIComponent(sp.value||"")))}')" aria-label="העתק"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+          </div>`).join("")}
+        </div>` : "";
+
         const hasUrl = site.url && site.url.trim();
         const btnHtml = hasUrl
           ? `<button class="btn-view-site" onclick="goToSite('${site.url}','${site.name||''}','${site.image||''}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>צפייה באתר</button>`
@@ -1176,6 +1270,7 @@
               </div>
             </div>
             ${msgHtml}
+            ${pwdsHtml}
             <div class="site-meta">${launchHtml}${lastUpdate}</div>
             ${btnHtml}
           </div>`;
@@ -1188,6 +1283,19 @@
         }, 400 + i * 120);
       });
     }
+
+    /* ── סיסמאות אתר: הצג/הסתר + העתקה (#1) ── */
+    window.toggleSitePwd = (id, btn) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle("blurred");
+      btn.setAttribute("aria-label", el.classList.contains("blurred") ? "הצג" : "הסתר");
+    };
+    window.copySitePwd = (b64) => {
+      let val = "";
+      try { val = decodeURIComponent(escape(atob(b64))); } catch(e) { val = b64; }
+      navigator.clipboard?.writeText(val).then(() => showToastClient("הסיסמה הועתקה ✓"));
+    };
 
     /* ── אנימציית מעבר לאתר ── */
     window.goToSite = (url, name, image) => {
@@ -1292,6 +1400,10 @@
       document.getElementById("c-lo").onclick=()=>{ ov.remove(); doActualLogout(); };
     };
     function doActualLogout() {localStorage.removeItem(SESSION_KEY);
+      /* סימון מנותק ידנית מהאתר (#17) */
+      if (currentPhone) {
+        set(ref(db, `clients/${currentPhone}/presence`), { online: false, chatOpen: false, lastSeen: Date.now() }).catch(()=>{});
+      }
       document.getElementById("inp-phone").value = "";
       document.getElementById("inp-pin").value   = "";
       document.getElementById("login-error").classList.remove("show");
@@ -1326,7 +1438,6 @@
     /* ══════════════════════════════════
        מודול צ'אט לקוח
     ══════════════════════════════════ */
-    let chatOpen     = false;
     let activeConvId = null;   /* מזהה השיחה הפעילה */
     let chatListener = null;   /* מאזין Firebase */
 
@@ -1461,6 +1572,7 @@
       chatOpen = !chatOpen;
       document.getElementById("chat-window").classList.toggle("open", chatOpen);
       document.getElementById("chat-overlay").classList.toggle("show", chatOpen);
+      setChatPresence(chatOpen);
       if (chatOpen) {
         document.getElementById("chat-fab-badge").style.display = "none";
         /* סימון כל הודעות הנציג כנקראו */
@@ -1687,17 +1799,6 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
 
     /* ── Reply לקוח ── */
     let clientReplyTo = null;
-    window.setClientReply = (key, msg) => {
-      clientReplyTo = { key, text: msg.text, sender: msg.sender };
-      document.getElementById("crb-name").textContent = msg.sender === "client" ? "אתה" : (allClients?.[currentPhone]?.agentName || "נציג");
-      document.getElementById("crb-text").textContent = msg.text.slice(0, 60);
-      document.getElementById("client-reply-bar").style.display = "flex";
-      document.getElementById("chat-textarea").focus();
-    };
-    window.cancelClientReply = () => {
-      clientReplyTo = null;
-      document.getElementById("client-reply-bar").style.display = "none";
-    };
 
     /* ══════════════════════════════════
        צ'אט לקוח — Context Menu מלא
@@ -1709,8 +1810,14 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       ctxKey = key; ctxMsg = msg;
       document.getElementById("client-ctx-prev").textContent = msg.text || "";
       /* הצגת עריכה רק אם ההודעה שלי ובתוך 30 דקות */
-      const canEdit = msg.sender === "client" && (Date.now() - msg.at) < EDIT_WIN_CLIENT;
+      const isMine = msg.sender === "client";
+      const canEdit = isMine && (Date.now() - msg.at) < EDIT_WIN_CLIENT;
       document.getElementById("cctx-edit").style.display = canEdit ? "" : "none";
+      /* מחיקה אצל כולם — רק להודעות שהלקוח שלח (#11) */
+      document.getElementById("cctx-del-all").style.display = isMine ? "" : "none";
+      /* עדכון תווית כוכב לפי מצב נוכחי */
+      const starLbl = document.getElementById("cctx-star-lbl");
+      if (starLbl) starLbl.textContent = msg.starred ? "הסר כוכב" : "סמן בכוכב";
       document.getElementById("client-ctx-overlay").classList.add("show");
     }
     window.openClientCtx = openClientCtx;
@@ -1744,6 +1851,14 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     };
     document.getElementById("cctx-copy").onclick = () => {
       if (ctxMsg?.text) navigator.clipboard?.writeText(ctxMsg.text).then(() => toast("הועתק ✓"));
+      closeClientCtx();
+    };
+    document.getElementById("cctx-star").onclick = async () => {
+      if (ctxKey && currentPhone) {
+        const cur = ctxMsg?.starred || false;
+        await set(ref(db, `clients/${currentPhone}/messages/${ctxKey}/starred`), !cur);
+        toast(cur ? "הוסר מהמועדפים" : "⭐ נוסף למועדפים");
+      }
       closeClientCtx();
     };
     document.getElementById("cctx-edit").onclick = () => {
@@ -1788,7 +1903,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     window.setClientReply = (key, msg) => {
       clientReplyTo = { key, text: msg.text, sender: msg.sender };
       const bar = document.getElementById("client-reply-bar");
-      document.getElementById("crb-name").textContent = msg.sender === "client" ? "אתה" : "נציג";
+      document.getElementById("crb-name").textContent = msg.sender === "client" ? "אתה" : (allClients?.[currentPhone]?.agentName || "נציג");
       document.getElementById("crb-text").textContent = msg.text?.slice(0, 60) || "";
       bar.classList.add("show");
       document.getElementById("chat-textarea").focus();
@@ -1942,16 +2057,6 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       <button class="ce-btn" onclick="clientQuickEmoji('🙏')">🙏</button>
       <button class="ce-btn" onclick="clientQuickEmoji('🔥')">🔥</button>
     </div>
-    <!-- קלט -->
-    <div id="client-reply-bar" style="display:none;background:rgba(14,165,233,.07);border-top:1px solid var(--border);padding:8px 14px;flex-direction:row;align-items:center;gap:10px">
-      <div style="border-right:3px solid var(--primary);padding-right:8px;flex:1;min-width:0">
-        <div style="font-size:11px;font-weight:700;color:var(--primary)" id="crb-name"></div>
-        <div style="font-size:12px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="crb-text"></div>
-      </div>
-      <button onclick="cancelClientReply()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;flex-shrink:0">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
         <!-- Reply bar -->
     <div class="reply-bar-client" id="client-reply-bar">
       <div class="rbc-line">
@@ -1972,6 +2077,9 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
         onkeydown="chatKeydown(event)"
         oninput="autoResize(this)"
       ></textarea>
+      <button class="chat-img-btn" id="chat-img-btn" title="שלח תמונה">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
       <button class="chat-send-btn" id="chat-send-btn" onclick="sendChatMsg()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="22" y1="2" x2="11" y2="13"/>
@@ -2001,6 +2109,10 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       <div class="ctx-action" id="cctx-copy">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         העתק הודעה
+      </div>
+      <div class="ctx-action" id="cctx-star">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="cctx-star-lbl">סמן בכוכב</span>
       </div>
       <div class="ctx-action" id="cctx-edit" style="display:none">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
@@ -2040,7 +2152,5 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
   <!-- input מוסתר לבחירת קובץ -->
   <input type="file" id="chat-file-input" accept="image/*" capture="environment" style="display:none"/>
 
-</body<button class="chat-img-btn" id="chat-img-btn" title="שלח תמונה">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </button>
-        >
+</body>
+</html>
