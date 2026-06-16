@@ -2128,16 +2128,28 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     };
 
     /* פתיחת תמונה חד-פעמית (#35) */
+    /* תמונה חד-פעמית — צפייה עד סגירה, ואז חסימה + מחיקה מהשרת (#35) */
+    let pendingOneTimeClose = null;
     window.openOneTimeImage = async (key, msg) => {
-      if (msg.viewed && msg.sender === "agent") { toast("התמונה כבר נצפתה"); return; }
-      /* צד הלקוח צופה בתמונה שנשלחה אליו */
+      if (msg.sender === "agent" && msg.viewed) { toast("התמונה כבר נצפתה"); return; }
       openLightbox(msg.imageUrl);
+      /* החסימה תתבצע בסגירת ה-lightbox */
       if (msg.sender === "agent" && !msg.viewed) {
-        /* סימון כנצפתה + מחיקת ה-URL מהשרת אחרי צפייה */
-        await set(ref(db, `clients/${currentPhone}/messages/${key}/viewed`), true);
-        await set(ref(db, `clients/${currentPhone}/messages/${key}/viewedAt`), Date.now());
+        pendingOneTimeClose = key;
       }
     };
+    async function finalizeOneTime() {
+      if (!pendingOneTimeClose || !currentPhone) return;
+      const key = pendingOneTimeClose;
+      pendingOneTimeClose = null;
+      try {
+        /* סימון כנצפתה + מחיקת ה-URL מהשרת (אבטחה + פינוי מקום) */
+        await update(ref(db, `clients/${currentPhone}/messages/${key}`), {
+          viewed: true, viewedAt: Date.now(), imageUrl: null
+        });
+      } catch(e) { console.error(e); }
+    }
+    window.finalizeOneTimeClose = finalizeOneTime;
 
     /* פתיחת lightbox */
     /* ── Lightbox עם זום (#4) ── */
@@ -2198,7 +2210,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
         }
       }, { passive: false });
       /* סגירה רק בלחיצה על הרקע (לא על התמונה) */
-      lb.addEventListener("click", e => { if (e.target === lb) { lb.classList.remove("show"); lbReset(); } });
+      lb.addEventListener("click", e => { if (e.target === lb) { lb.classList.remove("show"); lbReset(); finalizeOneTime(); } });
       img.addEventListener("click", e => e.stopPropagation());
     })();
 
@@ -2385,7 +2397,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
 
   <!-- Lightbox תמונה -->
   <div class="img-lightbox" id="img-lightbox">
-    <button class="img-lightbox-close" onclick="document.getElementById('img-lightbox').classList.remove('show')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <button class="img-lightbox-close" onclick="document.getElementById('img-lightbox').classList.remove('show'); if(window.finalizeOneTimeClose) window.finalizeOneTimeClose();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <img id="lightbox-img" src="" alt="תמונה"/>
   </div>
 
