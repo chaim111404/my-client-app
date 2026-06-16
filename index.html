@@ -1770,7 +1770,7 @@
           : "";
 
         /* reply preview */
-        const rpHtml = m.replyTo ? `<div style="background:rgba(14,165,233,.08);border-right:3px solid var(--primary);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);max-width:100%;overflow:hidden"><div style="font-weight:700;color:var(--primary);font-size:11px;margin-bottom:1px">${m.replyTo.sender==="client"?"אתה":"נציג"}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.replyTo.text}</div></div>` : "";
+        const rpHtml = m.replyTo ? `<div style="background:rgba(14,165,233,.08);border-right:3px solid var(--primary);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);max-width:100%;overflow:hidden;display:flex;align-items:center;gap:8px">${m.replyTo.type==="image"&&m.replyTo.imageUrl?`<img src="${m.replyTo.imageUrl}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0" alt=""/>`:""}<div style="min-width:0;flex:1"><div style="font-weight:700;color:var(--primary);font-size:11px;margin-bottom:1px">${m.replyTo.sender==="client"?"אתה":"נציג"}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.replyTo.type==="image"?(m.replyTo.text||"תמונה"):m.replyTo.text}</div></div></div>` : "";
         wrap.innerHTML = `
           ${rpHtml}
           ${senderLabel ? `<div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:3px;padding:0 2px">${senderLabel}</div>` : ""}
@@ -1908,7 +1908,7 @@
       try {
         const msgKey = `msg_${Date.now()}`;
         const msgData = { text, at: Date.now(), sender: "client", seen: false, agentRead: false };
-        if (clientReplyTo) { msgData.replyTo = { text: clientReplyTo.text.slice(0,80), sender: clientReplyTo.sender }; cancelClientReply(); }
+        if (clientReplyTo) { msgData.replyTo = buildClientReplyMeta(clientReplyTo); cancelClientReply(); }
         await set(ref(db, `clients/${currentPhone}/messages/${msgKey}`), msgData);
         /* #2 — סימון מי פתח את השיחה (אם אין עדיין) */
         await stampOpenedBy(currentPhone, "client", allClients?.[currentPhone]?.name || "הלקוח");
@@ -2283,17 +2283,33 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
 
     /* Reply */
     window.setClientReply = (key, msg) => {
-      clientReplyTo = { key, text: msg.text, sender: msg.sender };
+      clientReplyTo = { key, text: msg.text, sender: msg.sender, type: msg.type, imageUrl: msg.imageUrl };
       const bar = document.getElementById("client-reply-bar");
       document.getElementById("crb-name").textContent = msg.sender === "client" ? "אתה" : (allClients?.[currentPhone]?.agentName || "נציג");
-      document.getElementById("crb-text").textContent = msg.text?.slice(0, 60) || "";
+      const thumb = document.getElementById("crb-thumb");
+      const isImg = msg.type === "image" && msg.imageUrl;
+      if (isImg) {
+        thumb.src = msg.imageUrl; thumb.style.display = "block";
+        document.getElementById("crb-text").textContent = msg.text ? msg.text.slice(0, 60) : "תמונה";
+      } else {
+        thumb.style.display = "none"; thumb.src = "";
+        document.getElementById("crb-text").textContent = msg.text?.slice(0, 60) || "";
+      }
       bar.classList.add("show");
       document.getElementById("chat-textarea").focus();
     };
     window.cancelClientReply = () => {
       clientReplyTo = null;
       document.getElementById("client-reply-bar").classList.remove("show");
+      const t = document.getElementById("crb-thumb"); if (t) { t.style.display = "none"; t.src = ""; }
     };
+    /* בונה אובייקט reply עם תמונה ממוזערת אם רלוונטי (#reply לתמונה) */
+    function buildClientReplyMeta(r) {
+      const meta = { sender: r.sender };
+      if (r.type === "image" && r.imageUrl) { meta.type = "image"; meta.imageUrl = r.imageUrl; meta.text = r.text ? r.text.slice(0, 80) : ""; }
+      else { meta.text = (r.text || "").slice(0, 80); }
+      return meta;
+    }
 
 
     /* ══════════════════════════════════
@@ -2366,7 +2382,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
           seen: false, agentRead: false, type: "image"
         };
         if (oneTime) { msgData.oneTime = true; msgData.viewed = false; }
-        if (clientReplyTo) { msgData.replyTo = { text: clientReplyTo.text?.slice(0,80)||"📷 תמונה", sender: clientReplyTo.sender }; cancelClientReply(); }
+        if (clientReplyTo) { msgData.replyTo = buildClientReplyMeta(clientReplyTo); cancelClientReply(); }
         await set(ref(db, "clients/" + currentPhone + "/messages/" + msgKey), msgData);
         await stampOpenedBy(currentPhone, "client", allClients?.[currentPhone]?.name || "הלקוח");
         loadingEl.remove();
@@ -2568,6 +2584,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     </div>
         <!-- Reply bar -->
     <div class="reply-bar-client" id="client-reply-bar">
+      <img id="crb-thumb" style="display:none;width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0;margin-left:8px" alt=""/>
       <div class="rbc-line">
         <div class="rbc-name" id="crb-name"></div>
         <div class="rbc-text" id="crb-text"></div>
