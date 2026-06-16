@@ -1804,6 +1804,41 @@
               if (!msgData.deleted) openClientCtx(key, msgData);
             });
           }
+          /* swipe לתגובה (#4) — שלי (client) גורר שמאלה, נציג גורר ימינה */
+          if (!msgData.deleted) {
+            const mine = msgData.sender === "client";
+            let sx=0, sy=0, dragging=false, decided=false, active=false, curDx=0;
+            const TH=55;
+            wrap.addEventListener("touchstart", e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; dragging=true; decided=false; active=false; curDx=0; }, {passive:true});
+            wrap.addEventListener("touchmove", e=>{
+              if(!dragging) return;
+              const dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+              if(!decided){
+                if(Math.abs(dx)<6 && Math.abs(dy)<6) return;
+                if(Math.abs(dy)>Math.abs(dx)){ dragging=false; return; }
+                if(mine && dx>0){ dragging=false; return; }
+                if(!mine && dx<0){ dragging=false; return; }
+                decided=true; active=true;
+              }
+              if(!active) return;
+              curDx=Math.max(-90,Math.min(90,dx));
+              bubbleEl.style.transition="none";
+              bubbleEl.style.transform=`translateX(${curDx*0.6}px)`;
+              bubbleEl.style.opacity=String(1-Math.min(Math.abs(curDx)/220,0.25));
+            }, {passive:true});
+            const endSwipe=()=>{
+              if(!dragging && !active) return;
+              dragging=false;
+              if(active){
+                bubbleEl.style.transition="transform .2s ease, opacity .2s ease";
+                bubbleEl.style.transform=""; bubbleEl.style.opacity="";
+                if(Math.abs(curDx)>=TH) setClientReply(key, msgData);
+              }
+              active=false;
+            };
+            wrap.addEventListener("touchend", endSwipe, {passive:true});
+            wrap.addEventListener("touchcancel", endSwipe, {passive:true});
+          }
         }
         container.insertBefore(wrap, document.getElementById("typing-indicator"));
         /* סימון כנקרא */
@@ -2058,6 +2093,16 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
               <div style="width:38px;height:38px;border-radius:11px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
               <div><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">הצטרפות</div><div style="font-size:14px;font-weight:600">${new Date(snap.joinedAt).toLocaleDateString("he-IL")}</div></div>
             </div>` : ""}
+            <div id="cps-starred" style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(245,158,11,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--warning)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div style="flex:1"><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">מועדפים</div><div style="font-size:14px;font-weight:600">הודעות שסימנת בכוכב</div></div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <div id="cps-media" style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(14,165,233,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+              <div style="flex:1"><div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">מדיה</div><div style="font-size:14px;font-weight:600">כל התמונות בצ'אט</div></div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
             <div style="padding-top:16px">
               <button id="cps-avatar-btn" style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;color:var(--primary);font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -2073,7 +2118,65 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       sheet.querySelector("#cps-close").onclick = () => sheet.remove();
       sheet.querySelector("#cps-close2").onclick = () => sheet.remove();
       sheet.querySelector("#cps-avatar-btn").onclick = () => { sheet.remove(); openAvatarPicker(); };
+      sheet.querySelector("#cps-starred").onclick = () => { sheet.remove(); openClientStarred(); };
+      sheet.querySelector("#cps-media").onclick = () => { sheet.remove(); openClientMedia(); };
     };
+
+    /* ── מועדפים: הודעות שהלקוח (צד client) סימן בכוכב (#6) ── */
+    window.openClientStarred = () => {
+      if (!currentPhone) return;
+      const snap = allClients?.[currentPhone] || {};
+      const agentName = snap.agentName || "נציג";
+      const all = snap.messages ? Object.entries(snap.messages).filter(([, m]) => m.type !== "closed") : [];
+      const starred = all.filter(([, m]) => m.starredBy && m.starredBy["client"]).sort((a, b) => (a[1].at || 0) - (b[1].at || 0));
+      const rows = starred.length
+        ? starred.map(([key, m]) => {
+            const who = (m.sender === "client") ? "אתה" : agentName;
+            const time = `${new Date(m.at).toLocaleDateString("he-IL")} · ${new Date(m.at).toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"})}`;
+            let content;
+            if (m.type === "image" && m.imageUrl) content = `<img src="${m.imageUrl}" style="max-width:160px;max-height:160px;border-radius:10px;margin-top:4px;display:block;cursor:pointer;object-fit:cover" onclick="openLightbox('${m.imageUrl}')"/>${m.text?`<div style="font-size:14px;margin-top:4px">${m.text}</div>`:""}`;
+            else if (m.type === "image") content = `<div style="font-size:14px;opacity:.6">📷 תמונה</div>`;
+            else content = `<div style="font-size:14px;line-height:1.5;word-break:break-word">${m.deleted?"<em style='opacity:.6'>ההודעה נמחקה</em>":(m.text||"")}</div>`;
+            return `<div style="background:var(--bg);border-radius:14px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:700;color:var(--primary)">${who}</span><span style="font-size:11px;color:var(--text-muted)">${time}</span></div>${content}</div>`;
+          }).join("")
+        : `<div style="text-align:center;color:var(--text-muted);font-size:14px;padding:48px 20px">אין הודעות שסומנו בכוכב</div>`;
+      showClientPanel("הודעות שסומנו בכוכב", rows);
+    };
+
+    /* ── מדיה: כל התמונות בצ'אט (#6) ── */
+    window.openClientMedia = () => {
+      if (!currentPhone) return;
+      const snap = allClients?.[currentPhone] || {};
+      const agentName = snap.agentName || "נציג";
+      const imgs = snap.messages ? Object.entries(snap.messages).filter(([, m]) => m.type === "image" && m.imageUrl && !m.deleted) : [];
+      imgs.sort((a, b) => (b[1].at || 0) - (a[1].at || 0));
+      const grid = imgs.length
+        ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${imgs.map(([key, m]) => {
+            const who = (m.sender === "client") ? "אתה" : agentName;
+            const time = new Date(m.at).toLocaleDateString("he-IL");
+            return `<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;background:var(--bg)" onclick="openLightbox('${m.imageUrl}')"><img src="${m.imageUrl}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy"/><div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;font-size:9px;padding:8px 5px 4px;line-height:1.3">${who} · ${time}</div></div>`;
+          }).join("")}</div>`
+        : `<div style="text-align:center;color:var(--text-muted);font-size:14px;padding:48px 20px">אין תמונות בצ'אט הזה</div>`;
+      showClientPanel("מדיה", grid);
+    };
+
+    /* פאנל גנרי ללקוח (#6) */
+    function showClientPanel(title, innerHtml) {
+      document.getElementById("client-panel-sheet")?.remove();
+      const sheet = document.createElement("div");
+      sheet.id = "client-panel-sheet";
+      sheet.style.cssText = "position:fixed;inset:0;background:rgba(12,26,46,.7);backdrop-filter:blur(6px);z-index:550;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease";
+      sheet.innerHTML = `<div style="background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:85dvh;display:flex;flex-direction:column" onclick="event.stopPropagation()">
+        <div style="display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border)">
+          <button id="cpanel-close" style="background:rgba(255,255,255,.08);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <span style="font-size:17px;font-weight:800">${title}</span>
+        </div>
+        <div style="padding:14px 16px;overflow-y:auto">${innerHtml}</div>
+      </div>`;
+      document.body.appendChild(sheet);
+      sheet.onclick = e => { if (e.target === sheet) sheet.remove(); };
+      sheet.querySelector("#cpanel-close").onclick = () => sheet.remove();
+    }
 
     /* ── Reply לקוח ── */
     let clientReplyTo = null;
