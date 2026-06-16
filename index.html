@@ -666,6 +666,9 @@
       font-size: 14px; line-height: 1.5;
       word-break: break-word;
     }
+    /* הדגשה רגעית של הודעת יעד אחרי ניווט מ-reply (#1) */
+    @keyframes msgJumpHL{0%{box-shadow:0 0 0 0 rgba(14,165,233,.55)}30%{box-shadow:0 0 0 3px rgba(14,165,233,.55)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
+    .msg-jump-hl{animation:msgJumpHL 1.5s ease}
     /* גודל תמונה בצ'אט — מוגבל לתצוגה נורמלית */
     .msg-img {
       max-width: 220px; max-height: 280px;
@@ -1770,7 +1773,7 @@
           : "";
 
         /* reply preview */
-        const rpHtml = m.replyTo ? `<div style="background:rgba(14,165,233,.08);border-right:3px solid var(--primary);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);max-width:100%;overflow:hidden;display:flex;align-items:center;gap:8px">${m.replyTo.type==="image"&&m.replyTo.imageUrl?`<img src="${m.replyTo.imageUrl}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0" alt=""/>`:""}<div style="min-width:0;flex:1"><div style="font-weight:700;color:var(--primary);font-size:11px;margin-bottom:1px">${m.replyTo.sender==="client"?"אתה":"נציג"}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.replyTo.type==="image"?(m.replyTo.text||"תמונה"):m.replyTo.text}</div></div></div>` : "";
+        const rpHtml = m.replyTo ? `<div style="background:rgba(14,165,233,.08);border-right:3px solid var(--primary);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);max-width:100%;overflow:hidden;display:flex;align-items:center;gap:8px;cursor:pointer"${m.replyTo.key ? ` onclick="window.jumpToMsg('${m.replyTo.key}')"` : ""}>${m.replyTo.type==="image"&&m.replyTo.imageUrl?`<img src="${m.replyTo.imageUrl}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0" alt=""/>`:""}<div style="min-width:0;flex:1"><div style="font-weight:700;color:var(--primary);font-size:11px;margin-bottom:1px">${m.replyTo.sender==="client"?"אתה":"נציג"}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.replyTo.type==="image"?(m.replyTo.text||"תמונה"):m.replyTo.text}</div></div></div>` : "";
         wrap.innerHTML = `
           ${rpHtml}
           ${senderLabel ? `<div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:3px;padding:0 2px">${senderLabel}</div>` : ""}
@@ -2303,9 +2306,21 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       document.getElementById("client-reply-bar").classList.remove("show");
       const t = document.getElementById("crb-thumb"); if (t) { t.style.display = "none"; t.src = ""; }
     };
+    /* ניווט להודעה המקורית מתוך תצוגת ה-reply (#1) */
+    window.jumpToMsg = (key) => {
+      const container = document.getElementById("chat-messages");
+      if (!container) return;
+      const bubble = container.querySelector(`.msg-bubble-item[data-key="${key}"]`);
+      if (!bubble) { showToastClient("ההודעה המקורית לא נמצאה"); return; }
+      bubble.scrollIntoView({ behavior: "smooth", block: "center" });
+      bubble.classList.remove("msg-jump-hl");
+      void bubble.offsetWidth;
+      bubble.classList.add("msg-jump-hl");
+      setTimeout(() => bubble.classList.remove("msg-jump-hl"), 1600);
+    };
     /* בונה אובייקט reply עם תמונה ממוזערת אם רלוונטי (#reply לתמונה) */
     function buildClientReplyMeta(r) {
-      const meta = { sender: r.sender };
+      const meta = { sender: r.sender, key: r.key };
       if (r.type === "image" && r.imageUrl) { meta.type = "image"; meta.imageUrl = r.imageUrl; meta.text = r.text ? r.text.slice(0, 80) : ""; }
       else { meta.text = (r.text || "").slice(0, 80); }
       return meta;
