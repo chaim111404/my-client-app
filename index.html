@@ -669,6 +669,8 @@
     /* הדגשה רגעית של הודעת יעד אחרי ניווט מ-reply (#1) */
     @keyframes msgJumpHL{0%{box-shadow:0 0 0 0 rgba(14,165,233,.55)}30%{box-shadow:0 0 0 3px rgba(14,165,233,.55)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
     .msg-jump-hl{animation:msgJumpHL 1.5s ease}
+    /* פס "הודעות חדשות" כשהצ'אט פתוח (#2) */
+    .new-msgs-bar{align-self:center;text-align:center;font-size:12px;font-weight:700;color:var(--primary);background:rgba(14,165,233,.12);border-radius:20px;padding:5px 14px;margin:8px auto}
     /* גודל תמונה בצ'אט — מוגבל לתצוגה נורמלית */
     .msg-img {
       max-width: 220px; max-height: 280px;
@@ -1364,6 +1366,11 @@
        onDisconnect מבטיח עדכון גם בסגירת כרטיסייה/אפליקציה/ניתוק רשת */
     let presenceRef = null;
     let chatOpen = false;   /* חלון הצ'אט פתוח כרגע (מוגדר כאן כדי שיהיה זמין ל-setupPresence) */
+    /* מצב פס "הודעות חדשות" (#2) */
+    let cChatAtBottom = true;
+    let cNewMsgsSinceRead = 0;
+    let cFirstUnreadKey = null;
+    let cLastRenderedKeys = new Set();
     function setupPresence(phone) {
       presenceRef = ref(db, `clients/${phone}/presence`);
       const goOnline = () => set(presenceRef, { online: true, chatOpen: chatOpen, lastSeen: Date.now() }).catch(()=>{});
@@ -1677,6 +1684,17 @@
         renderClientChat(msgs, phone);
         updateChatBadge(msgs);
       });
+      /* #2 — איפוס מצב פס "הודעות חדשות" + מעקב גלילה */
+      cChatAtBottom = true; cNewMsgsSinceRead = 0; cFirstUnreadKey = null; cLastRenderedKeys = new Set();
+      const _cc = document.getElementById("chat-messages");
+      if (_cc && !_cc.dataset.nmBound) {
+        _cc.dataset.nmBound = "1";
+        _cc.addEventListener("scroll", () => {
+          const atBottom = (_cc.scrollHeight - _cc.scrollTop - _cc.clientHeight) < 60;
+          cChatAtBottom = atBottom;
+          if (atBottom && cNewMsgsSinceRead > 0) { cNewMsgsSinceRead = 0; cFirstUnreadKey = null; renderClientChat(allClients[currentPhone]?.messages || {}, currentPhone); }
+        }, { passive: true });
+      }
       /* האזנה לקלדן של הנציג */
       onValue(ref(db, `clients/${phone}/agentTyping`), snap => {
         const data = snap.val();
@@ -1721,9 +1739,27 @@
       }
 
       entries.sort(([,a],[,b]) => a.at - b.at);
+
+      /* #2 — זיהוי הודעות חדשות מהנציג בזמן שהמשתמש לא בתחתית */
+      container.querySelector(".new-msgs-bar")?.remove();
+      const cIncomingNew = entries.filter(([key,m]) => m.sender === "agent" && !cLastRenderedKeys.has(key));
+      const cIsFirstRender = cLastRenderedKeys.size === 0;
+      if (!cIsFirstRender && !cChatAtBottom && cIncomingNew.length) {
+        if (!cFirstUnreadKey) cFirstUnreadKey = cIncomingNew[0][0];
+        cNewMsgsSinceRead += cIncomingNew.length;
+      }
+      entries.forEach(([key]) => cLastRenderedKeys.add(key));
+
       let lastDate = "";
       entries.forEach(([key,m]) => {
         if (m.type === "closed") return; /* הודעת מערכת — לא מציג */
+        /* #2 — פס "הודעות חדשות" לפני ההודעה הראשונה שלא נקראה */
+        if (cFirstUnreadKey && key === cFirstUnreadKey && cNewMsgsSinceRead > 0) {
+          const nbar = document.createElement("div");
+          nbar.className = "new-msgs-bar";
+          nbar.textContent = cNewMsgsSinceRead === 1 ? "הודעה חדשה" : `${cNewMsgsSinceRead} הודעות חדשות`;
+          container.insertBefore(nbar, document.getElementById("typing-indicator"));
+        }
         const dateStr = new Date(m.at).toLocaleDateString("he-IL");
         if (dateStr !== lastDate) {
           lastDate = dateStr;
@@ -1851,7 +1887,10 @@
         }
       });
       if (window.initImageLoaders) window.initImageLoaders(container);
-      setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+      /* #2 — גלילה לתחתית רק אם המשתמש כבר בתחתית */
+      if (cChatAtBottom) {
+        setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+      }
     }
 
     /* badge — הודעות נציג שלא נקראו */
@@ -2138,7 +2177,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
             const time = `${new Date(m.at).toLocaleDateString("he-IL")} · ${new Date(m.at).toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"})}`;
             let content;
             if (m.type === "image" && m.imageUrl) content = `<img src="${m.imageUrl}" style="max-width:160px;max-height:160px;border-radius:10px;margin-top:4px;display:block;cursor:pointer;object-fit:cover" onclick="openLightbox('${m.imageUrl}')"/>${m.text?`<div style="font-size:14px;margin-top:4px">${m.text}</div>`:""}`;
-            else if (m.type === "image") content = `<div style="font-size:14px;opacity:.6">📷 תמונה</div>`;
+            else if (m.type === "image") content = `<div style="font-size:14px;opacity:.6;display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>תמונה</div>`;
             else content = `<div style="font-size:14px;line-height:1.5;word-break:break-word">${m.deleted?"<em style='opacity:.6'>ההודעה נמחקה</em>":(m.text||"")}</div>`;
             return `<div style="background:var(--bg);border-radius:14px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:700;color:var(--primary)">${who}</span><span style="font-size:11px;color:var(--text-muted)">${time}</span></div>${content}</div>`;
           }).join("")
@@ -2242,7 +2281,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
         /* כוכב פרטי (#5) — צד הלקוח, נשמר תחת starredBy/client */
         const cur = !!(ctxMsg?.starredBy && ctxMsg.starredBy["client"]);
         await set(ref(db, `clients/${currentPhone}/messages/${ctxKey}/starredBy/client`), cur ? null : true);
-        toast(cur ? "הוסר מהמועדפים" : "⭐ נוסף למועדפים");
+        toast(cur ? "הוסר מהמועדפים" : "נוסף למועדפים");
       }
       closeClientCtx();
     };
