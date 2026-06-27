@@ -3,6 +3,7 @@
   "short_name": "WebDesk",
   "description": "פורטל לקוחות - ניהול אתרים",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#071f45",
   "theme_color": "#1a6fd4",
@@ -11,16 +12,16 @@
   "dir": "rtl",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://i.postimg.cc/3R4hWfVm/IMG-0696.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://i.postimg.cc/3R4hWfVm/IMG-0696.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
