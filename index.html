@@ -162,6 +162,16 @@
     .btn-login:hover::after { opacity: 1; }
     .btn-login:active { transform: scale(0.98); }
     .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-login.loading { opacity: 1; }
+    .btn-login-spin { display: inline-block; width: 18px; height: 18px; margin-inline-end: 8px; vertical-align: -3px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+    /* אימות SMS — תיבות קוד */
+    .otp-boxes { display: flex; gap: 8px; justify-content: center; margin: 10px 0 18px; }
+    .otp-box { width: 44px; height: 54px; text-align: center; font-size: 24px; font-weight: 800; border: 2px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s; font-family: 'Heebo', sans-serif; }
+    .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,165,233,.15); }
+    .otp-box.filled { border-color: var(--primary); }
+    .otp-actions { display: flex; justify-content: space-between; margin-top: 14px; }
+    .otp-link { background: none; border: none; color: var(--primary); font-family: 'Heebo', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px; }
+    .otp-link:disabled { color: var(--text-muted); cursor: not-allowed; }
 
     .error-msg {
       background: rgba(239,68,68,0.12);
@@ -627,10 +637,83 @@
     }
     .chat-close-btn:hover { background: var(--border); }
 
+    /* #134 — תפריט + דיווח על השיחה */
+    .chat-menu-btn { background: var(--bg); border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: background .15s; }
+    .chat-menu-btn:hover { background: var(--border); }
+    .chat-menu { display: none; position: absolute; top: 56px; inset-inline-end: 10px; background: var(--card, #fff); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 32px rgba(12,26,46,.18); z-index: 50; overflow: hidden; min-width: 180px; }
+    .chat-menu.show { display: block; }
+    .chat-menu button { display: flex; align-items: center; gap: 9px; width: 100%; background: none; border: none; padding: 13px 16px; font-family: 'Heebo', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; text-align: start; }
+    .chat-menu button:hover { background: var(--bg); }
+    .chat-menu button.danger { color: var(--danger, #ef4444); }
+    .chat-menu button.danger:hover { background: rgba(239,68,68,.07); }
+    .report-overlay { display: none; position: fixed; inset: 0; background: rgba(12,26,46,.6); backdrop-filter: blur(5px); z-index: 9600; align-items: center; justify-content: center; padding: 22px; }
+    .report-overlay.show { display: flex; }
+    .report-card { background: var(--card, #fff); border-radius: 20px; padding: 24px 22px calc(20px + env(safe-area-inset-bottom)); max-width: 380px; width: 100%; box-shadow: 0 24px 64px rgba(12,26,46,.4); max-height: 90vh; overflow-y: auto; }
+    .report-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .report-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    .report-reason { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .15s; }
+    .report-reason .rr-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; transition: all .15s; }
+    .report-reason.sel { border-color: var(--primary); background: rgba(14,165,233,.06); }
+    .report-reason.sel .rr-dot { border-color: var(--primary); background: var(--primary); box-shadow: inset 0 0 0 3px var(--card, #fff); }
+    .report-detail { width: 100%; min-height: 74px; resize: vertical; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 11px 14px; font-family: 'Heebo', sans-serif; font-size: 14px; color: var(--text); outline: none; margin-top: 6px; }
+    .report-count { font-size: 12px; color: var(--text-muted); text-align: start; margin-top: 4px; }
+    .report-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .report-actions button { flex: 1; border: none; border-radius: 12px; font-family: 'Heebo', sans-serif; font-size: 15px; font-weight: 700; padding: 13px; cursor: pointer; }
+    .report-send { background: var(--danger, #ef4444); color: #fff; }
+    .report-send:disabled { opacity: .5; cursor: not-allowed; }
+    .report-cancel { background: var(--bg); color: var(--text-muted); border: 1.5px solid var(--border) !important; }
+    .report-msg-preview { background: var(--bg); border-inline-start: 3px solid var(--primary); border-radius: 10px; padding: 8px 12px; margin-bottom: 14px; }
+    .rmp-name { font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
+    .rmp-txt { font-size: 13.5px; color: var(--text); line-height: 1.5; max-height: 60px; overflow: hidden; word-break: break-word; }
+    .report-success { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 26px 10px 12px; }
+    .report-success.show { display: flex; }
+    .report-check { width: 84px; height: 84px; }
+    .report-check .rc-circle { stroke: var(--success); stroke-width: 3; stroke-dasharray: 151; stroke-dashoffset: 151; animation: rcCircle .5s ease forwards; }
+    .report-check .rc-check { stroke: var(--success); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: rcCheck .35s .45s ease forwards; }
+    .report-success-txt { font-size: 17px; font-weight: 800; color: var(--success); margin-top: 14px; }
+    @keyframes rcCircle { to { stroke-dashoffset: 0; } }
+    @keyframes rcCheck { to { stroke-dashoffset: 0; } }
+
+    /* #137 — דירוג שיחה (5 כוכבים) */
+    .rate-overlay { display: none; position: fixed; inset: 0; background: rgba(12,26,46,.6); backdrop-filter: blur(5px); z-index: 9650; align-items: center; justify-content: center; padding: 22px; }
+    .rate-overlay.show { display: flex; }
+    .rate-card { background: var(--card, #fff); border-radius: 20px; padding: 26px 22px calc(22px + env(safe-area-inset-bottom)); max-width: 360px; width: 100%; box-shadow: 0 24px 64px rgba(12,26,46,.4); text-align: center; }
+    .rate-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .rate-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+    .rate-stars { display: flex; gap: 8px; justify-content: center; margin: 6px 0 14px; }
+    .rate-star { width: 40px; height: 40px; cursor: pointer; color: var(--border); transition: transform .12s, color .12s; }
+    .rate-star:active { transform: scale(.9); }
+    .rate-star.on { color: #f5b301; }
+    .rate-input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 11px 14px; font-family: 'Heebo', sans-serif; font-size: 14px; color: var(--text); outline: none; text-align: center; }
+    .rate-count { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .rate-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .rate-actions button { flex: 1; border: none; border-radius: 12px; font-family: 'Heebo', sans-serif; font-size: 15px; font-weight: 700; padding: 13px; cursor: pointer; }
+    .rate-send { background: var(--primary); color: #fff; }
+    .rate-send:disabled { opacity: .5; cursor: not-allowed; }
+    .rate-skip { background: var(--bg); color: var(--text-muted); }
+    .rate-success { display: none; flex-direction: column; align-items: center; padding: 22px 8px 8px; }
+    .rate-success.show { display: flex; }
+    .rate-thanks { font-size: 17px; font-weight: 800; color: var(--success); margin-top: 12px; }
+
+    /* #104 — בורר רקע לצ'אט */
+    .bg-picker-overlay { display: none; position: fixed; inset: 0; background: rgba(12,26,46,.6); backdrop-filter: blur(5px); z-index: 9660; align-items: center; justify-content: center; padding: 22px; }
+    .bg-picker-overlay.show { display: flex; }
+    .bg-picker-card { background: var(--card, #fff); border-radius: 20px; padding: 22px 20px calc(20px + env(safe-area-inset-bottom)); max-width: 380px; width: 100%; box-shadow: 0 24px 64px rgba(12,26,46,.4); max-height: 88vh; overflow-y: auto; }
+    .bg-picker-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .bg-picker-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    .bg-swatch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .bg-swatch { border: none; background: none; cursor: pointer; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .bg-swatch-preview { width: 100%; aspect-ratio: 1; border-radius: 14px; border: 2px solid var(--border); box-shadow: inset 0 0 0 1px rgba(0,0,0,.02); transition: border-color .15s, transform .12s; }
+    .bg-swatch:active .bg-swatch-preview { transform: scale(.95); }
+    .bg-swatch.sel .bg-swatch-preview { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,165,233,.2); }
+    .bg-swatch-name { font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+    .bg-swatch.sel .bg-swatch-name { color: var(--primary); }
+    .bg-picker-close { width: 100%; margin-top: 16px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; color: var(--text-muted); font-family: 'Heebo', sans-serif; font-size: 15px; font-weight: 700; padding: 12px; cursor: pointer; }
+
     /* סטטוס שיחה סגורה */
     .chat-closed-banner {
       background: rgba(100,116,139,.08);
-      border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border);
       padding: 10px 20px;
       font-size: 13px; color: var(--text-muted);
       text-align: center; display: none;
@@ -710,6 +793,8 @@
     .img-preview-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; color: #fff; font-size: 16px; font-weight: 700; }
     .ipv-btn-x, .ipv-onetime { background: rgba(255,255,255,.12); border: none; border-radius: 50%; width: 40px; height: 40px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .ipv-onetime.active { background: var(--primary); color: #fff; box-shadow: 0 0 0 3px rgba(14,165,233,.3); }
+    .ipv-onetime-hint { display: none; align-items: center; justify-content: center; gap: 7px; margin: 0 16px 6px; padding: 8px 14px; background: rgba(14,165,233,.15); border: 1px solid rgba(14,165,233,.4); border-radius: 12px; color: #7dd3fc; font-size: 12.5px; font-weight: 600; text-align: center; }
+    .ipv-onetime-hint.show { display: flex; }
     .img-preview-imgwrap { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; }
     .img-preview-imgwrap img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; }
     .img-preview-bottom { display: flex; align-items: center; gap: 10px; padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); }
@@ -919,6 +1004,40 @@
     </div>
   </div>
 
+  <!-- מסך אימות SMS (אימות דו-שלבי במכשיר חדש) -->
+  <div id="screen-otp" class="screen">
+    <div class="login-card">
+      <div class="logo-wrap">
+        <div class="logo-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <div class="logo-text-wrap">
+          <div class="logo-title">אימות מאובטח</div>
+          <div class="logo-sub">שלב אחרון</div>
+        </div>
+      </div>
+      <div class="welcome-title">הזינו את קוד האימות</div>
+      <div class="welcome-sub" id="otp-sub">שלחנו קוד בן 6 ספרות ב-SMS</div>
+      <div class="otp-boxes" id="otp-boxes" dir="ltr">
+        <input class="otp-box" inputmode="numeric" maxlength="1" autocomplete="one-time-code" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+      </div>
+      <button id="btn-otp-verify" class="btn-login" onclick="verifyOtp()">אימות וכניסה</button>
+      <div id="otp-error" class="error-msg"></div>
+      <div class="otp-actions">
+        <button class="otp-link" id="otp-resend" onclick="resendOtp()">שליחת קוד מחדש</button>
+        <button class="otp-link" onclick="otpBack()">חזרה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- reCAPTCHA (בלתי-נראה) — מחוץ למסכים כדי שלא יהיה בתוך אלמנט מוסתר -->
+  <div id="recaptcha-container" style="position:fixed;bottom:0;left:0;z-index:-1"></div>
+
   <!-- מסך בית -->
   <div id="screen-home" class="screen">
     <div class="home-header">
@@ -1070,6 +1189,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, get, set, push, remove, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     const firebaseConfig = {
       apiKey:            "AIzaSyB9jeWAKY2UEz70V77SCPnSJ18IfwnsVV0",
       authDomain:        "deshbord-atarim-sheli.firebaseapp.com",
@@ -1082,6 +1202,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
     const storage = getStorage(app);
+    const auth = getAuth(app);
 
     /* ════════════════════════════════════════════════════════════════
        מודול טעינת תמונות חכם (skeleton + retry + offline)
@@ -1214,6 +1335,23 @@
     let currentPhone  = null;
     let allClients    = {};   /* רשומת הלקוח הנוכחי — מסונכרנת מהשרת (מתקן ReferenceError ששבר את הצ'אט) */
 
+    /* #107 — חלון פופאפ "ניתקנו אותך לצורך אבטחה" (במקום פס עליון) */
+    function showSecurityLogoutPopup() {
+      if (document.getElementById("sec-logout-pop")) return;
+      const ov = document.createElement("div");
+      ov.id = "sec-logout-pop";
+      ov.style.cssText = "position:fixed;inset:0;background:rgba(12,26,46,.6);backdrop-filter:blur(5px);z-index:9700;display:flex;align-items:center;justify-content:center;padding:22px";
+      ov.innerHTML = `
+        <div style="background:var(--card,#fff);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(12,26,46,.4)">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(245,158,11,.14);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--warning,#f59e0b)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12.01" y2="16.5"/></svg></div>
+          <div style="font-size:19px;font-weight:800;margin-bottom:8px">ניתקנו אותך לצורך אבטחה</div>
+          <div style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:22px">מטעמי אבטחה התנתקת מהמערכת. ניתן להתחבר מחדש.</div>
+          <button onclick="document.getElementById('sec-logout-pop').remove()" style="width:100%;background:var(--primary);border:none;border-radius:12px;color:#fff;font-family:'Heebo',sans-serif;font-size:15px;font-weight:700;padding:13px;cursor:pointer">התחברות מחדש</button>
+        </div>`;
+      document.body.appendChild(ov);
+    }
+    window.showSecurityLogoutPopup = showSecurityLogoutPopup;
+
     /* ── בדיקת סשן ── */
     window.addEventListener("DOMContentLoaded", () => {
       const saved = localStorage.getItem(SESSION_KEY);
@@ -1221,27 +1359,10 @@
         try {
           const { phone, expiry } = JSON.parse(saved);
           if (Date.now() < expiry) { loadHomeScreen(phone); return; }
-          /* פג תוקף — ניתוק אוטומטי */
+          /* פג תוקף — ניתוק אוטומטי (#107 — פופאפ במקום פס עליון) */
           localStorage.removeItem(SESSION_KEY);
           showScreen("screen-login");
-          setTimeout(() => {
-            const d = document.createElement("div");
-            d.style.cssText = "position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0d1b2e;color:#fff;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);border-right:3px solid #f59e0b;direction:rtl;font-family:'Heebo',sans-serif";
-            d.textContent = "ניתקנו אותך לצורך אבטחה — ניתן להתחבר מחדש";
-            document.body.appendChild(d);
-            setTimeout(() => d.remove(), 5000);
-          }, 100);
-          return;
-          /* פג תוקף */
-          localStorage.removeItem(SESSION_KEY);
-          showScreen("screen-login");
-          setTimeout(()=>{
-            const d=document.createElement("div");
-            d.style.cssText="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0d1b2e;color:#fff;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);border-right:3px solid var(--warning);white-space:nowrap;direction:rtl;font-family:'Heebo',sans-serif";
-            d.textContent="ניתקנו אותך לצורך אבטחה — ניתן להתחבר מחדש";
-            document.body.appendChild(d);
-            setTimeout(()=>d.remove(),5000);
-          },100);
+          showSecurityLogoutPopup();
           return;
         } catch(e) {}
         localStorage.removeItem(SESSION_KEY);
@@ -1259,6 +1380,33 @@
     document.getElementById("inp-pin").addEventListener("keydown", e => { if (e.key==="Enter") window.handleLogin(); });
 
     /* ── כניסה ── */
+    /* #126 — ספינר בתוך כפתור הכניסה בזמן אימות (לאחר ערכים תקינים) */
+    const BTN_LOGIN_TEXT = "כניסה לאזור האישי";
+    function setLoginLoading(on) {
+      const btn = document.getElementById("btn-login");
+      btn.disabled = on;
+      btn.classList.toggle("loading", on);
+      btn.innerHTML = on ? `<span class="btn-login-spin"></span>מתחבר...` : BTN_LOGIN_TEXT;
+    }
+    /* שליפת IP+מיקום עם ספקי גיבוי (ipapi.co מוגבל במכסה — נופלים לספק אחר) */
+    async function fetchGeo() {
+      /* 1) ipapi.co */
+      try {
+        const r = await fetch("https://ipapi.co/json/");
+        if (r.ok) { const g = await r.json(); if (g && g.ip && !g.error) return { ip: g.ip || "", country: g.country || "", city: g.city || "", region: g.region || "", countryName: g.country_name || "" }; }
+      } catch (e) {}
+      /* 2) ipwho.is */
+      try {
+        const r = await fetch("https://ipwho.is/");
+        if (r.ok) { const g = await r.json(); if (g && g.success !== false && g.ip) return { ip: g.ip || "", country: g.country_code || "", city: g.city || "", region: g.region || "", countryName: g.country || "" }; }
+      } catch (e) {}
+      /* 3) freeipapi.com */
+      try {
+        const r = await fetch("https://freeipapi.com/api/json");
+        if (r.ok) { const g = await r.json(); if (g && g.ipAddress) return { ip: g.ipAddress || "", country: g.countryCode || "", city: g.cityName || "", region: g.regionName || "", countryName: g.countryName || "" }; }
+      } catch (e) {}
+      return {};
+    }
     window.handleLogin = async () => {
       const rawPhone = phoneInput.value.replace(/\D/g,"");
       const pin      = document.getElementById("inp-pin").value.trim();
@@ -1269,11 +1417,12 @@
       if (rawPhone.length < 9) return showError("מספר טלפון לא תקין");
       if (!/^\d{4}$/.test(pin)) return showError("הקוד האישי חייב להיות 4 ספרות");
 
+      setLoginLoading(true);
       try {
         const blockedSnap = await get(ref(db, `blocked/${rawPhone}`));
         if (blockedSnap.exists() && blockedSnap.val().blocked) {
           document.getElementById("blocked-screen").classList.add("show");
-          btn.disabled = false; return;
+          setLoginLoading(false); return;
         }
         const clientSnap = await get(ref(db, `clients/${rawPhone}`));
         if (!clientSnap.exists()) { await recordFail(rawPhone, pin, null); return showError("מספר הטלפון לא נמצא במערכת"); }
@@ -1287,45 +1436,132 @@
           } else {
             showError(`קוד שגוי. נותרו ${left} ניסיונות.`);
           }
-          btn.disabled = false; return;
+          setLoginLoading(false); return;
         }
         await set(ref(db,`clients/${rawPhone}/failedAttempts`),0);
-        const expiry = Date.now() + 90*24*60*60*1000;
-        localStorage.setItem(SESSION_KEY, JSON.stringify({phone:rawPhone, expiry}));
-        /* שליפת IP ומדינה */
-        let geoData = {};
-        try {
-          const geoRes = await fetch("https://ipapi.co/json/");
-          const geo = await geoRes.json();
-          geoData = {
-            ip:      geo.ip       || "",
-            country: geo.country  || "",
-            city:    geo.city     || "",
-            region:  geo.region   || "",
-            countryName: geo.country_name || ""
-          };
-        } catch(e) { /* אם נכשל — ממשיך בלי geo */ }
-
-        const hist = client.loginHistory || {};
-        hist[Date.now()] = {
-          at: Date.now(),
-          ua: navigator.userAgent.slice(0,80),
-          ...geoData
-        };
-        await set(ref(db,`clients/${rawPhone}/loginHistory`), hist);
-        showScreen("screen-loading");
-        runLoadingAnimation(() => loadHomeScreen(rawPhone));
-      } catch(err) { showError("שגיאת תקשורת. נסו שוב."); console.error(err); btn.disabled=false; }
+        /* אימות דו-שלבי ב-SMS — רק במכשיר שטרם אומת (מחיקת localStorage/מכשיר אחר → SMS מחדש) */
+        if (isDeviceTrusted(rawPhone)) {
+          await proceedLogin(rawPhone, client);
+        } else {
+          await startSmsVerification(rawPhone, client);
+        }
+      } catch(err) { showError("שגיאת תקשורת. נסו שוב."); console.error(err); }
     };
 
-    async function recordFail(phone, pin, client) {
-      /* שליפת IP */
-      let geoData = {};
+    function isDeviceTrusted(phone) { return localStorage.getItem("wd_verified_" + phone) === "1"; }
+
+    /* השלמת ההתחברות (session + geo + היסטוריה + מעבר לבית) — משותף למכשיר מהימן ולאחר אימות SMS */
+    async function proceedLogin(rawPhone, client) {
+      const expiry = Date.now() + 90*24*60*60*1000;
+      localStorage.setItem(SESSION_KEY, JSON.stringify({phone:rawPhone, expiry}));
+      const geoData = await fetchGeo();
+      const hist = client.loginHistory || {};
+      hist[Date.now()] = { at: Date.now(), ua: navigator.userAgent.slice(0,80), ...geoData };
+      await set(ref(db,`clients/${rawPhone}/loginHistory`), hist);
+      showScreen("screen-loading");
+      runLoadingAnimation(() => loadHomeScreen(rawPhone));
+    }
+
+    /* ── אימות SMS (Firebase Phone Auth) ── */
+    let recaptchaVerifier = null, otpConfirmation = null, otpClient = null, otpPhone = null, otpResendCooldown = 0, otpResendTimer = null;
+    function freshRecaptcha() {
+      try { recaptchaVerifier?.clear?.(); } catch(_){}
+      recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
+      return recaptchaVerifier;
+    }
+    function toE164(phone) { return "+972" + phone.replace(/^0/, ""); }
+    function smsErrorText(e) {
+      const c = e?.code || "";
+      if (c.includes("too-many-requests")) return "יותר מדי ניסיונות. נסו שוב מאוחר יותר.";
+      if (c.includes("invalid-phone-number")) return "מספר הטלפון אינו תקין לשליחת SMS.";
+      if (c.includes("quota")) return "מכסת ההודעות מוצתה. נסו שוב מאוחר יותר.";
+      if (c.includes("captcha")) return "אימות ה-reCAPTCHA נכשל. רעננו ונסו שוב.";
+      return "שגיאה בשליחת קוד האימות. נסו שוב.";
+    }
+    async function startSmsVerification(rawPhone, client) {
+      otpClient = client; otpPhone = rawPhone;
       try {
-        const geoRes = await fetch("https://ipapi.co/json/");
-        const geo = await geoRes.json();
-        geoData = { ip: geo.ip||"", country: geo.country||"", city: geo.city||"", countryName: geo.country_name||"" };
-      } catch(e) {}
+        otpConfirmation = await signInWithPhoneNumber(auth, toE164(rawPhone), freshRecaptcha());
+        setLoginLoading(false);
+        showOtpScreen(rawPhone);
+      } catch (e) {
+        console.error(e);
+        try { recaptchaVerifier?.clear?.(); } catch(_){} recaptchaVerifier = null;
+        showError(smsErrorText(e));
+      }
+    }
+    function showOtpScreen(rawPhone) {
+      const masked = rawPhone.slice(0,3) + "-" + rawPhone.slice(3,6) + "•••" + rawPhone.slice(-2);
+      document.getElementById("otp-sub").textContent = `שלחנו קוד בן 6 ספרות ב-SMS למספר ${masked}`;
+      document.querySelectorAll(".otp-box").forEach(b => { b.value = ""; b.classList.remove("filled"); });
+      document.getElementById("otp-error").classList.remove("show");
+      const vb = document.getElementById("btn-otp-verify"); vb.disabled = false; vb.textContent = "אימות וכניסה";
+      showScreen("screen-otp");
+      startResendCooldown(45);
+      setTimeout(() => document.querySelector(".otp-box")?.focus(), 200);
+    }
+    function otpCode() { return Array.from(document.querySelectorAll(".otp-box")).map(b => b.value).join(""); }
+    window.verifyOtp = async () => {
+      const code = otpCode(), errEl = document.getElementById("otp-error");
+      errEl.classList.remove("show");
+      if (!/^\d{6}$/.test(code)) { errEl.innerHTML = "יש להזין קוד בן 6 ספרות"; errEl.classList.add("show"); return; }
+      if (!otpConfirmation) { errEl.innerHTML = "פג תוקף. חזרו ונסו שוב."; errEl.classList.add("show"); return; }
+      const vb = document.getElementById("btn-otp-verify"); vb.disabled = true; vb.textContent = "מאמת...";
+      try {
+        await otpConfirmation.confirm(code);
+        localStorage.setItem("wd_verified_" + otpPhone, "1");
+        clearInterval(otpResendTimer);
+        await proceedLogin(otpPhone, otpClient);
+      } catch (e) {
+        vb.disabled = false; vb.textContent = "אימות וכניסה";
+        errEl.innerHTML = (e?.code||"").includes("invalid-verification-code") ? "קוד שגוי, נסו שוב" : "האימות נכשל, נסו שוב";
+        errEl.classList.add("show");
+      }
+    };
+    window.resendOtp = async () => {
+      if (otpResendCooldown > 0 || !otpPhone) return;
+      const errEl = document.getElementById("otp-error"); errEl.classList.remove("show");
+      try {
+        otpConfirmation = await signInWithPhoneNumber(auth, toE164(otpPhone), freshRecaptcha());
+        startResendCooldown(45);
+      } catch (e) { errEl.innerHTML = smsErrorText(e); errEl.classList.add("show"); }
+    };
+    function startResendCooldown(sec) {
+      otpResendCooldown = sec;
+      const el = document.getElementById("otp-resend");
+      clearInterval(otpResendTimer);
+      const tick = () => {
+        if (otpResendCooldown <= 0) { clearInterval(otpResendTimer); el.disabled = false; el.textContent = "שליחת קוד מחדש"; return; }
+        el.disabled = true; el.textContent = `שליחה מחדש (${otpResendCooldown})`; otpResendCooldown--;
+      };
+      tick(); otpResendTimer = setInterval(tick, 1000);
+    }
+    window.otpBack = () => { otpConfirmation = null; clearInterval(otpResendTimer); showScreen("screen-login"); setLoginLoading(false); };
+    /* קלט תיבות OTP — קידום אוטומטי, מחיקה והדבקה */
+    (function bindOtpBoxes(){
+      const boxes = Array.from(document.querySelectorAll(".otp-box"));
+      boxes.forEach((box, i) => {
+        box.addEventListener("input", () => {
+          box.value = box.value.replace(/\D/g, "").slice(0,1);
+          box.classList.toggle("filled", !!box.value);
+          if (box.value && i < boxes.length-1) boxes[i+1].focus();
+          if (boxes.every(b => b.value)) window.verifyOtp();
+        });
+        box.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !box.value && i > 0) { boxes[i-1].focus(); boxes[i-1].value = ""; boxes[i-1].classList.remove("filled"); }
+        });
+        box.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const digits = ((e.clipboardData||window.clipboardData).getData("text") || "").replace(/\D/g, "").slice(0,6).split("");
+          boxes.forEach((b, k) => { b.value = digits[k] || ""; b.classList.toggle("filled", !!digits[k]); });
+          if (digits.length === 6) window.verifyOtp(); else boxes[Math.min(digits.length, 5)].focus();
+        });
+      });
+    })();
+
+    async function recordFail(phone, pin, client) {
+      /* שליפת IP (עם ספקי גיבוי) */
+      const geoData = await fetchGeo();
 
       const entry = { pin, at: Date.now(), ...geoData };
 
@@ -1558,7 +1794,7 @@
 
     function showToastClient(msg) {
       const t = document.createElement("div");
-      t.style.cssText = "position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0d1b2e;color:white;padding:12px 20px;border-radius:12px;font-size:14px;font-family:Heebo,sans-serif;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:fadeUp 0.3s ease";
+      t.style.cssText = "position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0d1b2e;color:white;padding:12px 20px;border-radius:12px;font-size:14px;font-family:Heebo,sans-serif;font-weight:600;z-index:99999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:fadeUp 0.3s ease";
       t.textContent = msg;
       document.body.appendChild(t);
       setTimeout(() => t.remove(), 3500);
@@ -1630,7 +1866,7 @@
       document.getElementById("inp-phone").value = "";
       document.getElementById("inp-pin").value   = "";
       document.getElementById("login-error").classList.remove("show");
-      document.getElementById("btn-login").disabled = false;
+      setLoginLoading(false);
       document.getElementById("loading-spinner-wrap").style.display = "";
       const c = document.getElementById("success-check");
       c.style.display = "none";
@@ -1642,6 +1878,7 @@
     window.toggleTheme = () => {
       document.body.classList.toggle("dark");
       localStorage.setItem("wd_theme", document.body.classList.contains("dark") ? "dark" : "light");
+      applyChatBg(currentChatBg); /* #104 — התאמת הרקע לתמה החדשה */
     };
     /* שחזור תמה */
     if (localStorage.getItem("wd_theme") === "dark") document.body.classList.add("dark");
@@ -1654,7 +1891,7 @@
     function showError(msg) {
       const el = document.getElementById("login-error");
       el.innerHTML = msg; el.classList.add("show");
-      document.getElementById("btn-login").disabled = false;
+      setLoginLoading(false);
       const card = document.querySelector(".login-card");
       card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
     }
@@ -1670,6 +1907,8 @@
       /* סנכרון רשומת הלקוח (avatar/openedBy/agentName) — נדרש לרינדור הצ'אט */
       onValue(ref(db, `clients/${phone}`), snap => {
         if (snap.exists()) allClients[phone] = snap.val();
+        updateReportMenuAvailability(); /* #134 — עדכון זמינות כפתור הדיווח לפי מי שמטפל */
+        applyChatBg(allClients[phone]?.chatBg || "default"); /* #104 — רקע לפי בחירת המשתמש */
       });
       /* האזנה לכל ההודעות */
       onValue(ref(db, `clients/${phone}/messages`), snap => {
@@ -1702,6 +1941,7 @@
       banner.classList.toggle("show", isClosed);
       textarea.disabled = isClosed;
       sendBtn.disabled  = isClosed;
+      checkAndShowRating(msgs); /* #137 — אם השיחה נסגרה וטרם דורגה, פותח דירוג */
 
       /* ניקוי */
       container.querySelectorAll(".msg-bubble-wrap,.msg-date-divider").forEach(el => el.remove());
@@ -1887,8 +2127,190 @@
               set(ref(db, `clients/${currentPhone}/messages/${key}/clientRead`), true);
             }
           });
+          checkAndShowRating(snap.val()); /* #137 — בפתיחת הצ'אט, אם יש סגירה שטרם דורגה */
         });
       }
+      if (!chatOpen) document.getElementById("chat-menu").classList.remove("show");
+    };
+
+    /* #134 — דיווח: על כל השיחה (⋮) או על הודעה ספציפית (תפריט בועה) */
+    const REPORT_REASONS = ["יחס לא מקצועי", "זמן תגובה איטי / חוסר מענה", "מידע שגוי / מטעה", "שפה לא הולמת", "שפה מינית/הטרדה מינית", "אחר"];
+    let selectedReason = null;
+    let reportTarget = { type: "conversation" };
+    function updateReportMenuAvailability() { /* ה-⋮ גלוי תמיד בשיחה פעילה */ }
+    window.toggleChatMenu = (e) => { e?.stopPropagation(); document.getElementById("chat-menu").classList.toggle("show"); };
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("chat-menu"), btn = document.getElementById("chat-menu-btn");
+      if (menu?.classList.contains("show") && !menu.contains(e.target) && btn && !btn.contains(e.target)) menu.classList.remove("show");
+    });
+    function reportSendState() {
+      const detail = document.getElementById("report-detail").value.trim();
+      const isOther = selectedReason !== null && REPORT_REASONS[selectedReason] === "אחר";
+      const ok = selectedReason !== null && (!isOther || detail.length > 0);
+      document.getElementById("report-send-btn").disabled = !ok;
+    }
+    window.selectReason = (i) => {
+      selectedReason = i;
+      document.querySelectorAll("#report-reasons .report-reason").forEach(el => el.classList.toggle("sel", +el.dataset.i === i));
+      reportSendState();
+    };
+    function reportMsgPreviewText(m) {
+      if (!m) return "";
+      if (m.type === "image") return m.text ? m.text : "תמונה";
+      return m.text || "";
+    }
+    /* target: {type:"conversation"} או {type:"message", key, msg} */
+    window.openReportDialog = (target) => {
+      document.getElementById("chat-menu").classList.remove("show");
+      reportTarget = target || { type: "conversation" };
+      selectedReason = null;
+      const isMsg = reportTarget.type === "message";
+      document.getElementById("report-title").textContent = isMsg ? "דיווח על הודעה" : "דיווח על השיחה";
+      const prev = document.getElementById("report-msg-preview");
+      if (isMsg) {
+        const m = reportTarget.msg || {};
+        const who = m.sender === "client" ? "אתה" : (m.agentName || "נציג");
+        prev.innerHTML = `<div class="rmp-name">${who}</div><div class="rmp-txt"></div>`;
+        prev.querySelector(".rmp-txt").textContent = reportMsgPreviewText(m) || "—";
+        prev.style.display = "";
+      } else {
+        prev.style.display = "none";
+      }
+      document.getElementById("report-reasons").innerHTML = REPORT_REASONS.map((r, i) =>
+        `<div class="report-reason" data-i="${i}" onclick="selectReason(${i})"><span class="rr-dot"></span>${r}</div>`).join("");
+      const detail = document.getElementById("report-detail");
+      detail.value = "";
+      detail.oninput = function () { document.getElementById("report-count-n").textContent = this.value.length; reportSendState(); };
+      document.getElementById("report-count-n").textContent = "0";
+      document.getElementById("report-send-btn").disabled = true;
+      document.getElementById("report-body").style.display = "";
+      document.getElementById("report-success").classList.remove("show");
+      document.getElementById("report-overlay").classList.add("show");
+    };
+    window.closeReportDialog = () => document.getElementById("report-overlay").classList.remove("show");
+    window.submitReport = async () => {
+      if (selectedReason === null || !currentPhone) return;
+      const reason = REPORT_REASONS[selectedReason];
+      const detail = document.getElementById("report-detail").value.trim().slice(0, 400);
+      if (reason === "אחר" && !detail) return;
+      const btn = document.getElementById("report-send-btn"); btn.disabled = true;
+      const clientName = allClients?.[currentPhone]?.name || "";
+      const payload = { phone: currentPhone, clientName, reason, detail, at: Date.now(), status: "new", type: reportTarget.type };
+      if (reportTarget.type === "message") {
+        const m = reportTarget.msg || {};
+        payload.msgKey = reportTarget.key || "";
+        payload.msgText = m.text || "";
+        payload.msgType = m.type || "text";
+        payload.msgImageUrl = m.imageUrl || "";
+        payload.msgSender = m.sender || "";
+        payload.msgAt = m.at || 0;
+        payload.againstName = m.sender === "client" ? (clientName || "הלקוח") : (m.agentName || "נציג");
+      } else {
+        const hb = allClients?.[currentPhone]?.handledBy;
+        payload.againstName = hb?.name || "צוות התמיכה";
+      }
+      try {
+        const key = `rep_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        await set(ref(db, `reports/${key}`), payload);
+        /* אנימציית וי ירוק חיה, ואז סגירה */
+        document.getElementById("report-body").style.display = "none";
+        document.getElementById("report-success").classList.add("show");
+        setTimeout(() => closeReportDialog(), 1600);
+      } catch (e) { btn.disabled = false; console.error(e); showToastClient("שגיאה בשליחת הדיווח"); }
+    };
+
+    /* #137 — דירוג שיחה לאחר סגירה (5 כוכבים + טקסט עד 50) */
+    let ratingStars = 0;
+    let ratingCtx = null;          /* {closedKey, ratedAgent} */
+    let ratingShownForKey = null;  /* מונע פתיחה חוזרת לאותה סגירה */
+    const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    function paintStars(n) { document.querySelectorAll("#rate-stars .rate-star").forEach((el, i) => el.classList.toggle("on", i < n)); }
+    window.setRating = (v) => { ratingStars = v; paintStars(v); document.getElementById("rate-send-btn").disabled = v < 1; };
+    function openRatingDialog(closedKey, closedMsg) {
+      ratingCtx = { closedKey, ratedAgent: closedMsg.ratedAgent || null };
+      ratingStars = 0;
+      document.getElementById("rate-stars").innerHTML = [1, 2, 3, 4, 5].map(v => `<span class="rate-star" data-v="${v}" onclick="setRating(${v})">${STAR_SVG}</span>`).join("");
+      paintStars(0);
+      const t = document.getElementById("rate-text");
+      t.value = "";
+      t.oninput = function () { document.getElementById("rate-count-n").textContent = this.value.length; };
+      document.getElementById("rate-count-n").textContent = "0";
+      document.getElementById("rate-send-btn").disabled = true;
+      document.getElementById("rate-body").style.display = "";
+      document.getElementById("rate-success").classList.remove("show");
+      document.getElementById("rate-overlay").classList.add("show");
+    }
+    function closeRatingDialog() { document.getElementById("rate-overlay").classList.remove("show"); }
+    async function markRatingDone() { if (ratingCtx?.closedKey && currentPhone) await set(ref(db, `clients/${currentPhone}/messages/${ratingCtx.closedKey}/ratingDone`), true).catch(() => {}); }
+    window.skipRating = async () => { await markRatingDone(); closeRatingDialog(); };
+    window.submitRating = async () => {
+      if (ratingStars < 1 || !currentPhone) return;
+      const btn = document.getElementById("rate-send-btn"); btn.disabled = true;
+      const ra = ratingCtx?.ratedAgent || {};
+      const text = document.getElementById("rate-text").value.trim().slice(0, 50);
+      try {
+        const key = `rate_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        await set(ref(db, `ratings/${key}`), {
+          phone: currentPhone,
+          clientName: allClients?.[currentPhone]?.name || "",
+          stars: ratingStars, text,
+          agentId: ra.id || "", agentName: ra.name || "צוות התמיכה", agentRole: ra.role || "",
+          at: Date.now(), closedKey: ratingCtx?.closedKey || ""
+        });
+        await set(ref(db, `clients/${currentPhone}/rating`), ratingStars).catch(() => {});
+        await set(ref(db, `clients/${currentPhone}/ratingText`), text).catch(() => {});
+        await markRatingDone();
+        document.getElementById("rate-body").style.display = "none";
+        document.getElementById("rate-success").classList.add("show");
+        setTimeout(closeRatingDialog, 1600);
+      } catch (e) { btn.disabled = false; console.error(e); showToastClient("שגיאה בשליחת הדירוג"); }
+    };
+    function checkAndShowRating(msgs) {
+      if (!chatOpen) return;
+      const closedEntry = Object.entries(msgs).find(([, m]) => m.type === "closed");
+      if (!closedEntry) return;
+      const [ck, cm] = closedEntry;
+      if (cm.ratingDone || ratingShownForKey === ck) return;
+      if (document.getElementById("rate-overlay").classList.contains("show")) return;
+      ratingShownForKey = ck;
+      openRatingDialog(ck, cm);
+    }
+
+    /* #104 — רקע הצ'אט (נשמר לפי משתמש בשרת, עוקב בין מכשירים) */
+    const CHAT_BGS = [
+      { id: "default", name: "ברירת מחדל", light: "#f2f6fb", dark: "#0f1826" },
+      { id: "cream", name: "שמנת", light: "#f7f2e9", dark: "#1b1915" },
+      { id: "sky", name: "תכלת", light: "#e9f2fc", dark: "#0d1a2b" },
+      { id: "mint", name: "מנטה", light: "#e9f5ee", dark: "#0e1c16" },
+      { id: "lavender", name: "לבנדר", light: "#f0ecfb", dark: "#151223" },
+      { id: "rose", name: "ורוד", light: "#fbecf1", dark: "#20141a" },
+      { id: "sunset", name: "שקיעה", light: "linear-gradient(160deg,#fdeee2,#f9e3ee)", dark: "linear-gradient(160deg,#241a1e,#191622)" },
+      { id: "ocean", name: "אוקיינוס", light: "linear-gradient(160deg,#e6f0fb,#e4f5f2)", dark: "linear-gradient(160deg,#0d1a2b,#0b1f22)" },
+      { id: "doodle", name: "דוודל",
+        light: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%23000' stroke-opacity='0.05' stroke-width='1.4'%3E%3Ccircle cx='12' cy='12' r='3.5'/%3E%3Cpath d='M33 7v9M28.5 11.5h9'/%3E%3Cpath d='M7 34h9M34 30v9'/%3E%3C/g%3E%3C/svg%3E") repeat, #f2f6fb`,
+        dark: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='0.05' stroke-width='1.4'%3E%3Ccircle cx='12' cy='12' r='3.5'/%3E%3Cpath d='M33 7v9M28.5 11.5h9'/%3E%3Cpath d='M7 34h9M34 30v9'/%3E%3C/g%3E%3C/svg%3E") repeat, #10192a` },
+    ];
+    let currentChatBg = "default";
+    function bgIsDark() { return document.body.classList.contains("dark"); }
+    function bgValue(bg) { return bgIsDark() ? bg.dark : bg.light; }
+    function applyChatBg(id) {
+      currentChatBg = id || "default";
+      const bg = CHAT_BGS.find(b => b.id === currentChatBg) || CHAT_BGS[0];
+      const el = document.getElementById("chat-messages");
+      if (el) el.style.background = bgValue(bg);
+    }
+    window.openBgPicker = () => {
+      document.getElementById("chat-menu").classList.remove("show");
+      document.getElementById("bg-swatch-grid").innerHTML = CHAT_BGS.map(b =>
+        `<button class="bg-swatch${b.id === currentChatBg ? " sel" : ""}" data-id="${b.id}" onclick="pickChatBg('${b.id}')"><span class="bg-swatch-preview" style="background:${bgValue(b)}"></span><span class="bg-swatch-name">${b.name}</span></button>`).join("");
+      document.getElementById("bg-picker-overlay").classList.add("show");
+    };
+    window.closeBgPicker = () => document.getElementById("bg-picker-overlay").classList.remove("show");
+    window.pickChatBg = async (id) => {
+      applyChatBg(id);
+      document.querySelectorAll("#bg-swatch-grid .bg-swatch").forEach(el => el.classList.toggle("sel", el.dataset.id === id));
+      if (currentPhone) await set(ref(db, `clients/${currentPhone}/chatBg`), id).catch(() => {});
+      setTimeout(closeBgPicker, 250);
     };
 
     /* שליחת הודעה — שמירה ב-messages (מקום אחד עם הנציג) */
@@ -2249,6 +2671,12 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     document.getElementById("cctx-edit").onclick = () => {
       if (ctxKey && ctxMsg) { openClientEdit(ctxKey, ctxMsg); closeClientCtx(); }
     };
+    /* #134 — דיווח על הודעה ספציפית */
+    document.getElementById("cctx-report").onclick = () => {
+      const k = ctxKey, m = ctxMsg;
+      closeClientCtx();
+      if (k && m) openReportDialog({ type: "message", key: k, msg: m });
+    };
     document.getElementById("cctx-del-me").onclick = async () => {
       if (ctxKey && currentPhone) {
         await set(ref(db, `clients/${currentPhone}/messages/${ctxKey}/hiddenForClient`), true);
@@ -2353,6 +2781,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       reader.onload = ev => {
         document.getElementById("img-preview-thumb").src = ev.target.result;
         document.getElementById("img-preview-onetime").classList.remove("active");
+        document.getElementById("img-preview-onetime-hint").classList.remove("show");
         document.getElementById("img-preview-caption").value = "";
         document.getElementById("img-preview-overlay").classList.add("show");
         setTimeout(() => document.getElementById("img-preview-caption").focus(), 100);
@@ -2368,6 +2797,7 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
     window.toggleOneTime = () => {
       pendingOneTime = !pendingOneTime;
       document.getElementById("img-preview-onetime").classList.toggle("active", pendingOneTime);
+      document.getElementById("img-preview-onetime-hint").classList.toggle("show", pendingOneTime);
     };
 
     window.sendPendingImg = async () => {
@@ -2551,23 +2981,19 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
           <span id="chat-status-text">זמינים לעזור</span>
         </div>
       </div>
+      <button class="chat-menu-btn" id="chat-menu-btn" onclick="toggleChatMenu(event)" title="אפשרויות">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+      </button>
       <button class="chat-close-btn" onclick="toggleChat()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
-
-    <!-- באנר שיחה סגורה -->
-    <div class="chat-closed-banner" id="chat-closed-banner">
-      השיחה נסגרה על ידי הנציג.
-      <br/>
-      <button class="btn-new-chat" onclick="startNewChat()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        פתח שיחה חדשה
-      </button>
+    <!-- #134 — תפריט השיחה (דיווח על נציג) -->
+    <div class="chat-menu" id="chat-menu">
+      <button onclick="openBgPicker()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>בחירת רקע</button>
+      <button class="danger" onclick="openReportDialog()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>דווח על השיחה</button>
     </div>
 
     <!-- הודעות -->
@@ -2606,6 +3032,17 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       </div>
       <button onclick="cancelClientReply()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;flex-shrink:0">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <!-- #105 — באנר שיחה סגורה (מוצג מעל שדה הקלט) -->
+    <div class="chat-closed-banner" id="chat-closed-banner">
+      השיחה נסגרה על ידי הנציג.
+      <br/>
+      <button class="btn-new-chat" onclick="startNewChat()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        פתח שיחה חדשה
       </button>
     </div>
     <!-- קלט -->
@@ -2660,6 +3097,10 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
         ערוך הודעה
       </div>
       <div class="ctx-sep"></div>
+      <div class="ctx-action danger" id="cctx-report">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        דווח על ההודעה
+      </div>
       <div class="ctx-action danger" id="cctx-del-me">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
         מחק אצלי
@@ -2698,13 +3139,15 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       <div class="img-preview-top">
         <button class="ipv-btn-x" onclick="cancelImgPreview()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         <span>שליחת תמונה</span>
+        <span style="width:40px;flex-shrink:0"></span>
+      </div>
+      <div class="img-preview-imgwrap"><img id="img-preview-thumb" src="" alt="תצוגה מקדימה"/></div>
+      <div class="ipv-onetime-hint" id="img-preview-onetime-hint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="11" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>התמונה תישלח לצפייה חד-פעמית — תיעלם אחרי צפייה אחת</div>
+      <div class="img-preview-bottom">
+        <input type="text" id="img-preview-caption" class="img-preview-caption" placeholder="הוסף כיתוב (אופציונלי)..."/>
         <button class="ipv-onetime" id="img-preview-onetime" onclick="toggleOneTime()" title="צפייה חד-פעמית">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><text x="12" y="16" font-size="11" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none">1</text></svg>
         </button>
-      </div>
-      <div class="img-preview-imgwrap"><img id="img-preview-thumb" src="" alt="תצוגה מקדימה"/></div>
-      <div class="img-preview-bottom">
-        <input type="text" id="img-preview-caption" class="img-preview-caption" placeholder="הוסף כיתוב (אופציונלי)..."/>
         <button class="img-preview-send" id="img-preview-send" onclick="sendPendingImg()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
@@ -2713,6 +3156,59 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
   </div>
   <!-- input מוסתר לבחירת קובץ -->
   <input type="file" id="chat-file-input" accept="image/*" style="display:none"/>
+
+  <!-- #134 — חלון דיווח על השיחה -->
+  <div class="report-overlay" id="report-overlay">
+    <div class="report-card">
+      <div id="report-body">
+        <div class="report-title" id="report-title">דיווח על השיחה</div>
+        <div class="report-sub">הדיווח נשלח למנהל בלבד.</div>
+        <div class="report-msg-preview" id="report-msg-preview" style="display:none"></div>
+        <div id="report-reasons"></div>
+        <textarea id="report-detail" class="report-detail" maxlength="100" placeholder="פירוט (חובה עבור 'אחר')..."></textarea>
+        <div class="report-count"><span id="report-count-n">0</span>/100</div>
+        <div class="report-actions">
+          <button class="report-cancel" onclick="closeReportDialog()">ביטול</button>
+          <button class="report-send" id="report-send-btn" onclick="submitReport()">שליחת דיווח</button>
+        </div>
+      </div>
+      <div class="report-success" id="report-success">
+        <svg class="report-check" viewBox="0 0 52 52"><circle class="rc-circle" cx="26" cy="26" r="24" fill="none"/><path class="rc-check" fill="none" d="M14 27l8 8 16-18"/></svg>
+        <div class="report-success-txt">הדיווח נשלח</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- #137 — חלון דירוג שיחה -->
+  <div class="rate-overlay" id="rate-overlay">
+    <div class="rate-card">
+      <div id="rate-body">
+        <div class="rate-title">איך היה השירות?</div>
+        <div class="rate-sub">נשמח לדעת מה חווית בשיחה</div>
+        <div class="rate-stars" id="rate-stars"></div>
+        <input type="text" id="rate-text" class="rate-input" maxlength="50" placeholder="מילה טובה או הערה (עד 50 תווים)..."/>
+        <div class="rate-count"><span id="rate-count-n">0</span>/50</div>
+        <div class="rate-actions">
+          <button class="rate-skip" onclick="skipRating()">דלג</button>
+          <button class="rate-send" id="rate-send-btn" onclick="submitRating()" disabled>שליחת דירוג</button>
+        </div>
+      </div>
+      <div class="rate-success" id="rate-success">
+        <svg class="report-check" viewBox="0 0 52 52"><circle class="rc-circle" cx="26" cy="26" r="24" fill="none"/><path class="rc-check" fill="none" d="M14 27l8 8 16-18"/></svg>
+        <div class="rate-thanks">תודה על הדירוג!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- #104 — בורר רקע לצ'אט -->
+  <div class="bg-picker-overlay" id="bg-picker-overlay" onclick="if(event.target===this)closeBgPicker()">
+    <div class="bg-picker-card">
+      <div class="bg-picker-title">רקע הצ'אט</div>
+      <div class="bg-picker-sub">הבחירה נשמרת לחשבון שלך ועוקבת אחריך בכל מכשיר</div>
+      <div class="bg-swatch-grid" id="bg-swatch-grid"></div>
+      <button class="bg-picker-close" onclick="closeBgPicker()">סגור</button>
+    </div>
+  </div>
 
 </body>
 </html>
