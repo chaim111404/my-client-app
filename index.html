@@ -49,7 +49,7 @@
     .screen.active { display: flex; }
 
     /* ── מסך כניסה ── */
-    #screen-login {
+    #screen-login, #screen-otp {
       background: linear-gradient(145deg, #0c1a2e 0%, #0a2540 45%, #0d3a6e 100%);
     }
     #screen-login::before {
@@ -166,12 +166,20 @@
     .btn-login-spin { display: inline-block; width: 18px; height: 18px; margin-inline-end: 8px; vertical-align: -3px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
     /* אימות SMS — תיבות קוד */
     .otp-boxes { display: flex; gap: 8px; justify-content: center; margin: 10px 0 18px; }
-    .otp-box { width: 44px; height: 54px; text-align: center; font-size: 24px; font-weight: 800; border: 2px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s; font-family: 'Heebo', sans-serif; }
-    .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,165,233,.15); }
-    .otp-box.filled { border-color: var(--primary); }
+    .otp-box {
+      width: 44px; height: 56px; text-align: center; font-size: 24px; font-weight: 800;
+      background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 14px; color: #fff; outline: none; caret-color: var(--accent);
+      font-family: 'Heebo', sans-serif; transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .otp-box::placeholder { color: rgba(255,255,255,0.25); }
+    .otp-box:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); box-shadow: 0 0 0 3px rgba(56,189,248,.18); }
+    .otp-box.filled { border-color: rgba(56,189,248,.55); background: rgba(56,189,248,.10); }
+    .otp-box.err { border-color: var(--error); box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
     .otp-actions { display: flex; justify-content: space-between; margin-top: 14px; }
-    .otp-link { background: none; border: none; color: var(--primary); font-family: 'Heebo', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px; }
-    .otp-link:disabled { color: var(--text-muted); cursor: not-allowed; }
+    .otp-link { background: none; border: none; color: var(--accent2); font-family: 'Heebo', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px; }
+    .otp-link:hover:not(:disabled) { color: #fff; }
+    .otp-link:disabled { color: rgba(255,255,255,0.32); cursor: not-allowed; }
 
     .error-msg {
       background: rgba(239,68,68,0.12);
@@ -1476,7 +1484,11 @@
       if (c.includes("invalid-phone-number")) return "מספר הטלפון אינו תקין לשליחת SMS.";
       if (c.includes("quota")) return "מכסת ההודעות מוצתה. נסו שוב מאוחר יותר.";
       if (c.includes("captcha")) return "אימות ה-reCAPTCHA נכשל. רעננו ונסו שוב.";
-      return "שגיאה בשליחת קוד האימות. נסו שוב.";
+      if (c.includes("unauthorized-domain")) return "הדומיין אינו מאושר לאימות. יש לפנות לתמיכה.";
+      if (c.includes("operation-not-allowed")) return "אימות SMS אינו מופעל בשרת. יש לפנות לתמיכה.";
+      if (c.includes("unsupported") || c.includes("region")) return "אימות SMS אינו נתמך באזור זה. יש לפנות לתמיכה.";
+      /* שגיאה לא מוכרת — מציגים את הקוד כדי לאפשר אבחון מהיר */
+      return "שגיאה בשליחת קוד האימות. נסו שוב." + (c ? ` (${c.replace("auth/", "")})` : "");
     }
     async function startSmsVerification(rawPhone, client) {
       otpClient = client; otpPhone = rawPhone;
@@ -1516,8 +1528,18 @@
         vb.disabled = false; vb.textContent = "אימות וכניסה";
         errEl.innerHTML = (e?.code||"").includes("invalid-verification-code") ? "קוד שגוי, נסו שוב" : "האימות נכשל, נסו שוב";
         errEl.classList.add("show");
+        clearOtpBoxes(true); /* ניקוי אוטומטי כדי להזין מחדש מהתיבה הראשונה */
       }
     };
+    /* ניקוי תיבות הקוד (עם הבזק אדום) והחזרת המיקוד לתיבה הראשונה */
+    function clearOtpBoxes(focusFirst) {
+      const boxes = Array.from(document.querySelectorAll(".otp-box"));
+      boxes.forEach(b => b.classList.add("err"));
+      setTimeout(() => {
+        boxes.forEach(b => { b.value = ""; b.classList.remove("filled"); b.classList.remove("err"); });
+        if (focusFirst) boxes[0]?.focus();
+      }, 600);
+    }
     window.resendOtp = async () => {
       if (otpResendCooldown > 0 || !otpPhone) return;
       const errEl = document.getElementById("otp-error"); errEl.classList.remove("show");
@@ -1542,7 +1564,16 @@
       const boxes = Array.from(document.querySelectorAll(".otp-box"));
       boxes.forEach((box, i) => {
         box.addEventListener("input", () => {
-          box.value = box.value.replace(/\D/g, "").slice(0,1);
+          const digits = box.value.replace(/\D/g, "");
+          /* מילוי אוטומטי מה-SMS (iOS/Android) מכניס את כל הקוד לתיבה אחת — מפזרים על כל התיבות */
+          if (digits.length > 1) {
+            const arr = digits.slice(0, boxes.length - i).split("");
+            arr.forEach((d, k) => { boxes[i+k].value = d; boxes[i+k].classList.add("filled"); });
+            boxes[Math.min(i + arr.length, boxes.length - 1)].focus();
+            if (boxes.every(b => b.value)) window.verifyOtp();
+            return;
+          }
+          box.value = digits.slice(0,1);
           box.classList.toggle("filled", !!box.value);
           if (box.value && i < boxes.length-1) boxes[i+1].focus();
           if (boxes.every(b => b.value)) window.verifyOtp();
