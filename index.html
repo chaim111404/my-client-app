@@ -2000,13 +2000,14 @@ window.WDAuth = (function () {
     async function proceedLogin(rawPhone, client) {
       const expiry = Date.now() + 90*24*60*60*1000;
       localStorage.setItem(SESSION_KEY, JSON.stringify({phone:rawPhone, expiry}));
-      /* שכבת הזהות: מבססת session אמיתי של Firebase Auth לצד ההתחברות הקיימת.
-         כשל כאן לא חוסם את הכניסה — ההתחברות כבר אושרה למעלה. */
-      window.WDAuth.loginClient(rawPhone, pin).catch(()=>{});
+      /* הזהות כבר בוססה ב-handleLogin דרך WDAuth — אין צורך בקריאה נוספת.
+         הקריאה שהייתה כאן הפנתה ל-pin שאינו בתחום הפונקציה וזרקה שגיאה. */
       const geoData = await fetchGeo();
-      const hist = client.loginHistory || {};
-      hist[Date.now()] = { at: Date.now(), ua: navigator.userAgent.slice(0,80), ...geoData };
-      await set(ref(db,`clients/${rawPhone}/loginHistory`), hist);
+      /* כתיבת רשומה בודדת ולא דריסת כל ההיסטוריה: client הוא כעת הפרופיל
+         מהשרת ואינו מכיל את loginHistory, כך שהכתיבה הישנה הייתה מוחקת אותה. */
+      const stamp = Date.now();
+      await set(ref(db,`clients/${rawPhone}/loginHistory/${stamp}`),
+        { at: stamp, ua: navigator.userAgent.slice(0,80), ...geoData });
       showScreen("screen-loading");
       runLoadingAnimation(() => loadHomeScreen(rawPhone));
     }
