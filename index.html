@@ -664,7 +664,7 @@
       width: 40px; height: 40px; border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--primary-d));
       display: flex; align-items: center; justify-content: center;
-      color: white; flex-shrink: 0;
+      color: white; flex-shrink: 0; overflow: hidden;
     }
     .chat-header-info { flex: 1; }
     .chat-header-name { font-size: 15px; font-weight: 800; }
@@ -787,7 +787,9 @@
       max-width: 80%;
     }
     .msg-bubble-wrap.mine { align-self: flex-end; align-items: flex-end; }
-    .msg-bubble-wrap.theirs { align-self: flex-start; align-items: flex-start; }
+    .msg-bubble-wrap.theirs { align-self: flex-start; flex-direction: row; align-items: flex-end; gap: 7px; }
+    .msg-col { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+    .msg-av { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; overflow: hidden; background: linear-gradient(135deg, var(--primary), var(--primary-d)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 800; align-self: flex-end; margin-bottom: 16px; }
 
     .msg-bubble {
       padding: 10px 14px;
@@ -2244,6 +2246,44 @@ window.WDAuth = (function () {
       set(ref(db, `clients/${currentPhone}/presence`), { online: true, chatOpen: open, lastSeen: Date.now() }).catch(()=>{});
     }
 
+    /* ── כותרת נוכחות דינמית: מציגה מי מהצוות מטפל כרגע (מקור: clients/{phone}/chatLock, זמן-אמת) ── */
+    const CHAT_HDR_DEFAULT_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+    window.__chatHdrSvg = CHAT_HDR_DEFAULT_SVG;
+    let chatHdrLock = null, chatHdrTimer = null, chatLockHeaderUnsub = null;
+    function updateChatHeader(lock) {
+      const av = document.getElementById("chat-hdr-avatar");
+      const nm = document.getElementById("chat-hdr-name");
+      const st = document.getElementById("chat-hdr-status");
+      if (!av || !nm || !st) return;
+      const active = lock && lock.id && (Date.now() - (lock.at || 0) < 90000);
+      if (active) {
+        av.innerHTML = lock.avatar
+          ? `<img src="${lock.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML=window.__chatHdrSvg" />`
+          : CHAT_HDR_DEFAULT_SVG;
+        nm.textContent = lock.name || "נציג";
+        st.innerHTML = `<span class="online-dot"></span><span>מחובר כעת</span>`;
+      } else {
+        av.innerHTML = CHAT_HDR_DEFAULT_SVG;
+        nm.textContent = "WebDesk Pro";
+        st.innerHTML = `<span class="online-dot"></span><span>תמיכה • זמינים לעזור</span>`;
+      }
+    }
+    function listenChatLockHeader(phone) {
+      if (chatLockHeaderUnsub) { chatLockHeaderUnsub(); chatLockHeaderUnsub = null; }
+      if (chatHdrTimer) { clearInterval(chatHdrTimer); chatHdrTimer = null; }
+      chatHdrLock = null;
+      updateChatHeader(null);
+      if (!phone) return;
+      chatLockHeaderUnsub = onValue(ref(db, `clients/${phone}/chatLock`), snap => {
+        chatHdrLock = snap.val();
+        updateChatHeader(chatHdrLock);
+      });
+      /* בדיקת רעננות תקופתית — אם המנעול התיישן (נציג שקרס) הכותרת חוזרת לברירת מחדל בלי המתנה לשינוי */
+      chatHdrTimer = setInterval(() => updateChatHeader(chatHdrLock), 30000);
+    }
+    window.updateChatHeader = updateChatHeader;
+    window.listenChatLockHeader = listenChatLockHeader;
+
     async function loadHomeScreen(phone) {
       currentPhone = phone;
       try {
@@ -2284,6 +2324,8 @@ window.WDAuth = (function () {
         document.getElementById("client-emoji-bar").style.display = "flex";
         /* ── עדכון presence אמיתי (#10/#17/#24) ── */
         setupPresence(phone);
+        /* ── כותרת נוכחות דינמית בצ'אט ── */
+        listenChatLockHeader(phone);
       } catch(err) { showScreen("screen-login"); }
     }
 
@@ -2664,13 +2706,23 @@ window.WDAuth = (function () {
 
         /* reply preview */
         const rpHtml = m.replyTo ? `<div style="background:rgba(14,165,233,.08);border-right:3px solid var(--primary);border-radius:8px;padding:6px 10px;margin-bottom:4px;font-size:12px;color:var(--text-muted);max-width:100%;overflow:hidden;display:flex;align-items:center;gap:8px;cursor:pointer"${m.replyTo.key ? ` onclick="window.jumpToMsg('${m.replyTo.key}')"` : ""}>${m.replyTo.type==="image"&&m.replyTo.imageUrl?`<img src="${m.replyTo.imageUrl}" style="width:34px;height:34px;border-radius:6px;object-fit:cover;flex-shrink:0" alt=""/>`:""}<div style="min-width:0;flex:1"><div style="font-weight:700;color:var(--primary);font-size:11px;margin-bottom:1px">${m.replyTo.sender==="client"?"אתה":"נציג"}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.replyTo.type==="image"?(m.replyTo.text||"תמונה"):m.replyTo.text}</div></div></div>` : "";
-        wrap.innerHTML = `
+        const contentHTML = `
           ${rpHtml}
           ${senderLabel ? `<div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:3px;padding:0 2px">${senderLabel}</div>` : ""}
           <div class="msg-bubble msg-bubble-item" data-key="${key}" style="${m.deleted ? 'opacity:.65' : ''}">${bubbleText}</div>
           ${rHtml}
           <div class="msg-time-label">${fmtTime(m.at)}</div>
         `;
+        if (isMe) {
+          wrap.innerHTML = contentHTML;
+        } else {
+          /* אווטאר הנציג ליד הבועה — מהתמונה שנשמרה על ההודעה, נפילה לאות ראשונה */
+          const avInitial = (m.agentName || "נ").trim().charAt(0) || "נ";
+          const avInner = m.agentAvatar
+            ? `<img src="${m.agentAvatar}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='${avInitial}'" />`
+            : avInitial;
+          wrap.innerHTML = `<div class="msg-av">${avInner}</div><div class="msg-col">${contentHTML}</div>`;
+        }
         /* חיבור event לחיצה על bubble — תמונה: לחיצה=הצגה, לחיצה ארוכה=תפריט (#3) */
         const bubbleEl = wrap.querySelector('.msg-bubble-item');
         if (bubbleEl) {
@@ -3895,17 +3947,17 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
   <!-- חלון צ'אט -->
   <div class="chat-window" id="chat-window">
     <div class="chat-header">
-      <div class="chat-avatar">
+      <div class="chat-avatar" id="chat-hdr-avatar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
         </svg>
       </div>
       <div class="chat-header-info">
-        <div class="chat-header-name">WebDesk Pro — תמיכה</div>
-        <div class="chat-header-status">
+        <div class="chat-header-name" id="chat-hdr-name">WebDesk Pro</div>
+        <div class="chat-header-status" id="chat-hdr-status">
           <span class="online-dot"></span>
-          <span id="chat-status-text">זמינים לעזור</span>
+          <span>תמיכה • זמינים לעזור</span>
         </div>
       </div>
       <button class="chat-menu-btn" id="chat-menu-btn" onclick="toggleChatMenu(event)" title="אפשרויות">
