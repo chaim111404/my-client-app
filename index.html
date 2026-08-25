@@ -1066,6 +1066,113 @@
 .notif-txt{font-size:14px;color:var(--text);font-weight:600;line-height:1.4}
 .notif-time{font-size:11.5px;color:var(--text-muted);margin-top:3px}
 
+/* ═══ שלב 3.2 — אייקונים צבעוניים, בר PWA, כרטיסי אתר ═══ */
+.cl-ni .ni-ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.cl-ni .ni-ic svg{width:17px;height:17px}
+.cl-ni .lbl{flex:1}
+.ni-ic.sky{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
+.ni-ic.indigo{background:linear-gradient(135deg,#6366f1,#818cf8)}
+.ni-ic.amber{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+.ni-ic.emerald{background:linear-gradient(135deg,#10b981,#34d399)}
+.ni-ic.coral{background:linear-gradient(135deg,#f43f5e,#fb7185)}
+.ni-ic.blue{background:linear-gradient(135deg,#3b82f6,#60a5fa)}
+/* בר תחתון — PWA בלבד, נקי בלי צבעים */
+.cl-tabbar{display:none}
+body.pwa .cl-tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:130;background:var(--card);border-top:1px solid var(--border,#e0eefa);padding:7px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(14,110,180,.07)}
+body.pwa .cl-menu{display:none!important}
+body.pwa .cl-fab-wrap{bottom:78px}
+body.pwa .cl-content{padding-bottom:96px}
+.cl-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:'Heebo',sans-serif;position:relative;padding:2px}
+.cl-tab svg{width:22px;height:22px}
+.cl-tab.active{color:var(--primary-d,#0284c7);font-weight:700}
+.cl-tab.active::after{content:"";position:absolute;top:-7px;width:5px;height:5px;border-radius:50%;background:var(--primary-d,#0284c7)}
+.cl-tab .cl-tab-badge{position:absolute;top:-3px;left:8px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--error,#ef4444);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center}
+.cl-tab .cl-tab-badge.show{display:flex}
+/* כרטיסי אתר עשירים */
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.cs-card{background:var(--card);border:1.5px solid var(--border,#e0eefa);border-radius:20px;overflow:hidden;box-shadow:var(--shadow,0 4px 24px rgba(14,165,233,.08))}
+.cs-banner{aspect-ratio:16/9;position:relative;background:linear-gradient(135deg,var(--primary),#6366f1);overflow:hidden}
+.cs-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.cs-banner-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6)}
+.cs-stat{position:absolute;top:11px;right:11px;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.94);display:flex;align-items:center;gap:5px}
+.cs-stat.building{color:#d97706}.cs-stat.active{color:#16a34a}.cs-stat.paused{color:#64748b}
+.cs-stat .sd{width:7px;height:7px;border-radius:50%;background:currentColor}
+.cs-type{position:absolute;top:11px;left:11px;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(12,26,46,.55);color:#fff;backdrop-filter:blur(4px)}
+.cs-body{padding:15px 16px 16px}
+.cs-name{font-size:17px;font-weight:800;color:var(--text)}
+.cs-url{font-size:12.5px;color:var(--text-muted);direction:ltr;text-align:right;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-prog{margin-top:13px}
+.cs-prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.cs-prog-stage{font-size:12px;color:var(--text-muted);font-weight:600}
+.cs-prog-pct{font-size:14px;font-weight:800;color:#8b5cf6}
+.cs-bar{height:7px;background:var(--bg);border-radius:20px;overflow:hidden}
+.cs-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.cs-qa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
+.cs-qa-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;font-size:12.5px;font-weight:700;border:1.5px solid var(--border,#e0eefa);background:var(--bg);color:var(--text);cursor:pointer;font-family:'Heebo',sans-serif}
+.cs-qa-btn svg{width:15px;height:15px;flex-shrink:0}
+.cs-qa-btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border-color:transparent}
+.cs-qa-btn.violet{color:#8b5cf6}.cs-qa-btn.slate{color:var(--text-muted)}.cs-qa-btn.sky{color:var(--primary-d)}
+.cred-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border,#e0eefa)}
+.cred-item:last-child{border-bottom:none}
+.cred-info{flex:1;min-width:0}.cred-label{font-size:13px;font-weight:700;color:var(--text)}
+.cred-val{font-size:14px;color:var(--text-muted);direction:ltr;text-align:right;letter-spacing:1px}
+.cred-btn{background:var(--bg);border:1px solid var(--border,#e0eefa);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:700;color:var(--primary-d);cursor:pointer;font-family:'Heebo',sans-serif;flex-shrink:0}
+
+/* ── קוביות משימה בצ'אט (שלב 4) ── */
+.tc-pins{display:flex;flex-direction:column;gap:8px;padding:10px 12px 4px;max-height:52vh;overflow-y:auto;flex-shrink:0}
+.tc-pins:empty{display:none;padding:0}
+.tc-pin-hint{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--text-muted);padding:0 2px 2px}
+.tc{background:var(--card);border:1px solid var(--border,#e0eefa);border-radius:15px;overflow:hidden;box-shadow:0 4px 16px rgba(12,26,46,.1)}
+.tc-bar{height:4px}
+.tc.admin .tc-bar{background:linear-gradient(90deg,var(--primary),#6366f1)}
+.tc.client .tc-bar{background:linear-gradient(90deg,#f43f5e,#fb7185)}
+.tc.done .tc-bar{background:#10b981}
+.tc-head{display:flex;align-items:center;gap:9px;padding:11px 13px 8px}
+.tc-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.tc.admin .tc-ic{background:linear-gradient(135deg,var(--primary),var(--primary-d))}
+.tc.client .tc-ic{background:linear-gradient(135deg,#f43f5e,#fb7185)}
+.tc-who{font-size:10px;font-weight:800;letter-spacing:.2px}
+.tc.admin .tc-who{color:var(--primary-d)}
+.tc.client .tc-who{color:#e11d48}
+.tc-title{font-size:14.5px;font-weight:800;color:var(--text);margin-top:1px;line-height:1.25}
+.tc-body{padding:0 13px 13px}
+.tc-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:11px;white-space:pre-wrap;word-break:break-word}
+.tc-status{margin-right:auto;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.tc-st-wait{background:rgba(245,158,11,.15);color:#b45309}
+.tc-st-sub{background:rgba(99,102,241,.14);color:#4f46e5}
+.tc-st-done{background:rgba(16,185,129,.15);color:#15803d}
+.tc-wait{display:flex;align-items:center;gap:9px;background:var(--bg);border-radius:11px;padding:10px 13px;margin-bottom:11px}
+.tc-dots{display:flex;gap:5px}
+.tc-dots span{width:8px;height:8px;border-radius:50%;background:var(--primary);animation:tcbounce 1.3s infinite ease-in-out}
+.tc-dots span:nth-child(2){animation-delay:.18s;background:#6366f1}
+.tc-dots span:nth-child(3){animation-delay:.36s;background:#8b5cf6}
+@keyframes tcbounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}
+.tc-wait-txt{font-size:12px;font-weight:600;color:var(--text-muted)}
+.tc-upload{border:2px dashed var(--border,#e0eefa);border-radius:12px;padding:16px;text-align:center;color:var(--text-muted);cursor:pointer;margin-bottom:11px;transition:border-color .15s}
+.tc-upload:hover{border-color:var(--primary)}
+.tc-upload svg{opacity:.6;margin-bottom:5px}
+.tc-upload-t{font-size:12.5px;font-weight:700;color:var(--text)}
+.tc-upload-s{font-size:11px}
+.tc-files{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.tc-file{width:58px;height:58px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0;border:1px solid var(--border,#e0eefa);background:var(--bg)}
+.tc-file img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.tc-file-doc{display:flex;align-items:center;justify-content:center;color:var(--primary);height:100%}
+.tc-file.pending{border-color:var(--amber,#f59e0b);border-style:dashed}
+.tc-file-x{position:absolute;top:2px;right:2px;width:19px;height:19px;border-radius:50%;background:rgba(12,26,46,.72);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.tc-file-name{position:absolute;bottom:0;left:0;right:0;font-size:8px;background:rgba(12,26,46,.65);color:#fff;padding:1px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-cta{display:flex;gap:8px}
+.tc-btn{flex:1;border:none;border-radius:11px;font-family:'Heebo',sans-serif;font-size:13px;font-weight:700;padding:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.tc-btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff}
+.tc-btn.ghost{background:var(--bg);color:var(--text);border:1px solid var(--border,#e0eefa)}
+.tc-sub-note{font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:9px}
+.tc-done{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border,#e0eefa);border-radius:12px;padding:9px 12px;margin:4px auto;max-width:92%;box-shadow:0 2px 8px rgba(12,26,46,.06)}
+.tc-done-ic{width:26px;height:26px;border-radius:8px;background:rgba(16,185,129,.15);color:#15803d;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tc-done-t{font-size:12.5px;font-weight:700;color:var(--text)}
+.tc-done-s{font-size:10.5px;color:var(--text-muted)}
+.tc-uploading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:10px}
+.tc-spin{width:16px;height:16px;border:2px solid var(--border,#e0eefa);border-top-color:var(--primary);border-radius:50%;animation:tcspin .8s linear infinite}
+@keyframes tcspin{to{transform:rotate(360deg)}}
+
 /* גיליון פרטים (sheet) לקוביות */
 .sheet-scroll{max-height:64vh;overflow-y:auto;text-align:right;margin-top:6px}
 .sheet-h{font-size:20px;font-weight:800;color:var(--text);text-align:right;margin-bottom:4px}
@@ -1276,12 +1383,12 @@
         <div><div class="cl-logo-t">WebDesk Pro</div><div class="cl-logo-s">האזור האישי</div></div>
       </div>
       <nav class="cl-nav">
-        <button class="cl-ni active" data-panel="p-home" onclick="showClientPanel('p-home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>בית</span></button>
-        <button class="cl-ni" data-panel="p-progress" onclick="showClientPanel('p-progress')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>התקדמות הפרויקט</span><span class="cl-badge" id="badge-prog">0</span></button>
-        <button class="cl-ni" data-panel="p-quotes" onclick="showClientPanel('p-quotes')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>הצעות מחיר</span><span class="cl-badge" id="badge-quote">0</span></button>
-        <button class="cl-ni" data-panel="p-billing" onclick="showClientPanel('p-billing')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>חיובים ותשלומים</span></button>
-        <button class="cl-ni" data-panel="p-requests" onclick="showClientPanel('p-requests')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>בקשות שירות</span><span class="cl-badge" id="badge-req">0</span></button>
-        <button class="cl-ni" data-panel="p-docs" onclick="showClientPanel('p-docs')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span>המסמכים שלי</span></button>
+        <button class="cl-ni active" data-panel="p-home" onclick="showClientPanel('p-home')"><span class="ni-ic sky"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="lbl">בית</span></button>
+        <button class="cl-ni" data-panel="p-sites" onclick="showClientPanel('p-sites')"><span class="ni-ic indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg></span><span class="lbl">האתרים שלי</span></button>
+        <button class="cl-ni" data-panel="p-quotes" onclick="showClientPanel('p-quotes')"><span class="ni-ic amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="lbl">הצעות מחיר</span><span class="cl-badge" id="badge-quote">0</span></button>
+        <button class="cl-ni" data-panel="p-billing" onclick="showClientPanel('p-billing')"><span class="ni-ic emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span class="lbl">חיובים ותשלומים</span></button>
+        <button class="cl-ni" data-panel="p-requests" onclick="showClientPanel('p-requests')"><span class="ni-ic coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span><span class="lbl">בקשות שירות</span><span class="cl-badge" id="badge-req">0</span></button>
+        <button class="cl-ni" data-panel="p-docs" onclick="showClientPanel('p-docs')"><span class="ni-ic blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span><span class="lbl">המסמכים שלי</span></button>
       </nav>
       <div class="cl-foot">
         <div class="cl-user"><div class="cl-user-av" id="cl-user-av">?</div><div class="cl-user-name" id="cl-user-name">לקוח</div></div>
@@ -1319,12 +1426,6 @@
             </div>
           </div>
 
-          <div class="ov-card" id="ov-progress-card" onclick="showClientPanel('p-progress')">
-            <div class="ov-card-top"><span class="ov-card-lbl">התקדמות הפרויקט</span><span class="ov-progress-pct" id="ov-progress-pct">0%</span></div>
-            <div class="ov-progress-bar"><div class="ov-progress-fill" id="ov-progress-fill" style="width:0%"></div></div>
-            <div class="ov-progress-stage" id="ov-progress-stage">—</div>
-          </div>
-
           <div class="ov-stats">
             <div class="ov-stat" onclick="showClientPanel('p-quotes')"><div class="ov-stat-n" id="ov-quotes-n">0</div><div class="ov-stat-l">הצעות ממתינות</div></div>
             <div class="ov-stat" onclick="showClientPanel('p-requests')"><div class="ov-stat-n" id="ov-requests-n">0</div><div class="ov-stat-l">בקשות פתוחות</div></div>
@@ -1337,15 +1438,15 @@
           </div>
 
           <div class="cl-section" id="sites-container">
-            <div class="cl-section-head"><span class="cl-section-title">האתרים שלי</span></div>
-            <div id="sites-list"></div>
+            <div class="cl-section-head"><span class="cl-section-title">האתרים שלי</span><button class="cl-section-link" onclick="showClientPanel('p-sites')">הכל</button></div>
+            <div class="cs-grid" id="sites-list"></div>
           </div>
         </div>
 
-        <!-- התקדמות -->
-        <div class="cl-panel" id="p-progress">
-          <div class="cl-panel-head"><h2 class="cl-panel-title" id="prog-sheet-title">התקדמות הפרויקט</h2><p class="cl-panel-sub" id="prog-sheet-sub"></p></div>
-          <div id="prog-timeline"></div>
+        <!-- האתרים שלי -->
+        <div class="cl-panel" id="p-sites">
+          <div class="cl-panel-head"><h2 class="cl-panel-title">האתרים שלי</h2><p class="cl-panel-sub">האתרים והאפליקציות שלך — סטטוס, התקדמות ופעולות</p></div>
+          <div class="cs-grid" id="p-sites-list"></div>
         </div>
         <!-- הצעות -->
         <div class="cl-panel" id="p-quotes">
@@ -1369,6 +1470,15 @@
         </div>
       </div>
     </div>
+
+    <!-- בר תחתון — PWA בלבד -->
+    <nav class="cl-tabbar" id="cl-tabbar">
+      <button class="cl-tab active" data-panel="p-home" onclick="showClientPanel('p-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>בית</button>
+      <button class="cl-tab" data-panel="p-sites" onclick="showClientPanel('p-sites')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>האתרים</button>
+      <button class="cl-tab" data-panel="p-quotes" onclick="showClientPanel('p-quotes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>הצעות<span class="cl-tab-badge" id="tabbadge-quote">0</span></button>
+      <button class="cl-tab" data-panel="p-requests" onclick="showClientPanel('p-requests')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>בקשות<span class="cl-tab-badge" id="tabbadge-req">0</span></button>
+      <button class="cl-tab" onclick="toggleClSidebar(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>עוד</button>
+    </nav>
 
     <!-- FAB צ'אט + WhatsApp -->
     <div class="cl-fab-wrap">
@@ -1419,6 +1529,26 @@
       <div class="sheet-h">התראות</div>
       <div class="sheet-sub" id="notif-sub">כל העדכונים במקום אחד</div>
       <div class="sheet-scroll" id="notif-list"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: שלבי האתר -->
+  <div class="popup-overlay" id="sheet-site-stages" onclick="closePopup('sheet-site-stages')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h" id="stages-sheet-title">שלבי הפרויקט</div>
+      <div class="sheet-sub">מעקב אחר שלבי העבודה</div>
+      <div class="sheet-scroll" id="stages-sheet-body"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: פרטי גישה -->
+  <div class="popup-overlay" id="sheet-site-creds" onclick="closePopup('sheet-site-creds')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h" id="creds-sheet-title">פרטי גישה</div>
+      <div class="sheet-sub">הסיסמאות והקודים שלך</div>
+      <div class="sheet-scroll" id="creds-sheet-body"></div>
     </div>
   </div>
 
@@ -2522,11 +2652,8 @@ window.WDAuth = (function () {
         })();
         /* הצגת אווטר קיים */
         if (client.avatar) updateAvatarDisplay(client.avatar);
-        const sites = client.sites ? Object.values(client.sites) : [];
-        document.getElementById("greeting-count").textContent =
-          sites.length === 0 ? "אין אתרים פעילים כרגע" :
-          sites.length === 1 ? "יש לך אתר אחד" : `יש לך ${sites.length} אתרים`;
-        renderSites(sites);
+        /* האתרים מגיעים כעת מ-projects (שלב 3.2) — נטענים ב-setupDashboard */
+        renderClientSites();
         showScreen("screen-home");
         initChat(phone);
         /* מנגנון הקישורים — חיווט השדה וטעינת העדפת האזהרה של הלקוח מהשרת */
@@ -2552,7 +2679,7 @@ window.WDAuth = (function () {
       onValue(ref(db,"projects"),s=>{
         const all=s.val()||{};
         myProjects=Object.entries(all).filter(([id,p])=>p.clientPhone===phone).map(([id,p])=>({id,...p})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-        renderCubes();refreshOpenSheets();
+        renderCubes();renderClientSites();refreshOpenSheets();
       });
       onValue(ref(db,"quotes"),s=>{
         const all=s.val()||{};
@@ -2566,14 +2693,16 @@ window.WDAuth = (function () {
       });
       onValue(ref(db,`tasks/${phone}`),s=>{
         const all=s.val()||{};
-        myRequests=Object.entries(all).map(([id,t])=>({id,...t})).sort((a,b)=>(b.at||0)-(a.at||0));
-        renderCubes();if(document.getElementById("sheet-requests").classList.contains("show"))renderRequests();
+        /* "בקשות שירות" = רק בקשות שהלקוח פתח בעצמו (משימות מהצוות מוצגות בצ'אט) */
+        myRequests=Object.entries(all).filter(([id,t])=>t.openedBy==="client").map(([id,t])=>({id,...t})).sort((a,b)=>(b.at||0)-(a.at||0));
+        renderCubes();if(document.getElementById("p-requests")?.classList.contains("active"))renderRequests();
       });
-      onValue(ref(db,`clients/${phone}/billing`),s=>{myBilling=s.val()||null;renderCubes();if(document.getElementById("sheet-billing").classList.contains("show"))renderBilling();});
+      onValue(ref(db,`clients/${phone}/billing`),s=>{myBilling=s.val()||null;renderCubes();if(document.getElementById("p-billing")?.classList.contains("active"))renderBilling();});
     }
     function primaryProject(){return myProjects.find(p=>p.status==="active")||myProjects[0]||null;}
     function projProgress(p){
-      const st=p.stages?Object.values(p.stages):[];if(!st.length)return p.progress||0;
+      if((p.progressMode||"stages")==="manual")return Math.max(0,Math.min(100,Number(p.manualProgress)||0));
+      const st=p.stages?Object.values(p.stages):[];if(!st.length)return Math.max(0,Math.min(100,Number(p.manualProgress)||p.progress||0));
       const total=st.reduce((s,x)=>s+(Number(x.weight)||1),0);
       const done=st.filter(x=>x.done).reduce((s,x)=>s+(Number(x.weight)||1),0);
       return total?Math.round(done/total*100):0;
@@ -2608,8 +2737,9 @@ window.WDAuth = (function () {
       /* באדג'ים בניווט + פעמון */
       setBadge("bell-badge",unseenBy(null));
       setBadge("badge-quote",unseenBy("quote"));
-      setBadge("badge-prog",unseenBy("stage"));
       setBadge("badge-req",unseenBy("request"));
+      setBadge("tabbadge-quote",unseenBy("quote"));
+      setBadge("tabbadge-req",unseenBy("request"));
     }
     function renderOvNotifs(){
       const host=document.getElementById("ov-notifs");if(!host)return;
@@ -2619,20 +2749,77 @@ window.WDAuth = (function () {
     }
     function refreshOpenSheets(){
       const cur=document.querySelector(".cl-panel.active")?.id;
-      if(cur==="p-progress")renderTimeline();
+      if(cur==="p-sites")renderClientSites();
       else if(cur==="p-quotes")renderQuotesList();
       else if(cur==="p-docs")renderDocs();
       else if(cur==="p-billing")renderBilling();
       else if(cur==="p-requests")renderRequests();
     }
+    /* ── כרטיסי אתר עשירים מ-projects (שלב 3.2) ── */
+    const CS_STAT={building:{c:"building",t:"בבנייה"},active:{c:"active",t:"פעיל"},paused:{c:"paused",t:"מושהה"}};
+    function siteCurStage(p){
+      if((p.progressMode||"stages")==="manual"){return projProgress(p)>=100?"הושלם":"בעבודה";}
+      const st=p.stages?Object.values(p.stages).sort((a,b)=>(a.order||0)-(b.order||0)):[];
+      const next=st.find(x=>!x.done);return next?next.title:(st.length?"כל השלבים הושלמו":"בעבודה");
+    }
+    function siteViewLink(p){
+      if(p.type==="app"){const a=p.appLinks||{};return a.ios||a.testflight||a.android||"";}
+      return p.url||"";
+    }
+    function clientSiteCard(p){
+      const pct=projProgress(p);const st=CS_STAT[p.status]||CS_STAT.building;const isApp=p.type==="app";
+      const link=siteViewLink(p);
+      const hasCreds=p.sitePasswords&&Object.keys(p.sitePasswords).length;
+      const hasStages=(p.progressMode||"stages")==="stages"&&p.stages&&Object.keys(p.stages).length;
+      const banner=p.image?`<img src="${escC(p.image)}" alt="" loading="lazy"/>`:`<div class="cs-banner-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>`;
+      return`<div class="cs-card">
+        <div class="cs-banner">${banner}<span class="cs-stat ${st.c}"><span class="sd"></span>${st.t}</span><span class="cs-type">${isApp?"אפליקציה":"אתר"}</span></div>
+        <div class="cs-body">
+          <div class="cs-name">${escC(p.name||"האתר שלי")}</div>
+          <div class="cs-url">${isApp?"אפליקציה":escC(p.url||"—")}</div>
+          <div class="cs-prog"><div class="cs-prog-top"><span class="cs-prog-stage">${escC(siteCurStage(p))}</span><span class="cs-prog-pct">${pct}%</span></div><div class="cs-bar"><div class="cs-bar-fill" style="width:${pct}%"></div></div></div>
+          <div class="cs-qa">
+            <button class="cs-qa-btn primary" ${link?`onclick="viewClientSite('${p.id}')"`:"disabled style='opacity:.5'"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${isApp?'<path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21l2.3-7.4-6-4.6h7.6z"/>':'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/>'}</svg>${isApp?"פתיחה":"צפייה באתר"}</button>
+            <button class="cs-qa-btn violet" ${hasStages?`onclick="openSiteStages('${p.id}')"`:"disabled style='opacity:.5'"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>שלבים</button>
+            <button class="cs-qa-btn slate" ${hasCreds?`onclick="openSiteCreds('${p.id}')"`:"disabled style='opacity:.5'"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>פרטי גישה</button>
+            <button class="cs-qa-btn sky" onclick="toggleChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>שיחה</button>
+          </div>
+        </div></div>`;
+    }
+    function renderClientSites(){
+      const html=myProjects.length?myProjects.map(clientSiteCard).join(""):
+        `<div class="sheet-empty" style="grid-column:1/-1"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div class="sheet-empty-t">אין אתרים עדיין</div><div>ברגע שנתחיל לעבוד על האתר שלך הוא יופיע כאן.</div></div>`;
+      const a=document.getElementById("sites-list"),b=document.getElementById("p-sites-list");
+      if(a)a.innerHTML=html;if(b)b.innerHTML=html;
+      const gc=document.getElementById("greeting-count");
+      if(gc)gc.textContent=myProjects.length?(myProjects.length===1?"פרויקט אחד פעיל":`${myProjects.length} פרויקטים`):"";
+    }
+    window.viewClientSite=(id)=>{const p=myProjects.find(x=>x.id===id);if(!p)return;const link=siteViewLink(p);if(!link)return;
+      window.open(/^https?:\/\//i.test(link)?link:"https://"+link,"_blank","noopener");};
+    /* זיהוי PWA — הבר התחתון מוצג רק כשמותקן כאפליקציה */
+    function detectPWA(){if(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true)document.body.classList.add("pwa");}
+    detectPWA();
+    window.matchMedia&&window.matchMedia("(display-mode: standalone)").addEventListener&&window.matchMedia("(display-mode: standalone)").addEventListener("change",detectPWA);
+    window.openSiteStages=(id)=>{const p=myProjects.find(x=>x.id===id);if(!p)return;
+      const st=p.stages?Object.values(p.stages).sort((a,b)=>(a.order||0)-(b.order||0)):[];
+      const curIdx=st.findIndex(x=>!x.done);
+      document.getElementById("stages-sheet-title").textContent=p.name||"שלבי הפרויקט";
+      document.getElementById("stages-sheet-body").innerHTML=st.length?st.map((s,i)=>{const state=s.done?"done":(i===curIdx?"current":"wait");const tag=state==="done"?'<span class="tl-tag done">הושלם</span>':state==="current"?'<span class="tl-tag current">בעבודה עכשיו</span>':'<span class="tl-tag wait">ממתין</span>';return`<div class="tl-item ${state}"><div class="tl-line"></div><div class="tl-dot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-body"><div class="tl-title">${escC(s.title)}</div>${s.done&&s.doneAt?`<div class="tl-meta">${relTime(s.doneAt)}</div>`:""}<div>${tag}</div></div></div>`;}).join(""):'<div class="sheet-empty">אין שלבים מוגדרים.</div>';
+      document.getElementById("sheet-site-stages").classList.add("show");markNotifsSeen("stage");};
+    window.openSiteCreds=(id)=>{const p=myProjects.find(x=>x.id===id);if(!p)return;
+      const creds=p.sitePasswords?Object.values(p.sitePasswords):[];
+      document.getElementById("creds-sheet-title").textContent=p.name||"פרטי גישה";
+      document.getElementById("creds-sheet-body").innerHTML=creds.length?creds.map((c,k)=>`<div class="cred-item"><div class="cred-info"><div class="cred-label">${escC(c.label||"פרטי גישה")}</div><div class="cred-val" id="credv${k}">••••••••</div></div><button class="cred-btn" onclick="(function(el){const v=document.getElementById('credv${k}');v.textContent=v.textContent==='${escC(c.value||"")}'?'••••••••':'${escC(c.value||"")}';el.textContent=el.textContent==='הצג'?'הסתר':'הצג';})(this)">הצג</button><button class="cred-btn" onclick="navigator.clipboard?.writeText('${escC(c.value||"")}').then(()=>showToastClient&&showToastClient('הועתק ✓'))">העתק</button></div>`).join(""):'<div class="sheet-empty">אין פרטי גישה.</div>';
+      document.getElementById("sheet-site-creds").classList.add("show");};
 
     /* ── ניווט תפריט הצד ── */
-    const CL_TITLES={"p-home":"בית","p-progress":"התקדמות הפרויקט","p-quotes":"הצעות מחיר","p-billing":"חיובים ותשלומים","p-requests":"בקשות שירות","p-docs":"המסמכים שלי"};
+    const CL_TITLES={"p-home":"בית","p-sites":"האתרים שלי","p-quotes":"הצעות מחיר","p-billing":"חיובים ותשלומים","p-requests":"בקשות שירות","p-docs":"המסמכים שלי"};
     window.showClientPanel=(id)=>{
       document.querySelectorAll(".cl-panel").forEach(p=>p.classList.toggle("active",p.id===id));
       document.querySelectorAll(".cl-ni").forEach(n=>n.classList.toggle("active",n.dataset.panel===id));
+      document.querySelectorAll(".cl-tab").forEach(n=>n.classList.toggle("active",n.dataset.panel===id));
       const t=document.getElementById("cl-title");if(t)t.textContent=CL_TITLES[id]||"";
-      if(id==="p-progress"){renderTimeline();markNotifsSeen("stage");}
+      if(id==="p-sites"){renderClientSites();}
       else if(id==="p-quotes"){renderQuotesList();markNotifsSeen("quote");}
       else if(id==="p-billing"){renderBilling();}
       else if(id==="p-requests"){renderRequests();markNotifsSeen("request");}
@@ -2718,7 +2905,7 @@ window.WDAuth = (function () {
 
     /* בקשות שירות */
     /* בקשות שירות (מוצג בפאנל) */
-    const REQ_STAT={new:"התקבלה",progress:"בטיפול",done:"הושלמה"};
+    const REQ_STAT={open:"נשלחה",new:"התקבלה",progress:"בטיפול",done:"הושלמה"};
     function renderRequests(){
       const host=document.getElementById("requests-body");
       const listHtml=myRequests.length?`<div style="font-weight:700;font-size:14px;margin:18px 0 10px">הבקשות שלי</div>`+myRequests.map(r=>`
@@ -2738,8 +2925,10 @@ window.WDAuth = (function () {
       if(!desc){toastC("נא לפרט את הבקשה");return;}
       const at=Date.now();const p=primaryProject();
       try{
-        await push(ref(db,`tasks/${dashPhone}`),{openedBy:"client",type,desc,status:"new",at,projectId:p?p.id:"",clientName:document.getElementById("greeting-name").textContent||""});
-        /* גשר לצד הניהול עד שלב 4 — הבקשה מופיעה גם בצ'אט הקיים */
+        /* בקשת לקוח = קוביית משימה (openedBy:client). נוצרת רק בשליחה — טיוטה עד כאן. */
+        const tid="task_"+at;
+        await set(ref(db,`tasks/${dashPhone}/${tid}`),{openedBy:"client",openedByName:document.getElementById("greeting-name").textContent||"",title:reqTypeLabel(type),category:type,desc,status:"open",at,projectId:p?p.id:"",clientName:document.getElementById("greeting-name").textContent||""});
+        /* הודעת מערכת בצ'אט כדי שהצוות יראה מיד */
         await push(ref(db,`clients/${dashPhone}/messages`),{text:`בקשת שירות חדשה — ${reqTypeLabel(type)}:\n${desc}`,at,seen:false});
         document.getElementById("req-desc").value="";
         toastC("הבקשה נשלחה ✓");
@@ -3049,7 +3238,95 @@ window.WDAuth = (function () {
           typingEl.classList.toggle("show", !!(data?.active));
         }
       });
+      /* האזנה לקוביות משימה (שלב 4) */
+      onValue(ref(db, `tasks/${phone}`), snap => { clientTasks = snap.val() || {}; renderClientTaskPins(); });
     }
+
+    /* ═══ קוביות משימה — צד הלקוח (שלב 4) ═══ */
+    let clientTasks = {}, tcUploadTarget = null;
+    function tcIsImg(f){return (f.type||"").startsWith("image")||/\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(f.name||"");}
+    function renderClientTaskPins(){
+      const host=document.getElementById("client-task-pins");if(!host)return;
+      const entries=Object.entries(clientTasks).sort((a,b)=>(a[1].at||0)-(b[1].at||0));
+      const open=entries.filter(([id,t])=>t.status!=="done");
+      const done=entries.filter(([id,t])=>t.status==="done");
+      let html="";
+      if(open.length)html+=`<div class="tc-pin-hint"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v5M9 10.76V4a2 2 0 012-2h2a2 2 0 012 2v6.76a2 2 0 001.11 1.79l1.78.89A2 2 0 0119 15.24V17H5v-1.76a2 2 0 011.11-1.79l1.78-.89A2 2 0 009 10.76z"/></svg>${open.length===1?"משימה מוצמדת":open.length+" משימות מוצמדות"}</div>`+open.map(([id,t])=>clientTaskCube(id,t)).join("");
+      html+=done.map(([id,t])=>`<div class="tc-done"><div class="tc-done-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div style="flex:1;min-width:0"><div class="tc-done-t">הושלמה: ${escC(t.title)}</div><div class="tc-done-s">${fmtDoneAt(t.doneAt)}</div></div></div>`).join("");
+      host.innerHTML=html;
+    }
+    function fmtDoneAt(ts){if(!ts)return"";const d=new Date(ts);return d.toLocaleDateString("he-IL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});}
+    function clientTaskCube(id,t){
+      const isClient=t.openedBy==="client";
+      const allFiles=t.files?Object.entries(t.files):[];
+      const pending=allFiles.filter(([fid,f])=>!f.submitted);
+      const submitted=allFiles.filter(([fid,f])=>f.submitted);
+      const icon=isClient?'<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/>':'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>';
+      let body=t.desc?`<div class="tc-desc">${escC(t.desc)}</div>`:"";
+      if(isClient){
+        /* בקשה שהלקוח כבר שלח — לקריאה בלבד + סטטוס */
+        body+=`<div style="display:flex;justify-content:flex-start"><span class="tc-status ${t.status==="done"?"tc-st-done":"tc-st-sub"}" style="margin-right:0">${t.status==="done"?"טופלה":"נשלחה לצוות"}</span></div>`;
+      }else{
+        /* משימה מהצוות — הלקוח מעלה קבצים (טיוטה עד שליחה) */
+        if(submitted.length)body+=`<div class="tc-files">${submitted.map(([fid,f])=>tcFileThumbClient(f,null,id,fid)).join("")}</div>`;
+        if(pending.length){
+          body+=`<div class="tc-files">${pending.map(([fid,f])=>tcFileThumbClient(f,true,id,fid)).join("")}</div>`;
+          body+=`<div class="tc-sub-note">הקבצים האלה עדיין לא נשלחו — אפשר להוסיף או להסיר. לחץ "שליחה" כשסיימת.</div>`;
+        }
+        if(t._uploading)body+=`<div class="tc-uploading"><div class="tc-spin"></div>מעלה...</div>`;
+        if(!submitted.length&&!pending.length&&!t._uploading){
+          body+=`<div class="tc-wait"><div class="tc-dots"><span></span><span></span><span></span></div><div class="tc-wait-txt">ממתין להעלאה שלך</div></div>`;
+        }
+        body+=`<div class="tc-upload" onclick="tcPickFiles('${id}')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div class="tc-upload-t">${(submitted.length||pending.length)?"הוספת קובץ":"העלאת קבצים לכאן"}</div><div class="tc-upload-s">תמונות, PDF וקבצים</div></div>`;
+        if(pending.length)body+=`<div class="tc-cta"><button class="tc-btn primary" onclick="tcSubmitFiles('${id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>שליחה (${pending.length})</button></div>`;
+      }
+      const statusHtml=isClient?"":`<span class="tc-status ${submitted.length?"tc-st-sub":"tc-st-wait"}">${submitted.length?"נשלחו "+submitted.length:"פתוחה"}</span>`;
+      return`<div class="tc ${isClient?"client":"admin"}">
+        <div class="tc-bar"></div>
+        <div class="tc-head"><div class="tc-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon}</svg></div>
+          <div style="flex:1;min-width:0"><div class="tc-who">${isClient?"הבקשה שלך":"משימה מ-WebDesk"}</div><div class="tc-title">${escC(t.title)}</div></div>${statusHtml}</div>
+        <div class="tc-body">${body}</div></div>`;
+    }
+    function tcFileThumbClient(f,pending,taskId,fileId){
+      const img=tcIsImg(f);
+      const del=pending?`<button class="tc-file-x" onclick="tcDeleteFile('${taskId}','${fileId}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`:"";
+      return`<div class="tc-file ${pending?"pending":""}">${img?`<img src="${escC(f.url)}" onclick="window.open('${escC(f.url)}','_blank')"/>`:`<div class="tc-file-doc" onclick="window.open('${escC(f.url)}','_blank')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>`}${del}<span class="tc-file-name">${escC(f.name||"קובץ")}</span></div>`;
+    }
+    window.tcPickFiles=(taskId)=>{tcUploadTarget=taskId;const inp=document.getElementById("tc-file-input");inp.value="";inp.click();};
+    async function tcHandleFiles(files){
+      const taskId=tcUploadTarget;if(!taskId||!currentPhone||!files.length)return;
+      clientTasks[taskId]=clientTasks[taskId]||{};clientTasks[taskId]._uploading=true;renderClientTaskPins();
+      for(const file of files){
+        try{
+          const ext=(file.name.split(".").pop()||"bin").toLowerCase();
+          const path="task-files/"+currentPhone+"/"+taskId+"/"+Date.now()+"_"+Math.random().toString(36).slice(2,7)+"."+ext;
+          const snap=await uploadBytes(sRef(storage,path),file);
+          const url=await getDownloadURL(snap.ref);
+          const fid="f_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
+          await set(ref(db,`tasks/${currentPhone}/${taskId}/files/${fid}`),{url,name:file.name,type:file.type||"",at:Date.now(),by:"client",submitted:false});
+        }catch(e){showToastClient&&showToastClient("שגיאה בהעלאת קובץ");}
+      }
+      if(clientTasks[taskId])delete clientTasks[taskId]._uploading;
+      renderClientTaskPins();
+    }
+    window.tcDeleteFile=async(taskId,fileId)=>{
+      const f=clientTasks[taskId]?.files?.[fileId];
+      if(f&&f.submitted)return; /* נעול אחרי שליחה */
+      await remove(ref(db,`tasks/${currentPhone}/${taskId}/files/${fileId}`));
+    };
+    window.tcSubmitFiles=async(taskId)=>{
+      const t=clientTasks[taskId];if(!t||!t.files)return;
+      const upd={};let n=0;
+      Object.entries(t.files).forEach(([fid,f])=>{if(!f.submitted){upd[`tasks/${currentPhone}/${taskId}/files/${fid}/submitted`]=true;n++;}});
+      if(!n)return;
+      upd[`tasks/${currentPhone}/${taskId}/clientSubmittedAt`]=Date.now();
+      try{await update(ref(db),upd);
+        /* הודעת מערכת קצרה בצ'אט כדי שהצוות יראה שנשלח */
+        await push(ref(db,`clients/${currentPhone}/messages`),{text:`שלחתי ${n} ${n===1?"קובץ":"קבצים"} למשימה: ${t.title}`,at:Date.now(),seen:false});
+        showToastClient&&showToastClient(`נשלחו ${n} ${n===1?"קובץ":"קבצים"} ✓`);
+      }catch(e){showToastClient&&showToastClient("שגיאה בשליחה");}
+    };
+    document.getElementById("tc-file-input")?.addEventListener("change",e=>{const files=[...e.target.files];e.target.value="";if(files.length)tcHandleFiles(files);});
 
 
     /* רינדור צ'אט לקוח מתוך messages */
@@ -4409,6 +4686,10 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       <button onclick="openBgPicker()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>בחירת רקע</button>
       <button class="danger" onclick="openReportDialog()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>דווח על השיחה</button>
     </div>
+
+    <!-- קוביות משימה מוצמדות (שלב 4) -->
+    <div class="tc-pins" id="client-task-pins"></div>
+    <input type="file" id="tc-file-input" accept="image/*,application/pdf,.doc,.docx,.zip" multiple hidden/>
 
     <!-- הודעות -->
     <div class="chat-messages" id="chat-messages">
