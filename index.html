@@ -971,32 +971,92 @@
 .wdl-a{text-decoration-thickness:1.5px}
 .wdl-a:focus-visible{outline:2px solid var(--wdl-accent);outline-offset:2px;border-radius:3px}
 
-/* ═══ דשבורד קוביות — אזור אישי (שלב 3) ═══ */
-.dash-container{width:100%;max-width:520px;padding:22px 20px 130px;flex:1;margin:0 auto}
-.cubes-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:26px}
-.cube{background:var(--card);border:1.5px solid var(--border,#e0eefa);border-radius:18px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .16s,box-shadow .16s,border-color .16s;text-align:right;min-height:118px;display:flex;flex-direction:column}
-.cube:active{transform:scale(.97)}
-.cube:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(14,165,233,.14);border-color:var(--primary)}
-.cube-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:#fff;flex-shrink:0}
-.cube-ic.c-site{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
-.cube-ic.c-prog{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}
-.cube-ic.c-quote{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
-.cube-ic.c-bill{background:linear-gradient(135deg,#10b981,#34d399)}
-.cube-ic.c-req{background:linear-gradient(135deg,#ef4444,#f87171)}
-.cube-ic.c-doc{background:linear-gradient(135deg,#3b82f6,#60a5fa)}
-.cube-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.25}
-.cube-sub{font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.4}
-.cube-badge{position:absolute;top:12px;left:12px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--error,#ef4444);color:#fff;font-size:12px;font-weight:800;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(239,68,68,.4)}
-.cube-badge.show{display:flex;animation:cbPop .3s cubic-bezier(.34,1.4,.64,1) both}
-@keyframes cbPop{from{transform:scale(0)}to{transform:scale(1)}}
-.dash-progress{margin-top:auto}
-.dash-progress-bar{height:6px;background:var(--bg);border-radius:20px;overflow:hidden;margin-top:8px}
-.dash-progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--primary),var(--accent,#38bdf8));transition:width .6s cubic-bezier(.4,1.2,.5,1)}
-
-/* פעמון + מרכז התראות */
-.bell-btn{position:relative;background:rgba(255,255,255,.14);border:none;border-radius:12px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer}
-.bell-badge{position:absolute;top:-4px;left:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--error,#ef4444);color:#fff;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid var(--deep,#0c1a2e)}
+/* ═══ אזור אישי — תפריט צד + פאנלים (שלב 3) ═══ */
+:root{--clsw:252px}
+#screen-home.active{display:block;padding:0;background:var(--bg);overflow:visible}
+.cl-ov{display:none;position:fixed;inset:0;background:rgba(12,26,46,.5);backdrop-filter:blur(2px);z-index:150}
+.cl-ov.show{display:block}
+.cl-sidebar{position:fixed;top:0;right:0;width:var(--clsw);height:100vh;background:linear-gradient(165deg,var(--deep,#0c1a2e),#0a2540 60%,var(--primary-dd));display:flex;flex-direction:column;z-index:160;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.cl-logo{display:flex;align-items:center;gap:11px;padding:20px 18px 18px}
+.cl-logo-icon{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--primary-d));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cl-logo-t{font-size:16px;font-weight:800;color:#fff;line-height:1.1}
+.cl-logo-s{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.cl-nav{flex:1;padding:8px 12px;overflow-y:auto}
+.cl-ni{display:flex;align-items:center;gap:11px;width:100%;padding:11px 13px;border:none;background:none;border-radius:11px;color:rgba(255,255,255,.62);font-family:'Heebo',sans-serif;font-size:14.5px;font-weight:600;cursor:pointer;text-align:right;margin-bottom:3px;transition:background .15s,color .15s}
+.cl-ni:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.cl-ni.active{background:rgba(56,189,248,.16);color:var(--accent,#38bdf8)}
+.cl-ni svg{flex-shrink:0}
+.cl-ni span:first-of-type{flex:1}
+.cl-badge{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--error,#ef4444);color:#fff;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center}
+.cl-badge.show{display:flex}
+.cl-foot{padding:14px 14px 18px;border-top:1px solid rgba(255,255,255,.08)}
+.cl-user{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cl-user-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.cl-user-av img{width:100%;height:100%;object-fit:cover}
+.cl-user-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-foot-actions{display:flex;gap:8px}
+.cl-foot-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:none;border-radius:10px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.cl-foot-btn:hover{background:rgba(255,255,255,.14)}
+.cl-foot-btn.logout{color:#fca5a5}
+.cl-main{margin-right:var(--clsw);min-height:100vh;display:flex;flex-direction:column}
+.cl-topbar{position:sticky;top:0;z-index:90;background:var(--card);border-bottom:1px solid var(--border,#e0eefa);display:flex;align-items:center;gap:12px;padding:12px 20px;box-shadow:0 1px 8px rgba(14,165,233,.05)}
+.cl-menu{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:4px}
+.cl-title{font-size:17px;font-weight:800;color:var(--text);flex:1}
+.bell-btn{position:relative;background:var(--bg);border:1px solid var(--border,#e0eefa);border-radius:11px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer}
+.bell-btn:hover{border-color:var(--primary);color:var(--primary)}
+.bell-badge{position:absolute;top:-5px;left:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--error,#ef4444);color:#fff;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid var(--card)}
 .bell-badge.show{display:flex}
+.cl-content{flex:1;padding:24px 22px 130px;max-width:860px;width:100%;margin:0 auto}
+.cl-panel{display:none;animation:clFade .25s ease}
+.cl-panel.active{display:block}
+@keyframes clFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.cl-panel-head{margin-bottom:18px}
+.cl-panel-title{font-size:23px;font-weight:800;color:var(--text)}
+.cl-panel-sub{font-size:13.5px;color:var(--text-muted);margin-top:3px}
+/* מסך בית */
+.cl-hero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--deep,#0c1a2e),var(--primary-dd));border-radius:20px;padding:22px 24px;margin-bottom:18px}
+.cl-hero-hello{font-size:14px;color:rgba(255,255,255,.7)}
+.cl-hero-name{font-size:24px;font-weight:800;color:#fff;line-height:1.2}
+.cl-hero-count{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
+.cl-hero-av-wrap{margin-right:auto;display:flex;flex-direction:column;align-items:center;position:relative}
+.ov-card{background:var(--card);border:1.5px solid var(--border,#e0eefa);border-radius:18px;padding:20px;margin-bottom:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.ov-card:hover{border-color:var(--primary);box-shadow:0 6px 20px rgba(14,165,233,.1)}
+.ov-card-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.ov-card-lbl{font-size:14px;font-weight:700;color:var(--text-muted)}
+.ov-progress-pct{font-size:28px;font-weight:800;color:var(--primary)}
+.ov-progress-bar{height:10px;background:var(--bg);border-radius:20px;overflow:hidden}
+.ov-progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--primary),var(--accent,#38bdf8));transition:width .6s cubic-bezier(.4,1.2,.5,1)}
+.ov-progress-stage{font-size:13px;color:var(--text-muted);margin-top:9px}
+.ov-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.ov-stat{background:var(--card);border:1.5px solid var(--border,#e0eefa);border-radius:16px;padding:16px 10px;text-align:center;cursor:pointer;transition:border-color .15s,transform .15s}
+.ov-stat:hover{border-color:var(--primary);transform:translateY(-2px)}
+.ov-stat-n{font-size:24px;font-weight:800;color:var(--text)}
+.ov-stat-l{font-size:11.5px;color:var(--text-muted);margin-top:3px}
+.cl-section{margin-bottom:24px}
+.cl-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cl-section-title{font-size:16px;font-weight:800;color:var(--text)}
+.cl-section-link{background:none;border:none;color:var(--primary);font-family:'Heebo',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.cl-fab-wrap{position:fixed;bottom:24px;left:calc(50% + var(--clsw)/2);transform:translateX(-50%);display:flex;gap:10px;z-index:120}
+@media(max-width:768px){
+  .cl-sidebar{transform:translateX(100%)}
+  .cl-sidebar.open{transform:translateX(0);box-shadow:-8px 0 30px rgba(0,0,0,.25)}
+  .cl-main{margin-right:0}
+  .cl-menu{display:flex}
+  .cl-content{padding:18px 16px 120px}
+  .ov-stats{gap:8px}
+  .ov-stat-n{font-size:20px}
+  .cl-fab-wrap{left:50%}
+  .cl-hero-name{font-size:21px}
+}
+/* מרכז התראות */
+.notif-item{display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid var(--border,#e0eefa);text-align:right;align-items:flex-start}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unseen{background:rgba(14,165,233,.05);margin:0 -12px;padding-left:16px;padding-right:16px;border-radius:8px}
+.notif-dot{width:9px;height:9px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:6px}
+.notif-dot.seen{background:transparent}
+.notif-body{flex:1;min-width:0}
+.notif-txt{font-size:14px;color:var(--text);font-weight:600;line-height:1.4}
+.notif-time{font-size:11.5px;color:var(--text-muted);margin-top:3px}
 .notif-item{display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid var(--border,#e0eefa);text-align:right;align-items:flex-start}
 .notif-item:last-child{border-bottom:none}
 .notif-item.unseen{background:rgba(14,165,233,.05);margin:0 -12px;padding-left:16px;padding-right:16px;border-radius:8px}
@@ -1207,108 +1267,116 @@
 
   <!-- מסך בית -->
   <div id="screen-home" class="screen">
-    <div class="home-header">
-      <div class="header-top">
-        <div class="header-logo">
-          <div class="header-logo-icon">
-            <svg width="20" height="20" viewBox="0 0 28 28" fill="none"><rect x="2" y="5" width="24" height="16" rx="3" stroke="white" stroke-width="2"/><path d="M9 21v3M19 21v3M6 24h16" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-          </div>
-          <span class="header-logo-text">WebDesk Pro</span>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="bell-btn" id="bell-btn" onclick="openNotifCenter()" aria-label="התראות">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-            <span class="bell-badge" id="bell-badge">0</span>
-          </button>
-          <button class="theme-toggle" onclick="toggleTheme()">
-            <svg id="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          </button>
-          <button class="btn-logout" onclick="handleLogout()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            יציאה
-          </button>
+    <div class="cl-ov" id="cl-ov" onclick="toggleClSidebar(false)"></div>
+
+    <!-- תפריט צד -->
+    <aside class="cl-sidebar" id="cl-sidebar">
+      <div class="cl-logo">
+        <div class="cl-logo-icon"><svg width="20" height="20" viewBox="0 0 28 28" fill="none"><rect x="2" y="5" width="24" height="16" rx="3" stroke="white" stroke-width="2"/><path d="M9 21v3M19 21v3M6 24h16" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div><div class="cl-logo-t">WebDesk Pro</div><div class="cl-logo-s">האזור האישי</div></div>
+      </div>
+      <nav class="cl-nav">
+        <button class="cl-ni active" data-panel="p-home" onclick="showClientPanel('p-home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>בית</span></button>
+        <button class="cl-ni" data-panel="p-progress" onclick="showClientPanel('p-progress')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>התקדמות הפרויקט</span><span class="cl-badge" id="badge-prog">0</span></button>
+        <button class="cl-ni" data-panel="p-quotes" onclick="showClientPanel('p-quotes')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>הצעות מחיר</span><span class="cl-badge" id="badge-quote">0</span></button>
+        <button class="cl-ni" data-panel="p-billing" onclick="showClientPanel('p-billing')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>חיובים ותשלומים</span></button>
+        <button class="cl-ni" data-panel="p-requests" onclick="showClientPanel('p-requests')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg><span>בקשות שירות</span><span class="cl-badge" id="badge-req">0</span></button>
+        <button class="cl-ni" data-panel="p-docs" onclick="showClientPanel('p-docs')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span>המסמכים שלי</span></button>
+      </nav>
+      <div class="cl-foot">
+        <div class="cl-user"><div class="cl-user-av" id="cl-user-av">?</div><div class="cl-user-name" id="cl-user-name">לקוח</div></div>
+        <div class="cl-foot-actions">
+          <button class="cl-foot-btn" onclick="toggleTheme()" aria-label="מצב תצוגה"><svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+          <button class="cl-foot-btn logout" onclick="handleLogout()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>יציאה</button>
         </div>
       </div>
-      <div class="header-greeting" style="display:flex;align-items:center;gap:16px">
-        <div>
-          <div class="greeting-hello">שלום,</div>
-          <div class="greeting-name" id="greeting-name">לקוח יקר</div>
-          <div class="greeting-count" id="greeting-count"></div>
-        </div>
-        <div style="margin-right:auto;display:flex;flex-direction:column;align-items:center">
-          <div style="position:relative">
-            <div class="avatar-circle" id="home-avatar-display" onclick="openAvatarPicker()">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
+    </aside>
+
+    <!-- אזור ראשי -->
+    <div class="cl-main">
+      <div class="cl-topbar">
+        <button class="cl-menu" onclick="toggleClSidebar()" aria-label="תפריט"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <span class="cl-title" id="cl-title">בית</span>
+        <button class="bell-btn" id="bell-btn" onclick="openNotifCenter()" aria-label="התראות">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="bell-badge" id="bell-badge">0</span>
+        </button>
+      </div>
+
+      <div class="cl-content">
+        <!-- בית -->
+        <div class="cl-panel active" id="p-home">
+          <div class="cl-hero">
+            <div><div class="cl-hero-hello" id="greeting-hello">שלום,</div><div class="cl-hero-name" id="greeting-name">לקוח יקר</div><div class="cl-hero-count" id="greeting-count"></div></div>
+            <div class="cl-hero-av-wrap">
+              <div class="avatar-circle" id="home-avatar-display" onclick="openAvatarPicker()">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <span class="avatar-edit-badge" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+              <button class="avatar-change-hint" id="avatar-change-btn" onclick="openAvatarPicker()">שנה תמונה</button>
+              <input type="file" id="av-file-cam" accept="image/*" capture="user" style="display:none" />
+              <input type="file" id="av-file-gal" accept="image/*" style="display:none" />
             </div>
-            <span class="avatar-edit-badge" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            </span>
           </div>
-          <button class="avatar-change-hint" id="avatar-change-btn" onclick="openAvatarPicker()">שנה תמונה</button>
-          <input type="file" id="av-file-cam" accept="image/*" capture="user" style="display:none" />
-          <input type="file" id="av-file-gal" accept="image/*" style="display:none" />
-        </div>
-      </div>
-    </div>
 
-    <div class="dash-container">
-      <div class="cubes-grid" id="cubes-grid">
-        <div class="cube" onclick="scrollToSites()">
-          <div class="cube-ic c-site"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg></div>
-          <div class="cube-title">האתר שלי</div>
-          <div class="cube-sub" id="cube-site-sub">—</div>
-        </div>
-        <div class="cube" onclick="openProgressSheet()">
-          <span class="cube-badge" id="badge-prog">0</span>
-          <div class="cube-ic c-prog"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-          <div class="cube-title">התקדמות הפרויקט</div>
-          <div class="dash-progress"><div class="cube-sub" id="cube-prog-sub">—</div><div class="dash-progress-bar"><div class="dash-progress-fill" id="cube-prog-fill" style="width:0%"></div></div></div>
-        </div>
-        <div class="cube" onclick="openQuotesSheet()">
-          <span class="cube-badge" id="badge-quote">0</span>
-          <div class="cube-ic c-quote"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-          <div class="cube-title">הצעות מחיר</div>
-          <div class="cube-sub" id="cube-quote-sub">—</div>
-        </div>
-        <div class="cube" onclick="openBillingSheet()">
-          <div class="cube-ic c-bill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-          <div class="cube-title">חיובים ותשלומים</div>
-          <div class="cube-sub" id="cube-bill-sub">—</div>
-        </div>
-        <div class="cube" onclick="openRequestsSheet()">
-          <span class="cube-badge" id="badge-req">0</span>
-          <div class="cube-ic c-req"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
-          <div class="cube-title">בקשות שירות</div>
-          <div class="cube-sub" id="cube-req-sub">—</div>
-        </div>
-        <div class="cube" onclick="openDocsSheet()">
-          <div class="cube-ic c-doc"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
-          <div class="cube-title">המסמכים שלי</div>
-          <div class="cube-sub" id="cube-doc-sub">—</div>
-        </div>
-      </div>
-    </div>
+          <div class="ov-card" id="ov-progress-card" onclick="showClientPanel('p-progress')">
+            <div class="ov-card-top"><span class="ov-card-lbl">התקדמות הפרויקט</span><span class="ov-progress-pct" id="ov-progress-pct">0%</span></div>
+            <div class="ov-progress-bar"><div class="ov-progress-fill" id="ov-progress-fill" style="width:0%"></div></div>
+            <div class="ov-progress-stage" id="ov-progress-stage">—</div>
+          </div>
 
-    <div class="sites-container" id="sites-container">
-      <div class="section-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>
-        האתרים שלי
+          <div class="ov-stats">
+            <div class="ov-stat" onclick="showClientPanel('p-quotes')"><div class="ov-stat-n" id="ov-quotes-n">0</div><div class="ov-stat-l">הצעות ממתינות</div></div>
+            <div class="ov-stat" onclick="showClientPanel('p-requests')"><div class="ov-stat-n" id="ov-requests-n">0</div><div class="ov-stat-l">בקשות פתוחות</div></div>
+            <div class="ov-stat" onclick="showClientPanel('p-docs')"><div class="ov-stat-n" id="ov-docs-n">0</div><div class="ov-stat-l">מסמכים</div></div>
+          </div>
+
+          <div class="cl-section">
+            <div class="cl-section-head"><span class="cl-section-title">התראות אחרונות</span><button class="cl-section-link" onclick="openNotifCenter()">הכל</button></div>
+            <div id="ov-notifs"></div>
+          </div>
+
+          <div class="cl-section" id="sites-container">
+            <div class="cl-section-head"><span class="cl-section-title">האתרים שלי</span></div>
+            <div id="sites-list"></div>
+          </div>
+        </div>
+
+        <!-- התקדמות -->
+        <div class="cl-panel" id="p-progress">
+          <div class="cl-panel-head"><h2 class="cl-panel-title" id="prog-sheet-title">התקדמות הפרויקט</h2><p class="cl-panel-sub" id="prog-sheet-sub"></p></div>
+          <div id="prog-timeline"></div>
+        </div>
+        <!-- הצעות -->
+        <div class="cl-panel" id="p-quotes">
+          <div class="cl-panel-head"><h2 class="cl-panel-title">הצעות מחיר</h2><p class="cl-panel-sub">ההצעות שנשלחו אליך — צפייה ואישור</p></div>
+          <div id="quotes-list"></div>
+        </div>
+        <!-- חיובים -->
+        <div class="cl-panel" id="p-billing">
+          <div class="cl-panel-head"><h2 class="cl-panel-title">חיובים ותשלומים</h2><p class="cl-panel-sub">מצב התשלומים בפרויקט</p></div>
+          <div id="billing-body"></div>
+        </div>
+        <!-- בקשות -->
+        <div class="cl-panel" id="p-requests">
+          <div class="cl-panel-head"><h2 class="cl-panel-title">בקשות שירות</h2><p class="cl-panel-sub">פתיחת בקשה ומעקב אחר הסטטוס</p></div>
+          <div id="requests-body"></div>
+        </div>
+        <!-- מסמכים -->
+        <div class="cl-panel" id="p-docs">
+          <div class="cl-panel-head"><h2 class="cl-panel-title">המסמכים שלי</h2><p class="cl-panel-sub">הצעות מאושרות וקבצים ששותפו איתך</p></div>
+          <div id="docs-body"></div>
+        </div>
       </div>
-      <div id="sites-list"></div>
     </div>
 
     <!-- FAB צ'אט + WhatsApp -->
-    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:200;animation:fabIn .6s cubic-bezier(.34,1.2,.64,1) .8s both">
-      <!-- כפתור WhatsApp -->
+    <div class="cl-fab-wrap">
       <a href="https://wa.me/972533729687" target="_blank" rel="noopener"
         style="background:linear-gradient(135deg,#25d366,#128c7e);border:none;border-radius:28px;color:white;font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;padding:13px 20px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(37,211,102,.4);text-decoration:none;white-space:nowrap">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.135 1.535 5.879L.057 23.535a.75.75 0 00.916.919l5.688-1.485A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
         WhatsApp
       </a>
-      <!-- כפתור צ'אט תמיכה -->
       <button onclick="toggleChat()" style="background:linear-gradient(135deg,var(--primary),var(--primary-d));border:none;border-radius:28px;color:white;font-family:'Heebo',sans-serif;font-size:14px;font-weight:700;padding:13px 20px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(14,165,233,.4);position:relative;white-space:nowrap">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         שיחה עם תמיכה
@@ -1351,56 +1419,6 @@
       <div class="sheet-h">התראות</div>
       <div class="sheet-sub" id="notif-sub">כל העדכונים במקום אחד</div>
       <div class="sheet-scroll" id="notif-list"></div>
-    </div>
-  </div>
-
-  <!-- גיליון: התקדמות הפרויקט -->
-  <div class="popup-overlay" id="sheet-progress" onclick="closePopup('sheet-progress')">
-    <div class="popup-sheet" onclick="event.stopPropagation()">
-      <div class="popup-handle"></div>
-      <div class="sheet-h" id="prog-sheet-title">התקדמות הפרויקט</div>
-      <div class="sheet-sub" id="prog-sheet-sub"></div>
-      <div class="sheet-scroll" id="prog-timeline"></div>
-    </div>
-  </div>
-
-  <!-- גיליון: הצעות מחיר -->
-  <div class="popup-overlay" id="sheet-quotes" onclick="closePopup('sheet-quotes')">
-    <div class="popup-sheet" onclick="event.stopPropagation()">
-      <div class="popup-handle"></div>
-      <div class="sheet-h">הצעות מחיר</div>
-      <div class="sheet-sub">ההצעות שנשלחו אליך — צפייה ואישור</div>
-      <div class="sheet-scroll" id="quotes-list"></div>
-    </div>
-  </div>
-
-  <!-- גיליון: חיובים ותשלומים -->
-  <div class="popup-overlay" id="sheet-billing" onclick="closePopup('sheet-billing')">
-    <div class="popup-sheet" onclick="event.stopPropagation()">
-      <div class="popup-handle"></div>
-      <div class="sheet-h">חיובים ותשלומים</div>
-      <div class="sheet-sub">מצב התשלומים בפרויקט</div>
-      <div class="sheet-scroll" id="billing-body"></div>
-    </div>
-  </div>
-
-  <!-- גיליון: בקשות שירות -->
-  <div class="popup-overlay" id="sheet-requests" onclick="closePopup('sheet-requests')">
-    <div class="popup-sheet" onclick="event.stopPropagation()">
-      <div class="popup-handle"></div>
-      <div class="sheet-h">בקשות שירות</div>
-      <div class="sheet-sub">פתיחת בקשה ומעקב אחר הסטטוס</div>
-      <div class="sheet-scroll" id="requests-body"></div>
-    </div>
-  </div>
-
-  <!-- גיליון: המסמכים שלי -->
-  <div class="popup-overlay" id="sheet-docs" onclick="closePopup('sheet-docs')">
-    <div class="popup-sheet" onclick="event.stopPropagation()">
-      <div class="popup-handle"></div>
-      <div class="sheet-h">המסמכים שלי</div>
-      <div class="sheet-sub">הצעות מאושרות וקבצים ששותפו איתך</div>
-      <div class="sheet-scroll" id="docs-body"></div>
     </div>
   </div>
 
@@ -2564,45 +2582,73 @@ window.WDAuth = (function () {
     function unseenBy(type){return myNotifs.filter(n=>!n.seen&&(!type||n.type===type)).length;}
     function setBadge(id,n){const el=document.getElementById(id);if(!el)return;el.textContent=n>99?"99+":n;el.classList.toggle("show",n>0);}
 
+    /* עדכון הניווט, מסך הבית והבאדג'ים (נקרא renderCubes לשם תאימות לקריאות קיימות) */
     function renderCubes(){
-      /* אתר */
-      const sitesN=(window.__clientSites||[]).length;
-      document.getElementById("cube-site-sub").textContent=sitesN?`${sitesN} ${sitesN===1?"אתר":"אתרים"}`:"אין אתרים עדיין";
-      /* התקדמות */
       const p=primaryProject();
-      if(p){const pct=projProgress(p);const cur=(p.stages?Object.values(p.stages).sort((a,b)=>(a.order||0)-(b.order||0)).find(x=>!x.done):null);
-        document.getElementById("cube-prog-sub").textContent=cur?cur.title:(pct>=100?"הושלם":"—");
-        document.getElementById("cube-prog-fill").style.width=pct+"%";}
-      else{document.getElementById("cube-prog-sub").textContent="טרם נפתח פרויקט";document.getElementById("cube-prog-fill").style.width="0%";}
-      /* הצעות */
+      /* מסך בית — כרטיס התקדמות */
+      const pctEl=document.getElementById("ov-progress-pct"),fillEl=document.getElementById("ov-progress-fill"),stEl=document.getElementById("ov-progress-stage");
+      if(pctEl){
+        if(p){const pct=projProgress(p);const cur=(p.stages?Object.values(p.stages).sort((a,b)=>(a.order||0)-(b.order||0)).find(x=>!x.done):null);
+          pctEl.textContent=pct+"%";fillEl.style.width=pct+"%";
+          stEl.textContent=cur?("השלב הנוכחי: "+cur.title):(pct>=100?"כל השלבים הושלמו":"—");}
+        else{pctEl.textContent="—";fillEl.style.width="0%";stEl.textContent="טרם נפתח פרויקט";}
+      }
+      /* מסך בית — סטטיסטיקות מהירות */
       const pending=myQuotes.filter(q=>q.status==="sent"||q.status==="viewed").length;
-      document.getElementById("cube-quote-sub").textContent=myQuotes.length?(pending?`${pending} ממתינות לאישור`:`${myQuotes.length} הצעות`):"אין הצעות עדיין";
-      /* חיוב */
-      if(myBilling&&myBilling.total!=null){const remain=(myBilling.total||0)-(myBilling.paid||0);document.getElementById("cube-bill-sub").textContent=remain>0?`נותר ${ilsC(remain)}`:"שולם במלואו";}
-      else document.getElementById("cube-bill-sub").textContent="אין חיובים כרגע";
-      /* בקשות */
       const openReq=myRequests.filter(r=>r.status!=="done").length;
-      document.getElementById("cube-req-sub").textContent=myRequests.length?`${openReq} פתוחות`:"פתח/י בקשה חדשה";
-      /* מסמכים */
       const docsN=myQuotes.filter(q=>q.status==="approved").length;
-      document.getElementById("cube-doc-sub").textContent=docsN?`${docsN} מסמכים`:"אין מסמכים עדיין";
-      /* באדג'ים */
+      const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+      set("ov-quotes-n",pending);set("ov-requests-n",openReq);set("ov-docs-n",docsN);
+      /* התראות אחרונות במסך הבית */
+      renderOvNotifs();
+      /* שם משתמש בסרגל */
+      const nameEl=document.getElementById("cl-user-name"),avEl=document.getElementById("cl-user-av"),gname=document.getElementById("greeting-name");
+      if(nameEl&&gname)nameEl.textContent=gname.textContent||"לקוח";
+      if(avEl&&gname&&!avEl.querySelector("img"))avEl.textContent=(gname.textContent||"ל").trim().charAt(0);
+      /* באדג'ים בניווט + פעמון */
       setBadge("bell-badge",unseenBy(null));
       setBadge("badge-quote",unseenBy("quote"));
       setBadge("badge-prog",unseenBy("stage"));
       setBadge("badge-req",unseenBy("request"));
     }
-    function refreshOpenSheets(){
-      if(document.getElementById("sheet-progress").classList.contains("show"))renderTimeline();
-      if(document.getElementById("sheet-quotes").classList.contains("show"))renderQuotesList();
-      if(document.getElementById("sheet-docs").classList.contains("show"))renderDocs();
-      if(document.getElementById("sheet-billing").classList.contains("show"))renderBilling();
+    function renderOvNotifs(){
+      const host=document.getElementById("ov-notifs");if(!host)return;
+      const top=myNotifs.slice(0,3);
+      host.innerHTML=top.length?top.map(n=>`<div class="notif-item ${n.seen?"":"unseen"}"><span class="notif-dot ${n.seen?"seen":""}"></span><div class="notif-body"><div class="notif-txt">${escC(n.text)}</div><div class="notif-time">${relTime(n.at)}</div></div></div>`).join(""):
+        `<div style="font-size:13px;color:var(--text-muted);padding:10px 2px">אין התראות חדשות.</div>`;
     }
-    function openSheet(id){document.getElementById(id).classList.add("show");}
-    window.scrollToSites=()=>{document.getElementById("sites-container")?.scrollIntoView({behavior:"smooth"});};
+    function refreshOpenSheets(){
+      const cur=document.querySelector(".cl-panel.active")?.id;
+      if(cur==="p-progress")renderTimeline();
+      else if(cur==="p-quotes")renderQuotesList();
+      else if(cur==="p-docs")renderDocs();
+      else if(cur==="p-billing")renderBilling();
+      else if(cur==="p-requests")renderRequests();
+    }
+
+    /* ── ניווט תפריט הצד ── */
+    const CL_TITLES={"p-home":"בית","p-progress":"התקדמות הפרויקט","p-quotes":"הצעות מחיר","p-billing":"חיובים ותשלומים","p-requests":"בקשות שירות","p-docs":"המסמכים שלי"};
+    window.showClientPanel=(id)=>{
+      document.querySelectorAll(".cl-panel").forEach(p=>p.classList.toggle("active",p.id===id));
+      document.querySelectorAll(".cl-ni").forEach(n=>n.classList.toggle("active",n.dataset.panel===id));
+      const t=document.getElementById("cl-title");if(t)t.textContent=CL_TITLES[id]||"";
+      if(id==="p-progress"){renderTimeline();markNotifsSeen("stage");}
+      else if(id==="p-quotes"){renderQuotesList();markNotifsSeen("quote");}
+      else if(id==="p-billing"){renderBilling();}
+      else if(id==="p-requests"){renderRequests();markNotifsSeen("request");}
+      else if(id==="p-docs"){renderDocs();}
+      document.querySelector(".cl-content")?.scrollTo({top:0});
+      toggleClSidebar(false);
+    };
+    window.toggleClSidebar=(force)=>{
+      const sb=document.getElementById("cl-sidebar"),ov=document.getElementById("cl-ov");
+      if(!sb)return;
+      const open=force!==undefined?force:!sb.classList.contains("open");
+      sb.classList.toggle("open",open);ov.classList.toggle("show",open);
+    };
 
     /* התראות */
-    window.openNotifCenter=()=>{renderNotifs();openSheet("sheet-notif");markNotifsSeen(null);};
+    window.openNotifCenter=()=>{renderNotifs();document.getElementById("sheet-notif").classList.add("show");markNotifsSeen(null);};
     function renderNotifs(){
       const host=document.getElementById("notif-list");
       const unseen=myNotifs.filter(n=>!n.seen).length;
@@ -2618,7 +2664,7 @@ window.WDAuth = (function () {
     }
 
     /* התקדמות — ציר זמן */
-    window.openProgressSheet=()=>{renderTimeline();openSheet("sheet-progress");markNotifsSeen("stage");};
+    /* התקדמות — ציר זמן (מוצג בפאנל) */
     function renderTimeline(){
       const host=document.getElementById("prog-timeline");
       if(!myProjects.length){host.innerHTML=emptySheet("טרם נפתח פרויקט","כשנתחיל לעבוד על הפרויקט שלך, כל השלבים יופיעו כאן.");document.getElementById("prog-sheet-sub").textContent="";return;}
@@ -2639,7 +2685,7 @@ window.WDAuth = (function () {
     }
 
     /* הצעות מחיר */
-    window.openQuotesSheet=()=>{renderQuotesList();openSheet("sheet-quotes");markNotifsSeen("quote");};
+    /* הצעות מחיר (מוצג בפאנל) */
     function quoteEff(q){if((q.status==="sent"||q.status==="viewed")&&q.validUntil&&new Date(q.validUntil+"T23:59:59")<new Date())return"expired";return q.status||"draft";}
     function quoteGrand(q){const items=q.items?Object.values(q.items):[];const sub=items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);const ad=Math.max(0,sub-(Number(q.discount)||0));return ad+ad*(Number(q.vat)||0)/100;}
     const Q_PILL={draft:"טיוטה",sent:"ממתינה לאישור",viewed:"נצפתה",approved:"אושרה",rejected:"נדחתה",expired:"פג תוקף"};
@@ -2656,7 +2702,7 @@ window.WDAuth = (function () {
     window.openClientQuote=(id)=>{window.open(`quote.html?id=${id}`,"_blank");};
 
     /* חיובים — תצוגה בלבד */
-    window.openBillingSheet=()=>{renderBilling();openSheet("sheet-billing");};
+    /* חיובים — תצוגה בלבד (מוצג בפאנל) */
     function renderBilling(){
       const host=document.getElementById("billing-body");
       if(!myBilling||myBilling.total==null){host.innerHTML=emptySheet("אין חיובים כרגע","פרטי החיוב יופיעו כאן כשייפתח חיוב לפרויקט.");return;}
@@ -2671,7 +2717,7 @@ window.WDAuth = (function () {
     }
 
     /* בקשות שירות */
-    window.openRequestsSheet=()=>{renderRequests();openSheet("sheet-requests");markNotifsSeen("request");};
+    /* בקשות שירות (מוצג בפאנל) */
     const REQ_STAT={new:"התקבלה",progress:"בטיפול",done:"הושלמה"};
     function renderRequests(){
       const host=document.getElementById("requests-body");
@@ -2701,7 +2747,7 @@ window.WDAuth = (function () {
     };
 
     /* מסמכים */
-    window.openDocsSheet=()=>{renderDocs();openSheet("sheet-docs");};
+    /* מסמכים (מוצג בפאנל) */
     function renderDocs(){
       const host=document.getElementById("docs-body");
       const approved=myQuotes.filter(q=>q.status==="approved");
