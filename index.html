@@ -1122,19 +1122,36 @@ body.pwa .cl-content{padding-bottom:96px}
 .tc-pins{display:flex;flex-direction:column;gap:8px;padding:10px 12px 4px;max-height:52vh;overflow-y:auto;flex-shrink:0}
 .tc-pins:empty{display:none;padding:0}
 .tc-pin-hint{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--text-muted);padding:0 2px 2px}
-.tc{background:var(--card);border:1px solid var(--border,#e0eefa);border-radius:15px;overflow:hidden;box-shadow:0 4px 16px rgba(12,26,46,.1)}
-.tc-bar{height:4px}
+.tc{background:var(--card);border:1px solid var(--border,#e0eefa);border-radius:18px;border-bottom-right-radius:6px;overflow:hidden;box-shadow:0 8px 22px rgba(12,26,46,.13);max-width:94%;align-self:flex-start;animation:tcPop .5s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes tcPop{0%{opacity:0;transform:translateY(10px) scale(.96)}100%{opacity:1;transform:none}}
+.tc-bar{display:none}
 .tc.admin .tc-bar{background:linear-gradient(90deg,var(--primary),#6366f1)}
 .tc.client .tc-bar{background:linear-gradient(90deg,#f43f5e,#fb7185)}
 .tc.done .tc-bar{background:#10b981}
-.tc-head{display:flex;align-items:center;gap:9px;padding:11px 13px 8px}
-.tc-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.tc-cap{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.2px;padding:10px 13px 0}
+.tc.admin .tc-cap{color:var(--primary-d)}
+.tc.client .tc-cap{color:#e11d48}
+.tc-cap .tc-pulse{width:7px;height:7px;border-radius:50%;background:currentColor;animation:tcPulse 1.8s infinite}
+@keyframes tcPulse{0%{box-shadow:0 0 0 0 rgba(14,165,233,.5)}70%{box-shadow:0 0 0 7px rgba(14,165,233,0)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
+.tc.client .tc-cap .tc-pulse{animation-name:tcPulseR}
+@keyframes tcPulseR{0%{box-shadow:0 0 0 0 rgba(244,63,94,.5)}70%{box-shadow:0 0 0 7px rgba(244,63,94,0)}100%{box-shadow:0 0 0 0 rgba(244,63,94,0)}}
+.tc-head{display:flex;align-items:flex-start;gap:11px;padding:8px 13px 11px}
+.tc-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(14,165,233,.35)}
 .tc.admin .tc-ic{background:linear-gradient(135deg,var(--primary),var(--primary-d))}
 .tc.client .tc-ic{background:linear-gradient(135deg,#f43f5e,#fb7185)}
 .tc-who{font-size:10px;font-weight:800;letter-spacing:.2px}
 .tc.admin .tc-who{color:var(--primary-d)}
 .tc.client .tc-who{color:#e11d48}
-.tc-title{font-size:14.5px;font-weight:800;color:var(--text);margin-top:1px;line-height:1.25}
+.tc-title{font-size:16px;font-weight:800;color:var(--text);margin-top:1px;line-height:1.25}
+.tc-cat-l{font-size:11px;font-weight:700;color:var(--text-muted);margin-top:2px}
+.tc-answer{width:100%;border:1.5px solid var(--border,#e0eefa);border-radius:12px;padding:11px 13px;font-family:'Heebo',sans-serif;font-size:13.5px;color:var(--text);background:var(--bg);resize:vertical;min-height:70px;margin-bottom:11px;box-sizing:border-box;line-height:1.5}
+.tc-answer:focus{outline:none;border-color:var(--primary)}
+.tc-answer-sent{background:var(--bg);border:1px solid var(--border,#e0eefa);border-radius:12px;padding:11px 13px;font-size:13px;color:var(--text);line-height:1.55;white-space:pre-wrap;word-break:break-word;margin-bottom:11px}
+.tc-ack{display:flex;align-items:center;gap:9px;background:var(--bg);border-radius:12px;padding:11px 13px;margin-bottom:12px}
+.tc-ack .tc-ack-k{width:30px;height:30px;border-radius:9px;background:rgba(16,185,129,.14);color:#15803d;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tc-ack .tc-ack-t{font-size:12.5px;font-weight:700;color:var(--text)}
+.tc-ack .tc-ack-s{font-size:11px;color:var(--text-muted)}
+.tc-btn.ack{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
 .tc-body{padding:0 13px 13px}
 .tc-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:11px;white-space:pre-wrap;word-break:break-word}
 .tc-status{margin-right:auto;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
@@ -1172,6 +1189,18 @@ body.pwa .cl-content{padding-bottom:96px}
 .tc-uploading{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:10px}
 .tc-spin{width:16px;height:16px;border:2px solid var(--border,#e0eefa);border-top-color:var(--primary);border-radius:50%;animation:tcspin .8s linear infinite}
 @keyframes tcspin{to{transform:rotate(360deg)}}
+.tc-flash{animation:tcFlash 1.6s ease}
+@keyframes tcFlash{0%{box-shadow:0 8px 22px rgba(12,26,46,.13)}25%{box-shadow:0 0 0 3px var(--primary),0 10px 26px rgba(14,165,233,.35)}100%{box-shadow:0 8px 22px rgba(12,26,46,.13)}}
+/* כרטיס משימה פעיל — אזור אישי */
+.home-task{background:var(--card);border:1px solid var(--border,#e0eefa);border-radius:16px;overflow:hidden;box-shadow:0 6px 18px rgba(12,26,46,.1);margin-bottom:12px;position:relative}
+.ht-stripe{position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--primary),var(--primary-d))}
+.ht-in{display:flex;align-items:center;gap:12px;padding:13px 15px 13px 14px}
+.ht-ic{width:42px;height:42px;border-radius:12px;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ht-t{font-size:14.5px;font-weight:800;color:var(--text);line-height:1.25}
+.ht-s{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.ht-badge{font-size:10px;font-weight:800;color:#b45309;background:rgba(245,158,11,.15);padding:3px 9px;border-radius:100px;display:inline-block;margin-top:6px}
+.ht-cta{border-top:1px solid var(--border,#e0eefa);padding:11px 14px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:800;color:var(--primary-d);background:rgba(14,165,233,.05);cursor:pointer}
+.ht-cta:active{background:rgba(14,165,233,.1)}
 
 /* גיליון פרטים (sheet) לקוביות */
 .sheet-scroll{max-height:64vh;overflow-y:auto;text-align:right;margin-top:6px}
@@ -1432,8 +1461,13 @@ body.pwa .cl-content{padding-bottom:96px}
             <div class="ov-stat" onclick="showClientPanel('p-docs')"><div class="ov-stat-n" id="ov-docs-n">0</div><div class="ov-stat-l">מסמכים</div></div>
           </div>
 
+          <div class="cl-section" id="home-tasks-section" style="display:none">
+            <div class="cl-section-head"><span class="cl-section-title">משימות פתוחות</span></div>
+            <div id="home-tasks-list"></div>
+          </div>
+
           <div class="cl-section">
-            <div class="cl-section-head"><span class="cl-section-title">התראות אחרונות</span><button class="cl-section-link" onclick="openNotifCenter()">הכל</button></div>
+            <div class="cl-section-head"><span class="cl-section-title">עדכונים אחרונים</span><button class="cl-section-link" onclick="openNotifCenter()">הכל</button></div>
             <div id="ov-notifs"></div>
           </div>
 
@@ -2672,7 +2706,7 @@ window.WDAuth = (function () {
     }
 
     /* ═══════════════ דשבורד קוביות — אזור אישי (שלב 3) ═══════════════ */
-    let dashPhone=null, myProjects=[], myQuotes=[], myNotifs=[], myRequests=[], myBilling=null;
+    let dashPhone=null, myProjects=[], myQuotes=[], myNotifs=[], myRequests=[], myOpenTasks=[], myBilling=null;
     function setupDashboard(phone){
       dashPhone=phone;
       /* פרויקטים של הלקוח — סינון לפי טלפון (בכללים הסגורים של שלב 5 הלקוח ממילא יראה רק את שלו) */
@@ -2695,7 +2729,9 @@ window.WDAuth = (function () {
         const all=s.val()||{};
         /* "בקשות שירות" = רק בקשות שהלקוח פתח בעצמו (משימות מהצוות מוצגות בצ'אט) */
         myRequests=Object.entries(all).filter(([id,t])=>t.openedBy==="client").map(([id,t])=>({id,...t})).sort((a,b)=>(b.at||0)-(a.at||0));
-        renderCubes();if(document.getElementById("p-requests")?.classList.contains("active"))renderRequests();
+        /* משימות פתוחות מהצוות — מוצגות ככרטיס פעיל באזור האישי */
+        myOpenTasks=Object.entries(all).filter(([id,t])=>t.openedBy!=="client"&&t.status!=="done").map(([id,t])=>({id,...t})).sort((a,b)=>(b.at||0)-(a.at||0));
+        renderCubes();renderHomeTasks();if(document.getElementById("p-requests")?.classList.contains("active"))renderRequests();
       });
       onValue(ref(db,`clients/${phone}/billing`),s=>{myBilling=s.val()||null;renderCubes();if(document.getElementById("p-billing")?.classList.contains("active"))renderBilling();});
     }
@@ -3256,18 +3292,57 @@ window.WDAuth = (function () {
       host.innerHTML=html;
     }
     function fmtDoneAt(ts){if(!ts)return"";const d=new Date(ts);return d.toLocaleDateString("he-IL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});}
+    /* מטא-דאטה של קטגוריות משימה (משימות שהצוות פותח) — זהה ב-3 הקבצים */
+    const TASK_CATS={
+      photos:{l:"תמונות לאתר",t:"תמונות לאתר",io:"upload",g:"#8b5cf6,#6366f1",ic:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>'},
+      logo:{l:"לוגו ומיתוג",t:"קובצי לוגו ומיתוג",io:"upload",g:"#f59e0b,#f97316",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 8.2l1.15 2.55 2.75.28-2.05 1.85.57 2.72L12 16.2l-2.42 1.4.57-2.72-2.05-1.85 2.75-.28z" fill="currentColor" stroke="none"/>'},
+      docs:{l:"מסמכים רשמיים",t:"מסמכים (ח.פ / רישיון)",io:"upload",g:"#0ea5e9,#0284c7",ic:'<path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/>'},
+      content:{l:"טקסטים ותוכן",t:"טקסטים לאתר",io:"text",g:"#0ea5e9,#0284c7",ic:'<path d="M4 7h16M4 12h10M4 17h13"/>'},
+      contact:{l:"פרטי קשר ומיקום",t:"פרטי קשר וכתובת",io:"text",g:"#10b981,#059669",ic:'<path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>'},
+      hours:{l:"שעות פעילות",t:"שעות פעילות",io:"text",g:"#14b8a6,#0d9488",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 1.6"/>'},
+      social:{l:"רשתות חברתיות",t:"קישורי רשתות חברתיות",io:"text",g:"#ec4899,#db2777",ic:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/>'},
+      approve:{l:"אישור / הגהה",t:"אישור תוכן",io:"ack",g:"#10b981,#059669",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>'},
+      other:{l:"אחר",t:"",io:"upload",g:"#64748b,#475569",ic:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="8" cy="12" r="1.3" fill="currentColor"/><circle cx="16" cy="12" r="1.3" fill="currentColor"/>'}
+    };
+    function tcCatMeta(t){return TASK_CATS[t&&t.category]||null;}
+    function tcInputType(t){return (t&&t.input)||(tcCatMeta(t)?tcCatMeta(t).io:"upload");}
+    function tcCatIconSvg(t){const c=tcCatMeta(t);return c?c.ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>';}
+    function tcCatGrad(t){const c=tcCatMeta(t);return c?c.g:"#0ea5e9,#0284c7";}
+    window.tcTextDrafts={};
     function clientTaskCube(id,t){
       const isClient=t.openedBy==="client";
+      const meta=tcCatMeta(t);
+      const input=tcInputType(t);
       const allFiles=t.files?Object.entries(t.files):[];
       const pending=allFiles.filter(([fid,f])=>!f.submitted);
       const submitted=allFiles.filter(([fid,f])=>f.submitted);
-      const icon=isClient?'<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/>':'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>';
+      const iconSvg=isClient?'<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/>':tcCatIconSvg(t);
+      const icStyle=isClient?"":`style="background:linear-gradient(135deg,${tcCatGrad(t)})"`;
+      const capLabel=isClient?"בקשה ששלחת":"משימה מ־WebDesk";
       let body=t.desc?`<div class="tc-desc">${escC(t.desc)}</div>`:"";
+      let statusHtml="";
       if(isClient){
         /* בקשה שהלקוח כבר שלח — לקריאה בלבד + סטטוס */
         body+=`<div style="display:flex;justify-content:flex-start"><span class="tc-status ${t.status==="done"?"tc-st-done":"tc-st-sub"}" style="margin-right:0">${t.status==="done"?"טופלה":"נשלחה לצוות"}</span></div>`;
+      }else if(input==="text"){
+        /* משימה מהצוות — תשובת טקסט (טיוטה עד שליחה) */
+        const sent=t.response&&t.response.submitted;
+        if(sent){
+          body+=`<div class="tc-answer-sent">${escC(t.response.text||"")}</div>`;
+          statusHtml=`<span class="tc-status tc-st-sub">נשלח</span>`;
+        }else{
+          const draft=(id in window.tcTextDrafts)?window.tcTextDrafts[id]:((t.response&&t.response.text)||"");
+          body+=`<textarea class="tc-answer" id="tc-ans-${id}" placeholder="כתוב/י את התשובה כאן..." oninput="window.tcTextDrafts['${id}']=this.value">${escC(draft)}</textarea>`;
+          body+=`<div class="tc-cta"><button class="tc-btn primary" onclick="tcSubmitText('${id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>שליחה</button></div>`;
+          statusHtml=`<span class="tc-status tc-st-wait">ממתין לתשובה</span>`;
+        }
+      }else if(input==="ack"){
+        /* משימה מהצוות — אישור בלבד */
+        body+=`<div class="tc-ack"><div class="tc-ack-k"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="tc-ack-t">נדרש אישור שלך</div><div class="tc-ack-s">לחיצה על הכפתור תסמן שהמשימה טופלה</div></div></div>`;
+        body+=`<div class="tc-cta"><button class="tc-btn ack" onclick="tcAckTask('${id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>אישרתי / בוצע</button></div>`;
+        statusHtml=`<span class="tc-status tc-st-wait">ממתין לאישור</span>`;
       }else{
-        /* משימה מהצוות — הלקוח מעלה קבצים (טיוטה עד שליחה) */
+        /* משימה מהצוות — העלאת קבצים (טיוטה עד שליחה) */
         if(submitted.length)body+=`<div class="tc-files">${submitted.map(([fid,f])=>tcFileThumbClient(f,null,id,fid)).join("")}</div>`;
         if(pending.length){
           body+=`<div class="tc-files">${pending.map(([fid,f])=>tcFileThumbClient(f,true,id,fid)).join("")}</div>`;
@@ -3279,19 +3354,78 @@ window.WDAuth = (function () {
         }
         body+=`<div class="tc-upload" onclick="tcPickFiles('${id}')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div class="tc-upload-t">${(submitted.length||pending.length)?"הוספת קובץ":"העלאת קבצים לכאן"}</div><div class="tc-upload-s">תמונות, PDF וקבצים</div></div>`;
         if(pending.length)body+=`<div class="tc-cta"><button class="tc-btn primary" onclick="tcSubmitFiles('${id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>שליחה (${pending.length})</button></div>`;
+        statusHtml=`<span class="tc-status ${submitted.length?"tc-st-sub":"tc-st-wait"}">${submitted.length?"נשלחו "+submitted.length:"פתוחה"}</span>`;
       }
-      const statusHtml=isClient?"":`<span class="tc-status ${submitted.length?"tc-st-sub":"tc-st-wait"}">${submitted.length?"נשלחו "+submitted.length:"פתוחה"}</span>`;
-      return`<div class="tc ${isClient?"client":"admin"}">
-        <div class="tc-bar"></div>
-        <div class="tc-head"><div class="tc-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon}</svg></div>
-          <div style="flex:1;min-width:0"><div class="tc-who">${isClient?"הבקשה שלך":"משימה מ-WebDesk"}</div><div class="tc-title">${escC(t.title)}</div></div>${statusHtml}</div>
+      return`<div class="tc ${isClient?"client":"admin"}" id="tc-card-${id}">
+        <div class="tc-cap"><span class="tc-pulse"></span>${capLabel}</div>
+        <div class="tc-head"><div class="tc-ic" ${icStyle}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${iconSvg}</svg></div>
+          <div style="flex:1;min-width:0"><div class="tc-title">${escC(t.title)}</div>${(!isClient&&meta)?`<div class="tc-cat-l">קטגוריה · ${escC(meta.l)}</div>`:""}</div>${statusHtml}</div>
         <div class="tc-body">${body}</div></div>`;
     }
+    window.tcSubmitText=async(taskId)=>{
+      const t=clientTasks[taskId];if(!t)return;
+      const txt=((taskId in window.tcTextDrafts)?window.tcTextDrafts[taskId]:((t.response&&t.response.text)||"")).trim();
+      if(!txt){showToastClient&&showToastClient("נא לכתוב תשובה לפני השליחה");return;}
+      try{
+        await update(ref(db,`tasks/${currentPhone}/${taskId}`),{response:{text:txt,submitted:true,at:Date.now()},clientSubmittedAt:Date.now()});
+        await push(ref(db,`clients/${currentPhone}/messages`),{text:`שלחתי תשובה למשימה: ${t.title}`,at:Date.now(),seen:false});
+        delete window.tcTextDrafts[taskId];
+        showToastClient&&showToastClient("התשובה נשלחה ✓");
+      }catch(e){showToastClient&&showToastClient("שגיאה בשליחה");}
+    };
+    window.tcAckTask=async(taskId)=>{
+      const t=clientTasks[taskId];if(!t)return;
+      try{
+        const nm=document.getElementById("greeting-name")?.textContent||"";
+        await update(ref(db,`tasks/${currentPhone}/${taskId}`),{status:"done",doneAt:Date.now(),doneBy:nm,acked:true,clientSubmittedAt:Date.now()});
+        await push(ref(db,`clients/${currentPhone}/messages`),{text:`אישרתי את המשימה: ${t.title}`,at:Date.now(),seen:false});
+        showToastClient&&showToastClient("המשימה אושרה ✓");
+      }catch(e){showToastClient&&showToastClient("שגיאה, נסה/י שוב");}
+    };
     function tcFileThumbClient(f,pending,taskId,fileId){
       const img=tcIsImg(f);
       const del=pending?`<button class="tc-file-x" onclick="tcDeleteFile('${taskId}','${fileId}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`:"";
       return`<div class="tc-file ${pending?"pending":""}">${img?`<img src="${escC(f.url)}" onclick="window.open('${escC(f.url)}','_blank')"/>`:`<div class="tc-file-doc" onclick="window.open('${escC(f.url)}','_blank')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>`}${del}<span class="tc-file-name">${escC(f.name||"קובץ")}</span></div>`;
     }
+    /* ═══ כרטיס משימה פעיל באזור האישי ═══ */
+    function tcTimeAgo(ts){if(!ts)return"";const d=Math.floor((Date.now()-ts)/1000);if(d<60)return"עכשיו";if(d<3600)return"לפני "+Math.floor(d/60)+" דק'";if(d<86400){const h=Math.floor(d/3600);return"לפני "+h+(h===1?" שעה":" שעות");}const dd=Math.floor(d/86400);return dd===1?"אתמול":"לפני "+dd+" ימים";}
+    function tcHomeBadge(t){
+      const input=tcInputType(t);
+      const filesSubmitted=t.files&&Object.values(t.files).some(f=>f.submitted);
+      if(input==="upload")return filesSubmitted?"נשלח · בטיפול הצוות":"ממתין להעלאה שלך";
+      if(input==="text")return (t.response&&t.response.submitted)?"נשלח · בטיפול הצוות":"ממתין לתשובה שלך";
+      if(input==="ack")return"ממתין לאישור שלך";
+      return"ממתין לך";
+    }
+    function renderHomeTasks(){
+      const sec=document.getElementById("home-tasks-section"),host=document.getElementById("home-tasks-list");
+      if(!sec||!host)return;
+      if(!myOpenTasks||!myOpenTasks.length){sec.style.display="none";host.innerHTML="";return;}
+      sec.style.display="";
+      host.innerHTML=myOpenTasks.map(t=>`
+        <div class="home-task">
+          <div class="ht-stripe"></div>
+          <div class="ht-in">
+            <div class="ht-ic" style="background:linear-gradient(135deg,${tcCatGrad(t)})"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${tcCatIconSvg(t)}</svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="ht-t">${escC(t.title||"משימה")}</div>
+              <div class="ht-s">WebDesk ביקש${t.at?" · "+tcTimeAgo(t.at):""}</div>
+              <span class="ht-badge">${tcHomeBadge(t)}</span>
+            </div>
+          </div>
+          <div class="ht-cta" onclick="openChatToTask('${t.id}')">פתיחת המשימה בצ'אט
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+        </div>`).join("");
+    }
+    window.openChatToTask=(taskId)=>{
+      const wasOpen=chatOpen;
+      if(!wasOpen)toggleChat();
+      setTimeout(()=>{
+        const el=document.getElementById("tc-card-"+taskId);
+        if(el){el.scrollIntoView({behavior:"smooth",block:"nearest"});el.classList.add("tc-flash");setTimeout(()=>el.classList.remove("tc-flash"),1600);}
+      },wasOpen?60:380);
+    };
     window.tcPickFiles=(taskId)=>{tcUploadTarget=taskId;const inp=document.getElementById("tc-file-input");inp.value="";inp.click();};
     async function tcHandleFiles(files){
       const taskId=tcUploadTarget;if(!taskId||!currentPhone||!files.length)return;
