@@ -970,6 +970,99 @@
 /* קו תחתי מעט עבה יותר גם בבועה הבהירה — זיהוי קישור בלי להסתמך על צבע בלבד (נגישות) */
 .wdl-a{text-decoration-thickness:1.5px}
 .wdl-a:focus-visible{outline:2px solid var(--wdl-accent);outline-offset:2px;border-radius:3px}
+
+/* ═══ דשבורד קוביות — אזור אישי (שלב 3) ═══ */
+.dash-container{width:100%;max-width:520px;padding:22px 20px 130px;flex:1;margin:0 auto}
+.cubes-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:26px}
+.cube{background:var(--card);border:1.5px solid var(--border,#e0eefa);border-radius:18px;padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .16s,box-shadow .16s,border-color .16s;text-align:right;min-height:118px;display:flex;flex-direction:column}
+.cube:active{transform:scale(.97)}
+.cube:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(14,165,233,.14);border-color:var(--primary)}
+.cube-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:#fff;flex-shrink:0}
+.cube-ic.c-site{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
+.cube-ic.c-prog{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}
+.cube-ic.c-quote{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+.cube-ic.c-bill{background:linear-gradient(135deg,#10b981,#34d399)}
+.cube-ic.c-req{background:linear-gradient(135deg,#ef4444,#f87171)}
+.cube-ic.c-doc{background:linear-gradient(135deg,#3b82f6,#60a5fa)}
+.cube-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.25}
+.cube-sub{font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.4}
+.cube-badge{position:absolute;top:12px;left:12px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--error,#ef4444);color:#fff;font-size:12px;font-weight:800;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(239,68,68,.4)}
+.cube-badge.show{display:flex;animation:cbPop .3s cubic-bezier(.34,1.4,.64,1) both}
+@keyframes cbPop{from{transform:scale(0)}to{transform:scale(1)}}
+.dash-progress{margin-top:auto}
+.dash-progress-bar{height:6px;background:var(--bg);border-radius:20px;overflow:hidden;margin-top:8px}
+.dash-progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--primary),var(--accent,#38bdf8));transition:width .6s cubic-bezier(.4,1.2,.5,1)}
+
+/* פעמון + מרכז התראות */
+.bell-btn{position:relative;background:rgba(255,255,255,.14);border:none;border-radius:12px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer}
+.bell-badge{position:absolute;top:-4px;left:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--error,#ef4444);color:#fff;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid var(--deep,#0c1a2e)}
+.bell-badge.show{display:flex}
+.notif-item{display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid var(--border,#e0eefa);text-align:right;align-items:flex-start}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unseen{background:rgba(14,165,233,.05);margin:0 -12px;padding-left:16px;padding-right:16px;border-radius:8px}
+.notif-dot{width:9px;height:9px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:6px}
+.notif-dot.seen{background:transparent}
+.notif-body{flex:1;min-width:0}
+.notif-txt{font-size:14px;color:var(--text);font-weight:600;line-height:1.4}
+.notif-time{font-size:11.5px;color:var(--text-muted);margin-top:3px}
+
+/* גיליון פרטים (sheet) לקוביות */
+.sheet-scroll{max-height:64vh;overflow-y:auto;text-align:right;margin-top:6px}
+.sheet-h{font-size:20px;font-weight:800;color:var(--text);text-align:right;margin-bottom:4px}
+.sheet-sub{font-size:13px;color:var(--text-muted);text-align:right;margin-bottom:18px}
+/* ציר זמן שלבים */
+.tl-item{display:flex;gap:14px;position:relative;padding-bottom:20px}
+.tl-item:last-child{padding-bottom:4px}
+.tl-line{position:absolute;right:13px;top:28px;bottom:-4px;width:2px;background:var(--border,#e0eefa)}
+.tl-item.done .tl-line{background:#22c55e}
+.tl-item:last-child .tl-line{display:none}
+.tl-dot{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--border,#e0eefa);background:var(--card);flex-shrink:0;display:flex;align-items:center;justify-content:center;z-index:1;color:transparent;transition:all .2s}
+.tl-item.done .tl-dot{background:#22c55e;border-color:#22c55e;color:#fff}
+.tl-item.current .tl-dot{border-color:var(--primary);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
+.tl-item.current .tl-dot::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--primary)}
+.tl-body{flex:1;padding-top:2px}
+.tl-title{font-size:15px;font-weight:700;color:var(--text)}
+.tl-item.done .tl-title{color:#16a34a}
+.tl-item.current .tl-title{color:var(--primary)}
+.tl-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.tl-tag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;margin-top:5px}
+.tl-tag.done{background:rgba(34,197,94,.14);color:#16a34a}
+.tl-tag.current{background:rgba(14,165,233,.14);color:var(--primary-d)}
+.tl-tag.wait{background:rgba(100,116,139,.12);color:var(--text-muted)}
+/* רשימת הצעות/מסמכים בגיליון */
+.q-row{display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--border,#e0eefa);border-radius:14px;margin-bottom:11px;cursor:pointer;transition:border-color .15s;text-align:right}
+.q-row:hover{border-color:var(--primary)}
+.q-row-ic{width:40px;height:40px;border-radius:11px;background:rgba(245,158,11,.13);color:#d97706;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.q-row-ic.doc{background:rgba(59,130,246,.13);color:#2563eb}
+.q-row-body{flex:1;min-width:0}
+.q-row-title{font-size:14.5px;font-weight:700;color:var(--text)}
+.q-row-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.q-row-total{font-size:15px;font-weight:800;color:var(--text);flex-shrink:0}
+.q-pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.q-pill.sent{background:rgba(14,165,233,.14);color:var(--primary-d)}
+.q-pill.viewed{background:rgba(139,92,246,.14);color:#7c3aed}
+.q-pill.approved{background:rgba(34,197,94,.14);color:#16a34a}
+.q-pill.rejected{background:rgba(239,68,68,.14);color:#dc2626}
+.q-pill.expired{background:rgba(245,158,11,.16);color:#b45309}
+.q-pill.draft{background:rgba(100,116,139,.14);color:var(--text-muted)}
+/* חיובים */
+.bill-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border,#e0eefa)}
+.bill-row:last-child{border-bottom:none}
+.bill-label{font-size:14px;color:var(--text);font-weight:600}
+.bill-val{font-size:15px;font-weight:800}
+.bill-summary{display:flex;gap:12px;margin-bottom:16px}
+.bill-stat{flex:1;background:var(--bg);border-radius:14px;padding:14px;text-align:center}
+.bill-stat-n{font-size:20px;font-weight:800}
+.bill-stat-l{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.sheet-empty{text-align:center;padding:40px 16px;color:var(--text-muted)}
+.sheet-empty svg{opacity:.4;margin-bottom:12px}
+.sheet-empty-t{font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px}
+.btn-sheet{width:100%;background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;border:none;border-radius:12px;font-family:'Heebo',sans-serif;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-sheet.ghost{background:var(--bg);color:var(--primary);border:1.5px solid var(--border,#e0eefa)}
+.req-field{margin-bottom:14px;text-align:right}
+.req-field label{display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:6px}
+.req-field select,.req-field textarea{width:100%;border:1.5px solid var(--border,#e0eefa);border-radius:11px;padding:12px 14px;font-family:'Heebo',sans-serif;font-size:15px;background:var(--bg);color:var(--text);outline:none}
+.req-field textarea{resize:vertical;min-height:90px}
 </style>
 </head>
 <body>
@@ -1123,6 +1216,10 @@
           <span class="header-logo-text">WebDesk Pro</span>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
+          <button class="bell-btn" id="bell-btn" onclick="openNotifCenter()" aria-label="התראות">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="bell-badge" id="bell-badge">0</span>
+          </button>
           <button class="theme-toggle" onclick="toggleTheme()">
             <svg id="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
           </button>
@@ -1157,7 +1254,45 @@
       </div>
     </div>
 
-    <div class="sites-container">
+    <div class="dash-container">
+      <div class="cubes-grid" id="cubes-grid">
+        <div class="cube" onclick="scrollToSites()">
+          <div class="cube-ic c-site"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg></div>
+          <div class="cube-title">האתר שלי</div>
+          <div class="cube-sub" id="cube-site-sub">—</div>
+        </div>
+        <div class="cube" onclick="openProgressSheet()">
+          <span class="cube-badge" id="badge-prog">0</span>
+          <div class="cube-ic c-prog"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <div class="cube-title">התקדמות הפרויקט</div>
+          <div class="dash-progress"><div class="cube-sub" id="cube-prog-sub">—</div><div class="dash-progress-bar"><div class="dash-progress-fill" id="cube-prog-fill" style="width:0%"></div></div></div>
+        </div>
+        <div class="cube" onclick="openQuotesSheet()">
+          <span class="cube-badge" id="badge-quote">0</span>
+          <div class="cube-ic c-quote"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="cube-title">הצעות מחיר</div>
+          <div class="cube-sub" id="cube-quote-sub">—</div>
+        </div>
+        <div class="cube" onclick="openBillingSheet()">
+          <div class="cube-ic c-bill"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+          <div class="cube-title">חיובים ותשלומים</div>
+          <div class="cube-sub" id="cube-bill-sub">—</div>
+        </div>
+        <div class="cube" onclick="openRequestsSheet()">
+          <span class="cube-badge" id="badge-req">0</span>
+          <div class="cube-ic c-req"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <div class="cube-title">בקשות שירות</div>
+          <div class="cube-sub" id="cube-req-sub">—</div>
+        </div>
+        <div class="cube" onclick="openDocsSheet()">
+          <div class="cube-ic c-doc"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+          <div class="cube-title">המסמכים שלי</div>
+          <div class="cube-sub" id="cube-doc-sub">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sites-container" id="sites-container">
       <div class="section-title">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg>
         האתרים שלי
@@ -1206,6 +1341,66 @@
       <div class="popup-title">האתר עדיין לא מוכן</div>
       <div class="popup-text" id="popup-unavailable-text">האתר שלכם נמצא בשלבי בנייה.</div>
       <button class="btn-popup-close" onclick="closePopup('popup-unavailable')">הבנתי, תודה</button>
+    </div>
+  </div>
+
+  <!-- גיליון: מרכז התראות -->
+  <div class="popup-overlay" id="sheet-notif" onclick="closePopup('sheet-notif')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h">התראות</div>
+      <div class="sheet-sub" id="notif-sub">כל העדכונים במקום אחד</div>
+      <div class="sheet-scroll" id="notif-list"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: התקדמות הפרויקט -->
+  <div class="popup-overlay" id="sheet-progress" onclick="closePopup('sheet-progress')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h" id="prog-sheet-title">התקדמות הפרויקט</div>
+      <div class="sheet-sub" id="prog-sheet-sub"></div>
+      <div class="sheet-scroll" id="prog-timeline"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: הצעות מחיר -->
+  <div class="popup-overlay" id="sheet-quotes" onclick="closePopup('sheet-quotes')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h">הצעות מחיר</div>
+      <div class="sheet-sub">ההצעות שנשלחו אליך — צפייה ואישור</div>
+      <div class="sheet-scroll" id="quotes-list"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: חיובים ותשלומים -->
+  <div class="popup-overlay" id="sheet-billing" onclick="closePopup('sheet-billing')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h">חיובים ותשלומים</div>
+      <div class="sheet-sub">מצב התשלומים בפרויקט</div>
+      <div class="sheet-scroll" id="billing-body"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: בקשות שירות -->
+  <div class="popup-overlay" id="sheet-requests" onclick="closePopup('sheet-requests')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h">בקשות שירות</div>
+      <div class="sheet-sub">פתיחת בקשה ומעקב אחר הסטטוס</div>
+      <div class="sheet-scroll" id="requests-body"></div>
+    </div>
+  </div>
+
+  <!-- גיליון: המסמכים שלי -->
+  <div class="popup-overlay" id="sheet-docs" onclick="closePopup('sheet-docs')">
+    <div class="popup-sheet" onclick="event.stopPropagation()">
+      <div class="popup-handle"></div>
+      <div class="sheet-h">המסמכים שלי</div>
+      <div class="sheet-sub">הצעות מאושרות וקבצים ששותפו איתך</div>
+      <div class="sheet-scroll" id="docs-body"></div>
     </div>
   </div>
 
@@ -2326,13 +2521,207 @@ window.WDAuth = (function () {
         setupPresence(phone);
         /* ── כותרת נוכחות דינמית בצ'אט ── */
         listenChatLockHeader(phone);
+        /* ── דשבורד קוביות (שלב 3) ── */
+        setupDashboard(phone);
       } catch(err) { showScreen("screen-login"); }
     }
+
+    /* ═══════════════ דשבורד קוביות — אזור אישי (שלב 3) ═══════════════ */
+    let dashPhone=null, myProjects=[], myQuotes=[], myNotifs=[], myRequests=[], myBilling=null;
+    function setupDashboard(phone){
+      dashPhone=phone;
+      /* פרויקטים של הלקוח — סינון לפי טלפון (בכללים הסגורים של שלב 5 הלקוח ממילא יראה רק את שלו) */
+      onValue(ref(db,"projects"),s=>{
+        const all=s.val()||{};
+        myProjects=Object.entries(all).filter(([id,p])=>p.clientPhone===phone).map(([id,p])=>({id,...p})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        renderCubes();refreshOpenSheets();
+      });
+      onValue(ref(db,"quotes"),s=>{
+        const all=s.val()||{};
+        myQuotes=Object.entries(all).filter(([id,q])=>q.clientPhone===phone).map(([id,q])=>({id,...q})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        renderCubes();refreshOpenSheets();
+      });
+      onValue(ref(db,`notifications/${phone}`),s=>{
+        const all=s.val()||{};
+        myNotifs=Object.entries(all).map(([id,n])=>({id,...n})).sort((a,b)=>(b.at||0)-(a.at||0));
+        renderCubes();if(document.getElementById("sheet-notif").classList.contains("show"))renderNotifs();
+      });
+      onValue(ref(db,`tasks/${phone}`),s=>{
+        const all=s.val()||{};
+        myRequests=Object.entries(all).map(([id,t])=>({id,...t})).sort((a,b)=>(b.at||0)-(a.at||0));
+        renderCubes();if(document.getElementById("sheet-requests").classList.contains("show"))renderRequests();
+      });
+      onValue(ref(db,`clients/${phone}/billing`),s=>{myBilling=s.val()||null;renderCubes();if(document.getElementById("sheet-billing").classList.contains("show"))renderBilling();});
+    }
+    function primaryProject(){return myProjects.find(p=>p.status==="active")||myProjects[0]||null;}
+    function projProgress(p){
+      const st=p.stages?Object.values(p.stages):[];if(!st.length)return p.progress||0;
+      const total=st.reduce((s,x)=>s+(Number(x.weight)||1),0);
+      const done=st.filter(x=>x.done).reduce((s,x)=>s+(Number(x.weight)||1),0);
+      return total?Math.round(done/total*100):0;
+    }
+    function ilsC(n){return "₪"+Number(n||0).toLocaleString("he-IL",{maximumFractionDigits:2});}
+    function unseenBy(type){return myNotifs.filter(n=>!n.seen&&(!type||n.type===type)).length;}
+    function setBadge(id,n){const el=document.getElementById(id);if(!el)return;el.textContent=n>99?"99+":n;el.classList.toggle("show",n>0);}
+
+    function renderCubes(){
+      /* אתר */
+      const sitesN=(window.__clientSites||[]).length;
+      document.getElementById("cube-site-sub").textContent=sitesN?`${sitesN} ${sitesN===1?"אתר":"אתרים"}`:"אין אתרים עדיין";
+      /* התקדמות */
+      const p=primaryProject();
+      if(p){const pct=projProgress(p);const cur=(p.stages?Object.values(p.stages).sort((a,b)=>(a.order||0)-(b.order||0)).find(x=>!x.done):null);
+        document.getElementById("cube-prog-sub").textContent=cur?cur.title:(pct>=100?"הושלם":"—");
+        document.getElementById("cube-prog-fill").style.width=pct+"%";}
+      else{document.getElementById("cube-prog-sub").textContent="טרם נפתח פרויקט";document.getElementById("cube-prog-fill").style.width="0%";}
+      /* הצעות */
+      const pending=myQuotes.filter(q=>q.status==="sent"||q.status==="viewed").length;
+      document.getElementById("cube-quote-sub").textContent=myQuotes.length?(pending?`${pending} ממתינות לאישור`:`${myQuotes.length} הצעות`):"אין הצעות עדיין";
+      /* חיוב */
+      if(myBilling&&myBilling.total!=null){const remain=(myBilling.total||0)-(myBilling.paid||0);document.getElementById("cube-bill-sub").textContent=remain>0?`נותר ${ilsC(remain)}`:"שולם במלואו";}
+      else document.getElementById("cube-bill-sub").textContent="אין חיובים כרגע";
+      /* בקשות */
+      const openReq=myRequests.filter(r=>r.status!=="done").length;
+      document.getElementById("cube-req-sub").textContent=myRequests.length?`${openReq} פתוחות`:"פתח/י בקשה חדשה";
+      /* מסמכים */
+      const docsN=myQuotes.filter(q=>q.status==="approved").length;
+      document.getElementById("cube-doc-sub").textContent=docsN?`${docsN} מסמכים`:"אין מסמכים עדיין";
+      /* באדג'ים */
+      setBadge("bell-badge",unseenBy(null));
+      setBadge("badge-quote",unseenBy("quote"));
+      setBadge("badge-prog",unseenBy("stage"));
+      setBadge("badge-req",unseenBy("request"));
+    }
+    function refreshOpenSheets(){
+      if(document.getElementById("sheet-progress").classList.contains("show"))renderTimeline();
+      if(document.getElementById("sheet-quotes").classList.contains("show"))renderQuotesList();
+      if(document.getElementById("sheet-docs").classList.contains("show"))renderDocs();
+      if(document.getElementById("sheet-billing").classList.contains("show"))renderBilling();
+    }
+    function openSheet(id){document.getElementById(id).classList.add("show");}
+    window.scrollToSites=()=>{document.getElementById("sites-container")?.scrollIntoView({behavior:"smooth"});};
+
+    /* התראות */
+    window.openNotifCenter=()=>{renderNotifs();openSheet("sheet-notif");markNotifsSeen(null);};
+    function renderNotifs(){
+      const host=document.getElementById("notif-list");
+      const unseen=myNotifs.filter(n=>!n.seen).length;
+      document.getElementById("notif-sub").textContent=myNotifs.length?(unseen?`${unseen} התראות חדשות`:"אין התראות חדשות"):"כל העדכונים במקום אחד";
+      host.innerHTML=myNotifs.length?myNotifs.map(n=>`<div class="notif-item ${n.seen?"":"unseen"}"><span class="notif-dot ${n.seen?"seen":""}"></span><div class="notif-body"><div class="notif-txt">${escC(n.text)}</div><div class="notif-time">${relTime(n.at)}</div></div></div>`).join(""):
+        `<div class="sheet-empty"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="sheet-empty-t">אין התראות</div><div>עדכונים חדשים יופיעו כאן.</div></div>`;
+    }
+    async function markNotifsSeen(type){
+      const toMark=myNotifs.filter(n=>!n.seen&&(!type||n.type===type));
+      if(!toMark.length)return;
+      const upd={};toMark.forEach(n=>{upd[`notifications/${dashPhone}/${n.id}/seen`]=true;});
+      try{await update(ref(db),upd);}catch(e){}
+    }
+
+    /* התקדמות — ציר זמן */
+    window.openProgressSheet=()=>{renderTimeline();openSheet("sheet-progress");markNotifsSeen("stage");};
+    function renderTimeline(){
+      const host=document.getElementById("prog-timeline");
+      if(!myProjects.length){host.innerHTML=emptySheet("טרם נפתח פרויקט","כשנתחיל לעבוד על הפרויקט שלך, כל השלבים יופיעו כאן.");document.getElementById("prog-sheet-sub").textContent="";return;}
+      host.innerHTML=myProjects.map(p=>{
+        const pct=projProgress(p);
+        const stages=p.stages?Object.values(p.stages).sort((a,b)=>(a.order||0)-(b.order||0)):[];
+        const curIdx=stages.findIndex(x=>!x.done);
+        const rows=stages.map((s,i)=>{
+          const state=s.done?"done":(i===curIdx?"current":"wait");
+          const tag=state==="done"?`<span class="tl-tag done">הושלם</span>`:state==="current"?`<span class="tl-tag current">בעבודה עכשיו</span>`:`<span class="tl-tag wait">ממתין</span>`;
+          return`<div class="tl-item ${state}"><div class="tl-line"></div><div class="tl-dot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-body"><div class="tl-title">${escC(s.title)}</div>${s.done&&s.doneAt?`<div class="tl-meta">${relTime(s.doneAt)}</div>`:""}<div>${tag}</div></div></div>`;
+        }).join("");
+        return`${myProjects.length>1?`<div style="font-weight:800;font-size:16px;margin:6px 0 14px">${escC(p.name||"פרויקט")}</div>`:""}
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px"><span style="font-size:30px;font-weight:800;color:var(--primary)">${pct}%</span><span style="font-size:13px;color:var(--text-muted)">הושלמו ${stages.filter(s=>s.done).length} מתוך ${stages.length} שלבים</span></div>
+          ${rows||`<div class="sheet-empty">טרם הוגדרו שלבים.</div>`}`;
+      }).join('<div style="height:24px"></div>');
+      const p=primaryProject();document.getElementById("prog-sheet-title").textContent=p?.name||"התקדמות הפרויקט";document.getElementById("prog-sheet-sub").textContent="מעקב אחר שלבי העבודה בזמן אמת";
+    }
+
+    /* הצעות מחיר */
+    window.openQuotesSheet=()=>{renderQuotesList();openSheet("sheet-quotes");markNotifsSeen("quote");};
+    function quoteEff(q){if((q.status==="sent"||q.status==="viewed")&&q.validUntil&&new Date(q.validUntil+"T23:59:59")<new Date())return"expired";return q.status||"draft";}
+    function quoteGrand(q){const items=q.items?Object.values(q.items):[];const sub=items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);const ad=Math.max(0,sub-(Number(q.discount)||0));return ad+ad*(Number(q.vat)||0)/100;}
+    const Q_PILL={draft:"טיוטה",sent:"ממתינה לאישור",viewed:"נצפתה",approved:"אושרה",rejected:"נדחתה",expired:"פג תוקף"};
+    function renderQuotesList(){
+      const host=document.getElementById("quotes-list");
+      const list=myQuotes.filter(q=>q.status!=="draft");
+      host.innerHTML=list.length?list.map(q=>{const st=quoteEff(q);return`
+        <div class="q-row" onclick="openClientQuote('${q.id}')">
+          <div class="q-row-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="q-row-body"><div class="q-row-title">${escC(q.title||"הצעת מחיר")}</div><div class="q-row-meta">${escC(q.number||"")} · ${ilsC(quoteGrand(q))}</div></div>
+          <span class="q-pill ${st}">${Q_PILL[st]||st}</span>
+        </div>`;}).join(""):emptySheet("אין הצעות עדיין","הצעות מחיר שנשלח אליך יופיעו כאן לצפייה ואישור.");
+    }
+    window.openClientQuote=(id)=>{window.open(`quote.html?id=${id}`,"_blank");};
+
+    /* חיובים — תצוגה בלבד */
+    window.openBillingSheet=()=>{renderBilling();openSheet("sheet-billing");};
+    function renderBilling(){
+      const host=document.getElementById("billing-body");
+      if(!myBilling||myBilling.total==null){host.innerHTML=emptySheet("אין חיובים כרגע","פרטי החיוב יופיעו כאן כשייפתח חיוב לפרויקט.");return;}
+      const total=myBilling.total||0,paid=myBilling.paid||0,remain=Math.max(0,total-paid);
+      const items=myBilling.items?Object.values(myBilling.items):[];
+      host.innerHTML=`<div class="bill-summary">
+          <div class="bill-stat"><div class="bill-stat-n" style="color:#16a34a">${ilsC(paid)}</div><div class="bill-stat-l">שולם</div></div>
+          <div class="bill-stat"><div class="bill-stat-n" style="color:${remain>0?"#d97706":"#16a34a"}">${ilsC(remain)}</div><div class="bill-stat-l">נותר לתשלום</div></div>
+        </div>
+        ${items.length?items.map(it=>`<div class="bill-row"><div><div class="bill-label">${escC(it.label||"תשלום")}</div>${it.due?`<div style="font-size:11.5px;color:var(--text-muted)">לתשלום עד ${escC(it.due)}</div>`:""}</div><div style="text-align:left"><div class="bill-val" style="color:${it.paid?"#16a34a":"var(--text)"}">${ilsC(it.amount)}</div><div style="font-size:11px;color:${it.paid?"#16a34a":"var(--text-muted)"}">${it.paid?"שולם":"ממתין"}</div></div></div>`).join(""):""}
+        <div style="font-size:11.5px;color:var(--text-muted);text-align:center;margin-top:16px">התשלומים מתעדכנים ידנית על ידי הצוות. לשאלות — פנה/י אלינו בצ'אט.</div>`;
+    }
+
+    /* בקשות שירות */
+    window.openRequestsSheet=()=>{renderRequests();openSheet("sheet-requests");markNotifsSeen("request");};
+    const REQ_STAT={new:"התקבלה",progress:"בטיפול",done:"הושלמה"};
+    function renderRequests(){
+      const host=document.getElementById("requests-body");
+      const listHtml=myRequests.length?`<div style="font-weight:700;font-size:14px;margin:18px 0 10px">הבקשות שלי</div>`+myRequests.map(r=>`
+        <div class="q-row" style="cursor:default"><div class="q-row-ic c-req" style="background:rgba(239,68,68,.12);color:#dc2626"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <div class="q-row-body"><div class="q-row-title">${escC(reqTypeLabel(r.type))}</div><div class="q-row-meta">${escC((r.desc||"").slice(0,60))}${(r.desc||"").length>60?"…":""}</div></div>
+          <span class="q-pill ${r.status==="done"?"approved":r.status==="progress"?"viewed":"sent"}">${REQ_STAT[r.status]||"התקבלה"}</span></div>`).join(""):"";
+      host.innerHTML=`
+        <div class="req-field"><label>סוג הבקשה</label><select id="req-type"><option value="fix">תיקון באתר</option><option value="content">שינוי תוכן</option><option value="feature">תוספת / פיצ'ר</option><option value="other">אחר</option></select></div>
+        <div class="req-field"><label>פירוט הבקשה</label><textarea id="req-desc" placeholder="תאר/י מה צריך..."></textarea></div>
+        <button class="btn-sheet" onclick="submitRequest()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>שליחת בקשה</button>
+        ${listHtml}`;
+    }
+    function reqTypeLabel(t){return{fix:"תיקון באתר",content:"שינוי תוכן",feature:"תוספת / פיצ'ר",other:"בקשה כללית"}[t]||"בקשה";}
+    window.submitRequest=async()=>{
+      const type=document.getElementById("req-type").value;
+      const desc=(document.getElementById("req-desc").value||"").trim();
+      if(!desc){toastC("נא לפרט את הבקשה");return;}
+      const at=Date.now();const p=primaryProject();
+      try{
+        await push(ref(db,`tasks/${dashPhone}`),{openedBy:"client",type,desc,status:"new",at,projectId:p?p.id:"",clientName:document.getElementById("greeting-name").textContent||""});
+        /* גשר לצד הניהול עד שלב 4 — הבקשה מופיעה גם בצ'אט הקיים */
+        await push(ref(db,`clients/${dashPhone}/messages`),{text:`בקשת שירות חדשה — ${reqTypeLabel(type)}:\n${desc}`,at,seen:false});
+        document.getElementById("req-desc").value="";
+        toastC("הבקשה נשלחה ✓");
+      }catch(e){toastC("שגיאה, נסה/י שוב");}
+    };
+
+    /* מסמכים */
+    window.openDocsSheet=()=>{renderDocs();openSheet("sheet-docs");};
+    function renderDocs(){
+      const host=document.getElementById("docs-body");
+      const approved=myQuotes.filter(q=>q.status==="approved");
+      host.innerHTML=approved.length?approved.map(q=>`
+        <div class="q-row" onclick="openClientQuote('${q.id}')"><div class="q-row-ic doc"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+          <div class="q-row-body"><div class="q-row-title">${escC(q.title||"הצעה מאושרת")}</div><div class="q-row-meta">${escC(q.number||"")} · אושרה · ${ilsC(quoteGrand(q))}</div></div>
+          <span class="q-pill approved">מאושרת</span></div>`).join(""):emptySheet("אין מסמכים עדיין","הצעות שאישרת וקבצים ששותפו איתך יופיעו כאן.");
+    }
+
+    function emptySheet(t,s){return`<div class="sheet-empty"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><div class="sheet-empty-t">${t}</div><div>${s}</div></div>`;}
+    function escC(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+    function relTime(ts){if(!ts)return"";const d=Math.floor((Date.now()-ts)/1000);if(d<60)return"עכשיו";if(d<3600)return`לפני ${Math.floor(d/60)} דק'`;if(d<86400)return`לפני ${Math.floor(d/3600)} שע'`;const days=Math.floor(d/86400);if(days===1)return"אתמול";if(days<7)return`לפני ${days} ימים`;return new Date(ts).toLocaleDateString("he-IL",{day:"2-digit",month:"2-digit",year:"numeric"});}
+    function toastC(msg){const t=document.createElement("div");t.style.cssText="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--deep,#0c1a2e);color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:400;box-shadow:0 8px 30px rgba(0,0,0,.3)";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
 
     /* ── כרטיסי אתרים ── */
     /* #125 — מצב "אין עדיין תמונה" (כשאין תמונה אישית, אין ברירת מחדל, או שהטעינה נכשלה) */
     const siteEmptyImgHTML = `<div class="site-image-placeholder"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>אין עדיין תמונה</span></div>`;
     function renderSites(sites) {
+      window.__clientSites = sites || [];
+      if (typeof renderCubes === "function") renderCubes();
       const container = document.getElementById("sites-list");
       container.innerHTML = "";
       if (!sites.length) {
