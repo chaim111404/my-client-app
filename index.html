@@ -1148,6 +1148,7 @@ body.pwa .cl-content{padding-bottom:96px}
 .tc.client .tc-who{color:#e11d48}
 .tc-title{font-size:16px;font-weight:800;color:var(--text);margin-top:1px;line-height:1.25}
 .tc-cat-l{font-size:11px;font-weight:700;color:var(--text-muted);margin-top:2px}
+.tc-pj-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:var(--primary-d);background:rgba(14,165,233,.1);border-radius:100px;padding:2px 9px;margin-top:5px}
 .tc-answer{width:100%;border:1.5px solid var(--border,#e0eefa);border-radius:12px;padding:11px 13px;font-family:'Heebo',sans-serif;font-size:13.5px;color:var(--text);background:var(--bg);resize:vertical;min-height:70px;margin-bottom:11px;box-sizing:border-box;line-height:1.5}
 .tc-answer:focus{outline:none;border-color:var(--primary)}
 .tc-answer-sent{background:var(--bg);border:1px solid var(--border,#e0eefa);border-radius:12px;padding:11px 13px;font-size:13px;color:var(--text);line-height:1.55;white-space:pre-wrap;word-break:break-word;margin-bottom:11px}
@@ -2416,7 +2417,20 @@ window.WDAuth = (function () {
       } catch(err) { showError("שגיאת תקשורת. נסו שוב."); console.error(err); }
     };
 
-    function isDeviceTrusted(phone) { return localStorage.getItem("wd_verified_" + phone) === "1"; }
+    /* ═══════════════════════════════════════════════════════════════════
+       מצב פיתוח — עוקף אך ורק את אימות ה-SMS (לבדיקות מקומיות מ-file://).
+       להחזרת ה-SMS: DEV_BYPASS_SMS = false  (שינוי שורה אחת, זהו).
+       • אינו נוגע בבדיקת טלפון+קוד בשרת, בספירת ניסיונות/חסימה, או בכללי המסד.
+       • קוד ה-SMS נשאר במקום — פשוט לא מגיעים אליו.
+       • רשת ביטחון: פעיל רק מ-file:// / localhost, כך שב-Vercel ה-SMS תמיד עובד
+         גם אם המתג נשאר דלוק בטעות.
+       ═══════════════════════════════════════════════════════════════════ */
+    const DEV_BYPASS_SMS = true;
+    const WD_IS_LOCAL = location.protocol === "file:" || /^(localhost|127\.|192\.168\.|10\.)/.test(location.hostname);
+    function isDeviceTrusted(phone) {
+      if (DEV_BYPASS_SMS && WD_IS_LOCAL) return true;
+      return localStorage.getItem("wd_verified_" + phone) === "1";
+    }
 
     /* השלמת ההתחברות (session + geo + היסטוריה + מעבר לבית) — משותף למכשיר מהימן ולאחר אימות SMS */
     async function proceedLogin(rawPhone, client) {
@@ -2926,7 +2940,10 @@ window.WDAuth = (function () {
           <span class="q-pill ${st}">${Q_PILL[st]||st}</span>
         </div>`;}).join(""):emptySheet("אין הצעות עדיין","הצעות מחיר שנשלח אליך יופיעו כאן לצפייה ואישור.");
     }
-    window.openClientQuote=(id)=>{window.open(`quote.html?id=${id}`,"_blank");};
+    /* משטח חתימה יחיד: גם האזור האישי וגם הקישור החיצוני פותחים את אותו quote.html
+       בכתובת הציבורית הקבועה (האזור האישי מתארח בדומיין אחר, לכן נתיב יחסי היה נשבר). */
+    const QUOTE_PUBLIC_BASE="https://my-atarim-deshboard.vercel.app";
+    window.openClientQuote=(id)=>{window.open(`${QUOTE_PUBLIC_BASE}/quote.html?id=${encodeURIComponent(id)}`,"_blank");};
 
     /* חיובים — תצוגה בלבד */
     /* חיובים — תצוגה בלבד (מוצג בפאנל) */
@@ -3288,6 +3305,8 @@ window.WDAuth = (function () {
     /* מזריק את קוביות המשימה לתוך זרם ההודעות (chat-messages), משולב לפי זמן — חלק מהשיחה */
     function renderClientTaskPins(){
       const container=document.getElementById("chat-messages");if(!container)return;
+      /* אם המשתמש כבר בתחתית — נשמור אותו בתחתית אחרי הזרקת קובייה חדשה (שהיא הפריט האחרון) */
+      const wasNearBottom=(container.scrollHeight-container.scrollTop-container.clientHeight)<80;
       container.querySelectorAll(".tc-flow").forEach(el=>el.remove());
       const typing=document.getElementById("typing-indicator");
       const entries=Object.entries(clientTasks).sort((a,b)=>(a[1].at||0)-(b[1].at||0));
@@ -3308,6 +3327,7 @@ window.WDAuth = (function () {
         }
         container.insertBefore(el, refNode||typing||null);
       });
+      if(wasNearBottom)container.scrollTop=container.scrollHeight;
     }
     function fmtDoneAt(ts){if(!ts)return"";const d=new Date(ts);return d.toLocaleDateString("he-IL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});}
     /* מטא-דאטה של קטגוריות משימה (משימות שהצוות פותח) — זהה ב-3 הקבצים */
@@ -3374,10 +3394,13 @@ window.WDAuth = (function () {
         if(pending.length)body+=`<div class="tc-cta"><button class="tc-btn primary" onclick="tcSubmitFiles('${id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>שליחה (${pending.length})</button></div>`;
         statusHtml=`<span class="tc-status ${submitted.length?"tc-st-sub":"tc-st-wait"}">${submitted.length?"נשלחו "+submitted.length:"פתוחה"}</span>`;
       }
+      const multiPj=(myProjects||[]).length>1;
+      const pjObj=t.projectId?(myProjects||[]).find(p=>p.id===t.projectId):null;
+      const pjName=(multiPj&&pjObj)?pjObj.name:"";
       return`<div class="tc ${isClient?"client":"admin"}" id="tc-card-${id}">
         <div class="tc-cap"><span class="tc-pulse"></span>${capLabel}</div>
         <div class="tc-head"><div class="tc-ic" ${icStyle}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${iconSvg}</svg></div>
-          <div style="flex:1;min-width:0"><div class="tc-title">${escC(t.title)}</div>${(!isClient&&meta)?`<div class="tc-cat-l">קטגוריה · ${escC(meta.l)}</div>`:""}</div>${statusHtml}</div>
+          <div style="flex:1;min-width:0"><div class="tc-title">${escC(t.title)}</div>${(!isClient&&meta)?`<div class="tc-cat-l">קטגוריה · ${escC(meta.l)}</div>`:""}${pjName?`<div class="tc-pj-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/></svg>${escC(pjName)}</div>`:""}</div>${statusHtml}</div>
         <div class="tc-body">${body}</div></div>`;
     }
     window.tcSubmitText=async(taskId)=>{
@@ -3420,7 +3443,11 @@ window.WDAuth = (function () {
       if(!sec||!host)return;
       if(!myOpenTasks||!myOpenTasks.length){sec.style.display="none";host.innerHTML="";return;}
       sec.style.display="";
-      host.innerHTML=myOpenTasks.map(t=>`
+      const multiPj=(myProjects||[]).length>1;
+      host.innerHTML=myOpenTasks.map(t=>{
+        const pjObj=t.projectId?(myProjects||[]).find(p=>p.id===t.projectId):null;
+        const pjName=(multiPj&&pjObj)?pjObj.name:"";
+        return `
         <div class="home-task">
           <div class="ht-stripe"></div>
           <div class="ht-in">
@@ -3428,13 +3455,14 @@ window.WDAuth = (function () {
             <div style="flex:1;min-width:0">
               <div class="ht-t">${escC(t.title||"משימה")}</div>
               <div class="ht-s">WebDesk ביקש${t.at?" · "+tcTimeAgo(t.at):""}</div>
+              ${pjName?`<div class="tc-pj-chip" style="margin-top:5px">${escC(pjName)}</div>`:""}
               <span class="ht-badge">${tcHomeBadge(t)}</span>
             </div>
           </div>
           <div class="ht-cta" onclick="openChatToTask('${t.id}')">פתיחת המשימה בצ'אט
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg>
           </div>
-        </div>`).join("");
+        </div>`;}).join("");
     }
     window.openChatToTask=(taskId)=>{
       const wasOpen=chatOpen;
@@ -3687,6 +3715,9 @@ window.WDAuth = (function () {
       setChatPresence(chatOpen);
       if (chatOpen) {
         document.getElementById("chat-fab-badge").style.display = "none";
+        /* גלילה לתחתית האמיתית בפתיחה — כדי שהפריט האחרון (כולל קוביית משימה חדשה) ייראה מיד */
+        const scrollBottom = () => { const c = document.getElementById("chat-messages"); if (c) c.scrollTop = c.scrollHeight; };
+        setTimeout(scrollBottom, 80); setTimeout(scrollBottom, 400);
         /* סימון כל הודעות הנציג כנקראו */
         get(ref(db, `clients/${currentPhone}/messages`)).then(snap => {
           if (!snap.exists()) return;
