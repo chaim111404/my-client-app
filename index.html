@@ -941,6 +941,33 @@
     }
     .chat-send-btn:active { transform: scale(.92); }
     .chat-send-btn:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+    /* כפתור צירוף מדיה — באותה שפה של כפתור השליחה */
+    .chat-img-btn {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--bg); border: 1.5px solid var(--border);
+      color: var(--primary-d); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: border-color .2s, color .2s, transform .15s;
+    }
+    .chat-img-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .chat-img-btn:active { transform: scale(.92); }
+    /* שורת אימוג'ים מהירה — מחשב בלבד (במובייל יש מקלדת) */
+    .client-emoji-bar {
+      display: none; gap: 6px; padding: 8px 16px 0;
+      justify-content: flex-start; flex-shrink: 0;
+    }
+    .ce-btn {
+      width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+      background: var(--bg); border: 1.5px solid var(--border);
+      font-size: 19px; line-height: 1; cursor: pointer; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .12s, border-color .15s, background .15s;
+    }
+    .ce-btn:hover { transform: translateY(-2px) scale(1.08); border-color: var(--primary); background: var(--card); }
+    .ce-btn:active { transform: scale(.95); }
+    @media (hover: none) and (pointer: coarse) {
+      .client-emoji-bar { display: none !important; } /* גובר על ה-inline display:flex שנקבע ב-JS */
+    }
 
     /* אנימציית typing */
     .typing-indicator {
@@ -5607,6 +5634,44 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
       document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
       document.addEventListener("gesturechange", function (e) { e.preventDefault(); }, { passive: false });
       document.addEventListener("gestureend", function (e) { e.preventDefault(); }, { passive: false });
+    })();
+  </script>
+
+  <!-- התאמת חלון הצ'אט למקלדת (iOS/Android) — visualViewport.
+       רקע: אחרי ביטול זום-הפוקוס (16px + נעילת viewport), נעלמה גם הגלילה-לשדה
+       ש-iOS עשה "בחינם" עם הזום, ובמיקוד הראשון שדה הקלט נשאר מוסתר מאחורי המקלדת.
+       הפתרון: כשהמקלדת פתוחה והצ'אט פתוח — מרימים את החלון מעל המקלדת ומצמידים
+       את ההודעות לתחתית; כשנסגרת — הכל חוזר. במחשב אין שינוי (אין מקלדת). -->
+  <script>
+    (function () {
+      var vv = window.visualViewport;
+      if (!vv) return;
+      function adjust() {
+        var cw = document.getElementById("chat-window");
+        if (!cw) return;
+        var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        if (cw.classList.contains("open") && kb > 60) {
+          cw.style.bottom = kb + "px";
+          cw.style.height = Math.min(vv.height, window.innerHeight * 0.85) + "px";
+          window.scrollTo(0, 0); /* מנטרל את ה-pan של iOS כדי שהפריסה תישאר מדויקת */
+          var c = document.getElementById("chat-messages");
+          if (c) c.scrollTop = c.scrollHeight;
+        } else {
+          cw.style.bottom = "";
+          cw.style.height = "";
+        }
+      }
+      vv.addEventListener("resize", adjust);
+      vv.addEventListener("scroll", adjust);
+      /* מיקוד בשדה — מריצים גם באיחורים קצרים, כי אירוע ה-resize של המקלדת מגיע אחרי הפוקוס */
+      document.addEventListener("focusin", function (e) {
+        if (e.target && e.target.id === "chat-textarea") {
+          setTimeout(adjust, 100); setTimeout(adjust, 350); setTimeout(adjust, 700);
+        }
+      });
+      /* סגירת הצ'אט מאפסת את ההרמה */
+      var cw = document.getElementById("chat-window");
+      if (cw) new MutationObserver(adjust).observe(cw, { attributes: true, attributeFilter: ["class"] });
     })();
   </script>
 </body>
