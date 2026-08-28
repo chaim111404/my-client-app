@@ -1480,18 +1480,32 @@ img,video,svg,picture,audio{-webkit-user-drag:none;-webkit-touch-callout:none}
   <div class="offline-banner" id="offline-banner">אין חיבור לאינטרנט</div>
 
   <!-- ── מסך טעינה ראשוני (#9): מוצג מיד עד שהאפליקציה נטענת ── -->
-  <div id="boot-splash" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(145deg,#0c1a2e,#0a2540);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .4s ease">
-    <img src="https://i.postimg.cc/3R4hWfVm/IMG-0696.png" alt="WebDesk Pro" onerror="this.style.display='none'" style="width:96px;height:96px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:bootPulse 1.8s ease-in-out infinite"/>
-    <div style="display:flex;gap:8px">
-      <span style="width:10px;height:10px;border-radius:50%;background:#0ea5e9;animation:bootDot 1.2s ease-in-out infinite"></span>
-      <span style="width:10px;height:10px;border-radius:50%;background:#0ea5e9;animation:bootDot 1.2s ease-in-out .2s infinite"></span>
-      <span style="width:10px;height:10px;border-radius:50%;background:#0ea5e9;animation:bootDot 1.2s ease-in-out .4s infinite"></span>
+  <div id="boot-splash" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(145deg,#0c1a2e,#0a2540);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .4s ease">
+    <div class="bs-logo">
+      <svg viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="5" width="24" height="16" rx="3"/>
+        <path d="M9 21v3M19 21v3M6 24h16"/>
+      </svg>
     </div>
+    <div class="bs-name">WebDesk <b>Pro</b></div>
+    <div class="bs-bar"><span></span></div>
   </div>
   <style>
-    @keyframes bootPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.06);opacity:.85} }
-    @keyframes bootDot { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-8px);opacity:1} }
+    /* מסך פתיחה ממותג — הלוגו מצייר את עצמו, הילה נושמת ופס טעינה עדין */
+    #boot-splash .bs-logo{width:92px;height:92px;border-radius:24px;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;animation:bsGlow 2.2s ease-out .4s infinite}
+    #boot-splash .bs-logo svg{width:52px;height:52px}
+    #boot-splash .bs-logo rect,#boot-splash .bs-logo path{stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:90;stroke-dashoffset:90;animation:bsDraw 1.1s cubic-bezier(.5,0,.3,1) forwards}
+    #boot-splash .bs-logo path{animation-delay:.45s}
+    #boot-splash .bs-name{color:#fff;font-family:'Heebo',sans-serif;font-size:22px;font-weight:800;letter-spacing:.5px;opacity:0;animation:bsFade .7s ease .8s forwards}
+    #boot-splash .bs-name b{color:#38bdf8}
+    #boot-splash .bs-bar{width:148px;height:3px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden;opacity:0;animation:bsFade .7s ease 1s forwards}
+    #boot-splash .bs-bar span{display:block;width:42%;height:100%;border-radius:3px;background:linear-gradient(90deg,#0ea5e9,#38bdf8);animation:bsSweep 1.05s ease-in-out .8s infinite alternate}
+    @keyframes bsDraw{to{stroke-dashoffset:0}}
+    @keyframes bsGlow{0%{box-shadow:0 0 0 0 rgba(14,165,233,.4)}70%{box-shadow:0 0 0 24px rgba(14,165,233,0)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
+    @keyframes bsFade{to{opacity:1}}
+    @keyframes bsSweep{from{transform:translateX(150%)}to{transform:translateX(-250%)}}
     #boot-splash.hide { opacity:0; pointer-events:none; }
+    @media (prefers-reduced-motion: reduce){ #boot-splash *{animation-duration:.01s !important;animation-delay:0s !important} }
   </style>
   <script>
     /* לוכד שגיאות אמיתי — חושף את המקור מאחורי "Script error" כללי */
@@ -1510,7 +1524,10 @@ img,video,svg,picture,audio{-webkit-user-drag:none;-webkit-touch-callout:none}
       try{ console.warn("[WebDesk] Promise נדחה:", ev.reason && (ev.reason.message||ev.reason)); }catch(_){}
     });
     window.__hideBoot = function(){ var b=document.getElementById("boot-splash"); if(b){ b.classList.add("hide"); setTimeout(function(){ b.remove(); }, 450); } };
-    window.addEventListener("load", function(){ setTimeout(window.__hideBoot, 600); });
+    /* התיקון מהשורש: הסמך נסגר רק כשהתקבלה החלטת ניתוב (showScreen) — לא בטיימר עיוור.
+       כך משתמש מחובר עובר סמך→אפליקציה בלי הבזק של מסך ההתחברות.
+       שכבת ביטחון בלבד: אם שום החלטה לא התקבלה תוך 10ש' (תקלה/אין רשת) — נחשוף את ההתחברות. */
+    window.addEventListener("load", function(){ setTimeout(window.__hideBoot, 10000); });
   </script>
 
   <!-- מסך כניסה -->
