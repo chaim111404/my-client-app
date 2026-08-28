@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <link rel="icon" href="https://i.postimg.cc/3R4hWfVm/IMG-0696.png"/>
   <link rel="apple-touch-icon" href="https://i.postimg.cc/3R4hWfVm/IMG-0696.png"/>
   <meta property="og:image" content="https://i.postimg.cc/3R4hWfVm/IMG-0696.png"/>
@@ -1430,6 +1430,22 @@
 .req-field label{display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:6px}
 .req-field select,.req-field textarea{width:100%;border:1.5px solid var(--border,#e0eefa);border-radius:11px;padding:12px 14px;font-family:'Heebo',sans-serif;font-size:15px;background:var(--bg);color:var(--text);outline:none}
 .req-field textarea{resize:vertical;min-height:90px}
+
+/* ═══════════════ הגנות תוכן (index.html בלבד) ═══════════════ */
+/* 4. נעילת זום כללי — צביטה/דאבל-טאפ (משלים את user-scalable=no ב-viewport) */
+html{touch-action:pan-x pan-y}
+/* 2. הגנת מדיה — בכל הפלטפורמות (כולל מחשב): בלי גרירה, בלי callout "שמור תמונה" ב-iOS */
+img,video,svg,picture,audio{-webkit-user-drag:none;-webkit-touch-callout:none}
+/* 1. מניעת בחירת טקסט — מובייל ו-PWA (standalone) בלבד; דפדפן מחשב נשאר חופשי לסימון.
+   3. ביטול זום-קלט של iOS — font-size מינימלי 16px, באותה תחולה. */
+@media (hover:none) and (pointer:coarse), (display-mode:standalone){
+  body{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;-webkit-touch-callout:none}
+  /* שדות קלט תמיד ניתנים לסימון ועריכה */
+  input,textarea,select,[contenteditable],[contenteditable="true"]{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text;-webkit-touch-callout:default}
+  /* 16px כדי למנוע זום פוקוס ב-iOS — לא נוגע בשדות שכבר גדולים (.input-field 20px, .otp-box 24px) ולא ברכיבים שאינם טקסט */
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="color"]):not(.otp-box):not(.input-field),
+  textarea,select{font-size:16px !important}
+}
 </style>
 </head>
 <body>
@@ -5553,6 +5569,45 @@ const AV_MALE = [{"id": "m1", "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94
         navigator.serviceWorker.register("service-worker.js").catch(function () {});
       });
     }
+  </script>
+
+  <!-- ═══ הגנות תוכן (index.html בלבד) ═══ -->
+  <script>
+    (function () {
+      var MEDIA = "img,video,svg,picture,audio";
+      function isMedia(t) { return t && t.closest && t.closest(MEDIA); }
+      /* 2. חסימת תפריט הקשר על מדיה בלבד — טקסט (וקליק ימני עליו) נשאר חופשי בכל הפלטפורמות */
+      document.addEventListener("contextmenu", function (e) { if (isMedia(e.target)) e.preventDefault(); }, false);
+      /* 2. מניעת גרירת מדיה */
+      document.addEventListener("dragstart", function (e) { if (isMedia(e.target)) e.preventDefault(); }, false);
+      /* 2. הסרת אפשרות הורדה מנגני וידאו/אודיו — כולל רכיבים שנוספים דינמית */
+      function hardenMedia(scope) {
+        var list = scope && scope.querySelectorAll ? scope.querySelectorAll("video,audio") : [];
+        for (var i = 0; i < list.length; i++) {
+          try { list[i].setAttribute("controlsList", "nodownload"); list[i].disablePictureInPicture = true; } catch (_) {}
+        }
+      }
+      hardenMedia(document);
+      document.addEventListener("DOMContentLoaded", function () { hardenMedia(document); });
+      try {
+        new MutationObserver(function (muts) {
+          for (var i = 0; i < muts.length; i++) {
+            var added = muts[i].addedNodes || [];
+            for (var j = 0; j < added.length; j++) {
+              var n = added[j];
+              if (n.nodeType === 1) {
+                if (n.matches && n.matches("video,audio")) { try { n.setAttribute("controlsList", "nodownload"); n.disablePictureInPicture = true; } catch (_) {} }
+                hardenMedia(n);
+              }
+            }
+          }
+        }).observe(document.documentElement, { childList: true, subtree: true });
+      } catch (_) {}
+      /* 4. חסימת זום-מחוות ב-iOS Safari (מתעלם מ-user-scalable=no) */
+      document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener("gesturechange", function (e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener("gestureend", function (e) { e.preventDefault(); }, { passive: false });
+    })();
   </script>
 </body>
 </html>
