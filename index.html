@@ -3222,6 +3222,7 @@ window.WDAuth = (function () {
             <button class="cs-qa-btn violet" ${hasStages?`onclick="openSiteStages('${p.id}')"`:"disabled style='opacity:.5'"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>שלבים</button>
             <button class="cs-qa-btn slate" ${hasCreds?`onclick="openSiteCreds('${p.id}')"`:"disabled style='opacity:.5'"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>פרטי גישה</button>
             <button class="cs-qa-btn req" onclick="openSiteRequest('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>בקשת שינוי</button>
+            <button class="cs-qa-btn violet" onclick="explainProject('${p.id}')" title="סיכום סטטוס בעזרת AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M11 6H9M21 6h-2M17.4 4.6l1.4-1.4"/><path d="M3 21l9-9 2 2-9 9-2-2z"/><path d="M12 8l4 4"/></svg>מה קורה?</button>
           </div>
         </div></div>`;
     }
@@ -3418,6 +3419,7 @@ window.WDAuth = (function () {
         <div class="q-row" onclick="openClientQuote('${q.id}')">
           <div class="q-row-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
           <div class="q-row-body"><div class="q-row-title">${escC(q.title||"הצעת מחיר")}</div><div class="q-row-meta">${escC(q.number||"")} · ${ilsC(quoteGrand(q))}</div></div>
+          <button onclick="event.stopPropagation();explainQuoteTerms('${q.id}')" title="הסבר מונחים בעזרת AI" style="flex:none;width:32px;height:32px;border-radius:9px;border:none;background:rgba(139,92,246,.12);color:#7c3aed;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M11 6H9M21 6h-2M17.4 4.6l1.4-1.4"/><path d="M3 21l9-9 2 2-9 9-2-2z"/><path d="M12 8l4 4"/></svg></button>
           <span class="q-pill ${st}">${Q_PILL[st]||st}</span>
         </div>`;}).join(""):emptySheet("אין הצעות עדיין","הצעות מחיר שנשלח אליך יופיעו כאן לצפייה ואישור.");
     }
@@ -3911,7 +3913,7 @@ window.WDAuth = (function () {
       return`<div class="tc ${isClient?"client":"admin"}" id="tc-card-${id}">
         <div class="tc-cap"><span class="tc-pulse"></span>${capLabel}</div>
         <div class="tc-head"><div class="tc-ic" ${icStyle}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${iconSvg}</svg></div>
-          <div style="flex:1;min-width:0"><div class="tc-title">${escC(t.title)}</div>${(!isClient&&meta)?`<div class="tc-cat-l">קטגוריה · ${escC(meta.l)}</div>`:""}${pjName?`<div class="tc-pj-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/></svg>${escC(pjName)}</div>`:""}</div>${statusHtml}</div>
+          <div style="flex:1;min-width:0"><div class="tc-title">${escC(t.title)}</div>${(!isClient&&meta)?`<div class="tc-cat-l">קטגוריה · ${escC(meta.l)}</div>`:""}${pjName?`<div class="tc-pj-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/></svg>${escC(pjName)}</div>`:""}</div>${(!isClient)?`<button onclick="explainTask('${id}')" title="הסבר בעזרת AI" style="flex:none;width:30px;height:30px;border-radius:9px;border:none;background:rgba(139,92,246,.12);color:#7c3aed;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-inline-start:4px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M11 6H9M21 6h-2M17.4 4.6l1.4-1.4"/><path d="M3 21l9-9 2 2-9 9-2-2z"/><path d="M12 8l4 4"/></svg></button>`:""}${statusHtml}</div>
         <div class="tc-body">${body}</div></div>`;
     }
     window.tcSubmitText=async(taskId)=>{
@@ -4513,6 +4515,8 @@ window.WDAuth = (function () {
         if (wdlField) msgData.linkPreview = wdlField;
         if (clientReplyTo) { msgData.replyTo = buildClientReplyMeta(clientReplyTo); cancelClientReply(); }
         await set(ref(db, `clients/${currentPhone}/messages/${msgKey}`), msgData);
+        /* P3': המוח עונה מהנתונים כשאין נציג פעיל (השרת בודק chatLock; התשובה נכתבת כהודעה ומוצגת דרך המאזין) */
+        clientAiReply(text);
         /* #2 — סימון מי פתח את השיחה (אם אין עדיין) */
         await stampOpenedBy(currentPhone, "client", allClients?.[currentPhone]?.name || "הלקוח");
         ta.value = ""; ta.style.height = ""; ta.style.overflowY = ""; ta.scrollTop = 0;
@@ -4521,6 +4525,129 @@ window.WDAuth = (function () {
       if (currentPhone) set(ref(db, `clients/${currentPhone}/typing`), { active: false, text: "", at: Date.now() });
       } catch(e) { console.error(e); }
       finally { ta2.disabled = false; }
+    };
+
+    /* ── P3': עוזר הצ'אט (§14/§15) — אנימציית "חושב" מקצועית + קריאה למוח ──
+       הבקאנד (handleChat) בודק chatLock/תקרות ומפרסם את התשובה כהודעה; אנו רק
+       מפעילים אותו ומציגים אינדיקציה חיה. אותו אורב כמו בדשבורד — מערכת אחת. */
+    function ensureAiCss(){
+      if(document.getElementById("wd-ai-css"))return;
+      const st=document.createElement("style");st.id="wd-ai-css";
+      st.textContent=`
+      .wd-ai-orb .r{animation:wdAiRip 1.9s ease-out infinite}
+      .wd-ai-orb .r2{animation-delay:.95s}
+      .wd-ai-orb .orbit{transform-box:fill-box;transform-origin:center;animation:wdAiSpin 3.4s linear infinite}
+      .wd-ai-orb .core{transform-box:fill-box;transform-origin:center;animation:wdAiPulse 1.6s ease-in-out infinite}
+      @keyframes wdAiRip{0%{r:11px;opacity:.5}100%{r:31px;opacity:0}}
+      @keyframes wdAiSpin{to{transform:rotate(360deg)}}
+      @keyframes wdAiPulse{0%,100%{transform:scale(.8)}50%{transform:scale(1.12)}}
+      .wd-ai-trow{display:flex;align-items:center;gap:9px;padding:4px 2px 12px;animation:fadeUp .25s ease}
+      .wd-ai-tbubble{background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:8px 13px;font-size:13px;font-weight:700;color:#7c3aed;display:inline-flex;align-items:center;gap:2px}
+      .wd-ai-tbubble i{font-style:normal;animation:wdAiDots 1.4s steps(1,end) infinite;opacity:0}
+      .wd-ai-tbubble i:nth-child(2){animation-delay:.25s}.wd-ai-tbubble i:nth-child(3){animation-delay:.5s}
+      @keyframes wdAiDots{0%,100%{opacity:0}25%,90%{opacity:1}}`;
+      document.head.appendChild(st);
+    }
+    function showClientAiThinking(){
+      ensureAiCss();
+      const cont=document.getElementById("chat-messages");
+      if(!cont||document.getElementById("ai-thinking"))return;
+      const row=document.createElement("div");
+      row.id="ai-thinking";row.className="wd-ai-trow";
+      row.innerHTML=`<svg class="wd-ai-orb" width="32" height="32" viewBox="0 0 76 76" fill="none" aria-hidden="true">
+        <defs><linearGradient id="wdAiGc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient></defs>
+        <circle class="r" cx="38" cy="38" r="11" stroke="url(#wdAiGc)" stroke-width="3"/>
+        <circle class="r r2" cx="38" cy="38" r="11" stroke="url(#wdAiGc)" stroke-width="3"/>
+        <g class="orbit"><circle cx="38" cy="38" r="25" stroke="url(#wdAiGc)" stroke-width="2.5" stroke-dasharray="5 11" opacity=".5"/><circle cx="38" cy="13" r="3.5" fill="#a78bfa"/><circle cx="63" cy="38" r="3" fill="#c4b5fd"/></g>
+        <circle class="core" cx="38" cy="38" r="9" fill="url(#wdAiGc)"/></svg>
+        <div class="wd-ai-tbubble">WebDesk AI כותב<i>.</i><i>.</i><i>.</i></div>`;
+      const typing=document.getElementById("typing-indicator");
+      cont.insertBefore(row, typing||null);
+      cont.scrollTop=cont.scrollHeight;
+    }
+    function hideClientAiThinking(){const r=document.getElementById("ai-thinking");if(r)r.remove();}
+    async function clientAiReply(text){
+      try{
+        const u=window.WDAuth&&window.WDAuth.currentUser?window.WDAuth.currentUser():null;
+        if(!u)return;
+        const tok=await u.getIdToken();
+        showClientAiThinking();
+        try{
+          await fetch("https://us-central1-deshbord-atarim-sheli.cloudfunctions.net/aiAssist",{
+            method:"POST",headers:{"Content-Type":"application/json; charset=utf-8","Authorization":"Bearer "+tok},
+            body:JSON.stringify({task:"chat",text})
+          }).then(r=>r.json()).catch(()=>null);
+        }finally{ hideClientAiThinking(); }
+        /* ok:true+answered → ההודעה כבר ב-RTDB והמאזין מציג. skipped/escalated → נציג יטפל. */
+      }catch(e){ hideClientAiThinking(); }
+    }
+
+    /* עוזר קריאה מאומת ל-aiAssist (לקוח) — משותף ל-explain וכו' */
+    async function clientAiPost(payload){
+      try{
+        const u=window.WDAuth&&window.WDAuth.currentUser?window.WDAuth.currentUser():null;
+        if(!u)return {ok:false,error:"no-session"};
+        const tok=await u.getIdToken();
+        return await fetch("https://us-central1-deshbord-atarim-sheli.cloudfunctions.net/aiAssist",{method:"POST",headers:{"Content-Type":"application/json; charset=utf-8","Authorization":"Bearer "+tok},body:JSON.stringify(payload)}).then(r=>r.json()).catch(()=>({ok:false,error:"network"}));
+      }catch(e){return {ok:false,error:"network"};}
+    }
+    /* §17/§18: עוזר הלקוח בהקשר — הסבר משימה / הסבר מונחים בהצעה. level A, קריאה בלבד. */
+    function openExplainOverlay(loadingLabel){
+      ensureAiCss();
+      let ov=document.getElementById("explain-ov");if(ov)ov.remove();
+      ov=document.createElement("div");ov.id="explain-ov";
+      ov.style.cssText="position:fixed;inset:0;background:rgba(12,26,46,.55);backdrop-filter:blur(4px);z-index:99998;display:flex;align-items:center;justify-content:center;padding:22px";
+      ov.innerHTML=`<div style="background:var(--card,#fff);border-radius:18px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:hidden"><div id="explain-body" style="padding:10px"></div></div>`;
+      ov.onclick=e=>{if(e.target===ov)ov.remove();};
+      document.body.appendChild(ov);
+      const body=document.getElementById("explain-body");
+      body.innerHTML=`<div style="padding:26px 8px">${aiThinkingHTML(loadingLabel)}</div>`;
+      return body;
+    }
+    function fillExplain(res,title){
+      const b2=document.getElementById("explain-body");if(!b2)return;
+      if(res&&res.ok&&res.text){
+        b2.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4V2M11 6H9M21 6h-2M17.4 4.6l1.4-1.4"/><path d="M3 21l9-9 2 2-9 9-2-2z"/><path d="M12 8l4 4"/></svg><b style="font-size:14px">${escC(title)}</b><button onclick="document.getElementById('explain-ov').remove()" style="margin-inline-start:auto;background:none;border:none;cursor:pointer;color:var(--text-muted,#64748b)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div style="font-size:13.5px;line-height:1.75;padding:0 8px 12px;white-space:pre-wrap;max-height:60vh;overflow:auto">${escC(res.text)}</div>`;
+      }else{
+        const m={"ai-unavailable":"העוזר לא זמין כרגע, נסה/י מאוחר יותר.","cost-cap":"העוזר עסוק כרגע, נסה/י מאוחר יותר.","skill-off":"העוזר כבוי כרגע.","network":"תקלת רשת."};
+        b2.innerHTML=`<div style="padding:16px;font-size:13.5px;color:#dc2626;font-weight:600">${(res&&m[res.error])||"לא הצלחתי להסביר כרגע."}<div style="margin-top:10px"><button onclick="document.getElementById('explain-ov').remove()" style="background:var(--bg,#f1f5f9);border:1px solid var(--bdr,#e2e8f0);border-radius:9px;padding:7px 16px;font-family:Heebo,sans-serif;font-weight:700;cursor:pointer">סגור</button></div></div>`;
+      }
+    }
+    window.explainTask=async(taskId)=>{
+      const t=(typeof clientTasks!=="undefined"&&clientTasks)?clientTasks[taskId]:null;
+      if(!t)return;
+      openExplainOverlay("מסביר את המשימה");
+      const res=await clientAiPost({task:"explain",topic:"task",taskInfo:{title:t.title,category:t.category,input:t.input||"",desc:t.desc||""}});
+      fillExplain(res,"מה המשימה הזו?");
+    };
+    window.explainQuoteTerms=async(qid)=>{
+      const q=(typeof myQuotes!=="undefined"&&myQuotes)?myQuotes.find(x=>x&&x.id===qid):null;
+      if(!q)return;
+      const terms=[],add=v=>{v=((v||"")+"").trim();if(v&&!terms.includes(v))terms.push(v);};
+      (q.items?Object.values(q.items):[]).forEach(it=>add(it&&it.desc));
+      const stages=Array.isArray(q.stages)?q.stages:(q.stages?Object.values(q.stages):[]);stages.forEach(s=>add(s&&s.title));
+      const legal=Array.isArray(q.legal)?q.legal:(q.legal?Object.values(q.legal):[]);legal.forEach(c=>add(c&&c.title));
+      if(!terms.length){toastC&&toastC("אין מונחים מקצועיים להסביר בהצעה הזו");return;}
+      openExplainOverlay("מסביר מונחים");
+      const res=await clientAiPost({task:"explain",topic:"quote",terms});
+      fillExplain(res,"הסבר מונחים בהצעה");
+    };
+    /* §19: מספר-סטטוס פרויקט — סיכום בשפה טבעית */
+    window.explainProject=async(pid)=>{
+      const p=(typeof myProjects!=="undefined"&&myProjects)?myProjects.find(x=>x&&x.id===pid):null;
+      if(!p)return;
+      const stagesRaw=p.stages?Object.values(p.stages):[];
+      const stages=stagesRaw.sort((a,b)=>(a.order||0)-(b.order||0)).map(s=>({title:s.title||"",done:!!s.done}));
+      let pending=[];
+      try{
+        const tasks=(typeof clientTasks!=="undefined"&&clientTasks)?clientTasks:{};
+        pending=Object.values(tasks).filter(t=>t&&t.openedBy!=="client"&&t.status!=="done"&&(!t.projectId||t.projectId===pid)).map(t=>t.title).filter(Boolean);
+      }catch(e){}
+      const statLabel=(typeof CS_STAT!=="undefined"&&CS_STAT[p.status]&&CS_STAT[p.status].t)||p.status||"";
+      const info={name:p.name||"",progress:(typeof projProgress==="function"?projProgress(p):(p.progress||0)),status:statLabel,currentStage:(typeof siteCurStage==="function"?siteCurStage(p):""),stages,pending};
+      openExplainOverlay("בודק מה קורה בפרויקט");
+      const res=await clientAiPost({task:"explain",topic:"project",projectInfo:info});
+      fillExplain(res,"מה קורה בפרויקט שלי?");
     };
 
     /* פתיחת שיחה חדשה — מנקה הודעת סגירה ומאפשר שליחה */
